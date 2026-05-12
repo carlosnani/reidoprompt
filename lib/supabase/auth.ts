@@ -12,13 +12,15 @@ export async function requireUser() {
   return data.user;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isAdmin(user: any) {
   const adminEmail =
     process.env.NEXT_PUBLIC_ADMIN_EMAIL || process.env.ADMIN_EMAIL;
 
   return (
     user?.user_metadata?.role === "admin" ||
-    (adminEmail && user?.email?.toLowerCase() === adminEmail.toLowerCase())
+    user?.app_metadata?.role === "admin" ||
+    (adminEmail && user?.email?.toLowerCase() === adminEmail?.toLowerCase())
   );
 }
 

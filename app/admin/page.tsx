@@ -1,70 +1,103 @@
-import Link from "next/link";
-import { Suspense } from "react";
-import { InfoIcon } from "lucide-react";
-import { requireAdmin } from "@/lib/supabase/auth";
-import { createClient } from "@/lib/supabase/server";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users, ImageIcon, CreditCard, Activity } from "lucide-react";
 
-function AdminPage() {
+export default function AdminDashboardPage() {
   return (
-    <Suspense fallback={<div className="py-10 text-center">Carregando painel admin...</div>}>
-      <AdminDashboard />
-    </Suspense>
-  );
-}
-
-async function AdminDashboard() {
-  const user = await requireAdmin();
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
-
-  return (
-    <div className="flex-1 w-full flex flex-col gap-12">
-      <div className="w-full">
-        <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-          <InfoIcon size="16" strokeWidth={2} />
-          Admin dashboard: acesso restrito apenas para usuários com permissão de administrador.
-        </div>
+    <div className="flex-1 space-y-4">
+      <div className="flex items-center justify-between space-y-2">
+        <h2 className="text-3xl font-bold tracking-tight text-admin-text">Dashboard</h2>
       </div>
-
-      <div className="grid gap-6">
-        <section className="rounded-3xl border border-border bg-card p-6 shadow-sm">
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Você está autenticado como administrador e pode acessar recursos exclusivos.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <Link
-              href="/protected"
-              className="inline-flex items-center justify-center rounded-md border border-border px-4 py-2 text-sm hover:bg-muted"
-            >
-              Voltar ao dashboard do usuário
-            </Link>
-          </div>
-        </section>
-
-        <section className="grid gap-4 md:grid-cols-2">
-          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
-            <h2 className="text-xl font-semibold">Seu perfil de administrador</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Verifique os dados da sessão atual e confirme as permissões.
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="bg-admin-surface border-admin-border shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-admin-text">
+              Total Revenue
+            </CardTitle>
+            <CreditCard className="h-4 w-4 text-admin-text-secondary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-admin-text">R$ 15,231.89</div>
+            <p className="text-xs text-admin-text-muted">
+              +20.1% from last month
             </p>
-            <div className="mt-4 text-sm font-mono overflow-auto max-h-64 rounded-lg border bg-background p-4">
-              <pre>{JSON.stringify({ user: data.user, session: user }, null, 2)}</pre>
+          </CardContent>
+        </Card>
+        <Card className="bg-admin-surface border-admin-border shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-admin-text">
+              Active Subscriptions
+            </CardTitle>
+            <Users className="h-4 w-4 text-admin-text-secondary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-admin-text">+2350</div>
+            <p className="text-xs text-admin-text-muted">
+              +180.1% from last month
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="bg-admin-surface border-admin-border shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-admin-text">Total Prompts</CardTitle>
+            <ImageIcon className="h-4 w-4 text-admin-text-secondary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-admin-text">+12,234</div>
+            <p className="text-xs text-admin-text-muted">
+              +19% from last month
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="bg-admin-surface border-admin-border shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-admin-text">
+              Active Now
+            </CardTitle>
+            <Activity className="h-4 w-4 text-admin-text-secondary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-admin-text">+573</div>
+            <p className="text-xs text-admin-text-muted">
+              +201 since last hour
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="col-span-4 bg-admin-surface border-admin-border shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-admin-text">Overview</CardTitle>
+          </CardHeader>
+          <CardContent className="pl-2 flex justify-center items-center h-[300px] text-admin-text-muted border-2 border-dashed border-admin-border m-4 rounded-lg bg-admin-muted/50">
+            [Chart Placeholder]
+          </CardContent>
+        </Card>
+        <Card className="col-span-3 bg-admin-surface border-admin-border shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-admin-text">Recent Subscribers</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-8">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="flex items-center">
+                  <div className="h-9 w-9 rounded-full bg-admin-primary-soft text-admin-primary flex items-center justify-center font-bold">
+                    U{i}
+                  </div>
+                  <div className="ml-4 space-y-1">
+                    <p className="text-sm font-medium leading-none text-admin-text">User {i}</p>
+                    <p className="text-sm text-admin-text-muted">
+                      user{i}@example.com
+                    </p>
+                  </div>
+                  <div className="ml-auto font-medium text-admin-success">
+                    +$39.00
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
-
-          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
-            <h2 className="text-xl font-semibold">Ações recomendadas</h2>
-            <ul className="mt-4 list-disc pl-5 text-sm leading-7 text-muted-foreground">
-              <li>Gerencie conteúdo compartilhado somente para administradores.</li>
-              <li>Use `ADMIN_EMAIL` ou a claim `role: admin` no Supabase para controle de acesso.</li>
-              <li>Consulte o painel de usuários no Supabase para gerenciar autenticação.</li>
-            </ul>
-          </div>
-        </section>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
 }
-
-export default AdminPage;
