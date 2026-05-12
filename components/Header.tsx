@@ -16,7 +16,7 @@ export function Header() {
 
   useEffect(() => {
     const supabase = createClient();
-    
+
     // Buscar sessão atual
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user);
@@ -49,7 +49,7 @@ export function Header() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
           <div className="p-2 rounded-full bg-green-deep/30 border border-green-neon/20 group-hover:shadow-[0_0_15px_rgba(72,255,36,0.5)] transition-all duration-300">
-            <Image src="/logo.svg" alt="Logo" width={24} height={24} className="w-6 h-6 object-contain" onError={() => {}} />
+            <Image src="/logo.svg" alt="Logo" width={24} height={24} className="w-6 h-6 object-contain" onError={() => { }} />
           </div>
           <span className="text-xl font-bold tracking-tight text-white">REI DO PROMPT</span>
         </Link>
@@ -101,9 +101,9 @@ export function Header() {
               <span className="hidden sm:block text-sm text-gray-400">
                 Olá, <span className="text-white">{userName}</span>
               </span>
-              <Button 
+              <Button
                 onClick={handleLogout}
-                variant="ghost" 
+                variant="ghost"
                 className="text-gray-300 hover:text-white hover:bg-white/10"
               >
                 Sair
