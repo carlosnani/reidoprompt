@@ -131,3 +131,24 @@ export const mockPrompts: MockPrompt[] = [
     model: "DALL-E 3",
   },
 ];
+
+export function getPromptById(id: string): DetailedPrompt | undefined {
+  const prompt = mockPrompts.find((p) => p.id === id);
+  if (!prompt) return undefined;
+
+  // Augmenting MockPrompt to DetailedPrompt for the detail page
+  return {
+    ...prompt,
+    title: prompt.tag,
+    categories: prompt.category ? [prompt.category, "AI Art"] : ["AI Art", "Digital"],
+    author: "Prompt Master",
+    date: "24 Mai 2024",
+    description: "Um prompt profissional e altamente otimizado para gerar imagens de altíssima qualidade. Este prompt foi testado exaustivamente em múltiplos modelos para garantir o melhor resultado possível.",
+    promptText: "A highly detailed cinematic portrait of a " + prompt.tag.toLowerCase() + " character, masterpiece, 8k resolution, photorealistic, volumetric lighting, ray tracing, sharp focus, intricate details.",
+    images: [
+      prompt.image,
+      "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80",
+      "https://images.unsplash.com/photo-1633167606207-d840b5070fc2?w=800&q=80",
+    ],
+  };
+}

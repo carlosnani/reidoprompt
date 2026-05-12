@@ -20,6 +20,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
           src={prompt.image} 
           alt={prompt.tag}
           fill
+          sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, (max-width: 1536px) 20vw, 16vw"
           className="object-cover transform transition-transform duration-700 ease-out group-hover:scale-105"
         />
 

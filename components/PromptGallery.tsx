@@ -110,6 +110,7 @@ function GalleryCard({ theme }: { theme: typeof themes[0] }) {
         src={theme.img} 
         alt={theme.name}
         fill
+        sizes="(max-width: 768px) 100vw, 300px"
         className="object-cover transition-transform duration-700 ease-out group-hover:scale-110 opacity-60 group-hover:opacity-100"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80 transition-opacity duration-500"></div>

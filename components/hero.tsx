@@ -76,6 +76,7 @@ export function Hero() {
           alt="AI Technology Background"
           fill
           className="object-cover scale-105"
+          sizes="100vw"
           priority
         />
         {/* 🌑 Overlays para legibilidade e estética premium */}

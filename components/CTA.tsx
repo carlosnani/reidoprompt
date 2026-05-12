@@ -85,6 +85,7 @@ export function CTA() {
                     src="/home/mobile-site_.png"
                     alt="O Rei do Prompt Mobile App"
                     fill
+                    sizes="(max-width: 768px) 100vw, 400px"
                     className="object-cover"
                   />
                 </div>
