@@ -20,7 +20,7 @@ export async function AuthButton() {
       <div className="text-sm">Hey, {user.email}!</div>
       <div className="flex flex-wrap gap-2">
         <Button asChild size="sm" variant="outline">
-          <Link href="/protected">Dashboard</Link>
+          <Link href="/conta">Dashboard</Link>
         </Button>
         {isAdmin ? (
           <Button asChild size="sm" variant="outline">

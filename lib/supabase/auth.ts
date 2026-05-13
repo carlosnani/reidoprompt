@@ -27,7 +27,7 @@ export function isAdmin(user: any) {
 export async function requireAdmin() {
   const user = await requireUser();
   if (!isAdmin(user)) {
-    redirect("/protected");
+    redirect("/conta");
   }
   return user;
 }

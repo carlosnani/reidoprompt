@@ -19,6 +19,7 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
   - `auth/`: Fluxos de autenticação (Login, Cadastro, Recuperação de senha).
   - `prompts/`: Galeria principal de prompts.
   - `prompt/[id]/`: Página de detalhes de um prompt específico.
+  - `conta/`: Área do usuário (Perfil, atalhos, gestão de conta).
   - `favoritos/`: Área de itens salvos pelo usuário.
   - `planos/`: Página de precificação e assinaturas.
 - `components/`: Componentes React reutilizáveis.

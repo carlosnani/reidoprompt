@@ -34,7 +34,7 @@ export function LoginForm() {
       return;
     }
 
-    router.push("/protected");
+    router.push("/conta");
     router.refresh();
   };
 

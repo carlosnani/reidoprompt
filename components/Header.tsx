@@ -76,7 +76,7 @@ export function Header() {
           </Link>
           {user && (
             <Link
-              href="/protected"
+              href="/conta"
               className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white rounded-full hover:bg-white/5 transition-colors"
             >
               Minha Conta
