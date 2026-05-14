@@ -25,29 +25,29 @@ export function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-6">Produtos</h4>
             <ul className="space-y-4">
-              <li><Link href="#" className="text-gray-400 hover:text-green-neon text-sm transition-colors">Prompts ChatGPT</Link></li>
-              <li><Link href="#" className="text-gray-400 hover:text-green-neon text-sm transition-colors">Prompts Midjourney</Link></li>
-              <li><Link href="#" className="text-gray-400 hover:text-green-neon text-sm transition-colors">Prompts Flow</Link></li>
-              <li><Link href="#" className="text-gray-400 hover:text-green-neon text-sm transition-colors">Prompts Premium</Link></li>
+              <li><Link href="/prompts" className="text-gray-400 hover:text-green-neon text-sm transition-colors">Prompts ChatGPT</Link></li>
+              <li><Link href="/prompts" className="text-gray-400 hover:text-green-neon text-sm transition-colors">Prompts Midjourney</Link></li>
+              <li><Link href="/prompts" className="text-gray-400 hover:text-green-neon text-sm transition-colors">Prompts Flow</Link></li>
+              <li><Link href="/planos" className="text-gray-400 hover:text-green-neon text-sm transition-colors">Prompts Premium</Link></li>
             </ul>
           </div>
 
           <div>
             <h4 className="text-white font-semibold mb-6">Empresa</h4>
             <ul className="space-y-4">
-              <li><Link href="#" className="text-gray-400 hover:text-green-neon text-sm transition-colors">Sobre Nós</Link></li>
+              <li><Link href="/sobre" className="text-gray-400 hover:text-green-neon text-sm transition-colors">Sobre Nós</Link></li>
               {/* <li><Link href="#" className="text-gray-400 hover:text-green-neon text-sm transition-colors">Blog</Link></li> */}
               {/* <li><Link href="#" className="text-gray-400 hover:text-green-neon text-sm transition-colors">Afiliados</Link></li> */}
-              <li><Link href="#" className="text-gray-400 hover:text-green-neon text-sm transition-colors">Termos de Uso</Link></li>
+              <li><Link href="/termos-de-uso" className="text-gray-400 hover:text-green-neon text-sm transition-colors">Termos de Uso</Link></li>
             </ul>
           </div>
 
           <div>
             <h4 className="text-white font-semibold mb-6">Contato</h4>
             <ul className="space-y-4">
-              <li><Link href="#" className="text-gray-400 hover:text-green-neon text-sm transition-colors">Suporte</Link></li>
-              <li><Link href="#" className="text-gray-400 hover:text-green-neon text-sm transition-colors">FAQ</Link></li>
-              <li><Link href="#" className="text-gray-400 hover:text-green-neon text-sm transition-colors">contato@reidoprompt.com</Link></li>
+              <li><Link href="/suporte" className="text-gray-400 hover:text-green-neon text-sm transition-colors">Suporte</Link></li>
+              <li><Link href="/faq" className="text-gray-400 hover:text-green-neon text-sm transition-colors">FAQ</Link></li>
+              <li><Link href="mailto:contato@reidoprompt.com" className="text-gray-400 hover:text-green-neon text-sm transition-colors">contato@reidoprompt.com</Link></li>
             </ul>
           </div>
         </div>
@@ -57,8 +57,8 @@ export function Footer() {
             &copy; 2026 Rei do Prompt. Todos os direitos reservados.
           </p>
           <div className="flex gap-4">
-            <Link href="#" className="text-gray-500 hover:text-white transition-colors text-sm">Privacidade</Link>
-            <Link href="#" className="text-gray-500 hover:text-white transition-colors text-sm">Termos</Link>
+            <Link href="/privacidade" className="text-gray-500 hover:text-white transition-colors text-sm">Privacidade</Link>
+            <Link href="/termos" className="text-gray-500 hover:text-white transition-colors text-sm">Termos</Link>
           </div>
         </div>
       </div>

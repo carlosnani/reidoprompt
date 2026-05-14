@@ -52,6 +52,13 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/login") ||
     request.nextUrl.pathname.startsWith("/auth") ||
     request.nextUrl.pathname.startsWith("/planos") ||
+    request.nextUrl.pathname.startsWith("/sobre") ||
+    request.nextUrl.pathname.startsWith("/termos") ||
+    request.nextUrl.pathname.startsWith("/contato") ||
+    request.nextUrl.pathname.startsWith("/suporte") ||
+    request.nextUrl.pathname.startsWith("/faq") ||
+    request.nextUrl.pathname.startsWith("/privacidade") ||
+    request.nextUrl.pathname.startsWith("/termos") ||
     request.nextUrl.pathname.startsWith("/prompts");
 
   if (!user && !isPublicPath) {
