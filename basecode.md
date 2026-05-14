@@ -22,6 +22,12 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
   - `conta/`: Área do usuário (Perfil, atalhos, gestão de conta).
   - `favoritos/`: Área de itens salvos pelo usuário.
   - `planos/`: Página de precificação e assinaturas.
+  - `faq/`: Central de ajuda com perguntas frequentes.
+  - `suporte/`: Canal de atendimento ao cliente.
+  - `sobre/`: Informações institucionais sobre a plataforma.
+  - `termos/`: Central Legal (página agregadora de links jurídicos e suporte).
+  - `termos-de-uso/`: Termos de serviço detalhados.
+  - `privacidade/`: Política de privacidade e tratamento de dados.
 - `components/`: Componentes React reutilizáveis.
   - `admin/`: Componentes exclusivos do painel administrativo.
   - `auth/`: Componentes de formulários e containers de autenticação.
@@ -74,6 +80,7 @@ interface DetailedPrompt extends Prompt {
 4. **Painel Administrativo:** Controle total sobre o conteúdo da plataforma (CRUD de prompts, categorias e modelos).
 5. **Gestão de Assinaturas (Página de Planos):** A página de planos (`/planos`) deve ser pública e visível para todos os usuários (logados ou não). Diferenciação entre usuários gratuitos e premium através de planos.
 6. **Autenticação Completa:** Cadastro, login social e gestão de perfil via Supabase.
+7. **Páginas Institucionais e Suporte:** Sistema de FAQ, suporte ao usuário, termos de uso e políticas de privacidade integrados via Footer.
 
 ## 📝 Convenções de Desenvolvimento
 - Utilizar Server Components por padrão para performance, e Client Components (`"use client"`) apenas quando necessário para interatividade.
