@@ -4,14 +4,16 @@ import { Footer } from "@/components/Footer";
 import { GalleryHeader } from "@/components/prompts/GalleryHeader";
 import { GalleryGrid } from "@/components/prompts/GalleryGrid";
 import { GalleryPagination } from "@/components/prompts/GalleryPagination";
-import { mockPrompts } from "@/lib/data/mockPrompts";
+import { fetchPrompts } from "@/lib/data/mockPrompts";
 
 export const metadata: Metadata = {
   title: "Galeria de Prompts | Rei do Prompt",
   description: "Explore prompts premium para criação de imagens cinematográficas, retratos, cenas urbanas e identidades visuais realistas.",
 };
 
-export default function PromptsGalleryPage() {
+export default async function PromptsGalleryPage() {
+  const prompts = await fetchPrompts();
+
   return (
     <div className="min-h-screen flex flex-col bg-[#121212] selection:bg-green-neon/30 selection:text-white">
       {/* 
@@ -36,8 +38,8 @@ export default function PromptsGalleryPage() {
       <main className="flex-grow relative z-10 pt-32 pb-24 px-4 sm:px-6 lg:px-8 max-w-[1920px] mx-auto w-full">
         <GalleryHeader />
         
-        {/* Passando os dados mockados gerados na lib */}
-        <GalleryGrid prompts={mockPrompts} />
+        {/* Passando os dados do Supabase */}
+        <GalleryGrid prompts={prompts} />
         
         <GalleryPagination />
       </main>

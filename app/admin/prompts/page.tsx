@@ -2,11 +2,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Edit } from "lucide-react";
-import { mockPrompts } from "@/lib/data/mockPrompts";
+import { fetchPrompts } from "@/lib/data/mockPrompts";
 import { TablePagination } from "@/components/admin/TablePagination";
 import { DeleteAction } from "@/components/admin/DeleteAction";
 
-export default function AdminPromptsPage() {
+export default async function AdminPromptsPage() {
+  const prompts = await fetchPrompts(10);
+
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between">
@@ -35,7 +37,7 @@ export default function AdminPromptsPage() {
               </tr>
             </thead>
             <tbody className="text-admin-text">
-              {mockPrompts.slice(0, 10).map((prompt) => (
+              {prompts.map((prompt) => (
                 <tr
                   key={prompt.id}
                   className="border-b border-admin-border transition-all duration-200 hover:bg-admin-muted/50 even:bg-admin-bg/30"

@@ -1,18 +1,53 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { GalleryGrid } from "@/components/prompts/GalleryGrid";
 import { GalleryPagination } from "@/components/prompts/GalleryPagination";
-import { mockPrompts } from "@/lib/data/mockPrompts";
+import { getUserFavorites } from "@/lib/supabase/queries";
+import { useUser } from "@/lib/supabase/hooks";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export default function FavoritosPage() {
-  // Simulando que o usuário favoritou os 10 primeiros prompts para preencher a tela
-  const favoritePrompts = mockPrompts.slice(0, 10);
+  const { user, loading } = useUser();
+  const [favoritePrompts, setFavoritePrompts] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      getUserFavorites(user.id).then((favorites) => {
+        // Extract prompts from favorites
+        const prompts = favorites.map((fav: any) => fav.prompts);
+        setFavoritePrompts(prompts);
+      }).catch(console.error);
+    }
+  }, [user]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col bg-[#050505] selection:bg-green-neon/30 selection:text-white overflow-hidden">
+        <div className="flex-grow flex items-center justify-center">
+          <div className="text-center">
+            <Heart className="mx-auto h-16 w-16 text-green-neon mb-4" />
+            <h1 className="text-2xl font-bold text-white mb-4">Acesse sua conta</h1>
+            <p className="text-gray-400 mb-8">Faça login para ver seus prompts favoritos</p>
+            <Link href="/auth/login">
+              <Button className="bg-green-neon hover:bg-green-neon/80 text-black font-semibold">
+                Fazer Login
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#050505] selection:bg-green-neon/30 selection:text-white overflow-hidden">

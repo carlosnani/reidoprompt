@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { getPromptById } from "@/lib/data/mockPrompts";
+import { getPromptById } from "@/lib/supabase/queries";
 import { ImageGallery } from "@/components/prompt-detail/ImageGallery";
 import { PromptDetails } from "@/components/prompt-detail/PromptDetails";
 import { PromptText } from "@/components/prompt-detail/PromptText";
@@ -23,7 +23,24 @@ interface PromptPageProps {
 
 export default async function PromptPage(props: PromptPageProps) {
   const params = await props.params;
-  const prompt = getPromptById(params.id);
+  let prompt;
+
+  try {
+    const basicPrompt = await getPromptById(params.id);
+    // Convert to DetailedPrompt
+    prompt = {
+      ...basicPrompt,
+      title: basicPrompt.title || basicPrompt.tag,
+      categories: basicPrompt.category ? [basicPrompt.category, "AI Art"] : ["AI Art", "Digital"],
+      author: "Prompt Master",
+      date: basicPrompt.created_at ? new Date(basicPrompt.created_at).toLocaleDateString('pt-BR') : "24 Mai 2024",
+      description: "Um prompt profissional e altamente otimizado para gerar imagens de altíssima qualidade.",
+      promptText: `A highly detailed ${basicPrompt.category?.toLowerCase() || 'artistic'} scene of ${basicPrompt.tag.toLowerCase()}, masterpiece, 8k resolution, photorealistic.`,
+      images: [basicPrompt.image],
+    };
+  } catch (error) {
+    notFound();
+  }
 
   if (!prompt) {
     notFound();

@@ -1,17 +1,12 @@
-export interface MockPrompt {
-  id: string;
-  tag: string;
-  image: string;
-  views: number;
-  likes: number;
-  category?: string;
-  model?: string;
-}
+import { getPrompts, getCategories, Prompt, Category } from '../supabase/queries';
+
+// Re-export types for compatibility
+export type { Prompt, Category };
 
 // Alias para compatibilidade com componentes de galeria
-export type Prompt = MockPrompt;
+export type MockPrompt = Prompt;
 
-export interface DetailedPrompt extends MockPrompt {
+export interface DetailedPrompt extends Prompt {
   title: string;
   categories: string[];
   author: string;
@@ -21,6 +16,16 @@ export interface DetailedPrompt extends MockPrompt {
   images?: string[];
 }
 
+// Funções para obter dados reais do Supabase
+export async function fetchPrompts(limit = 50, offset = 0): Promise<Prompt[]> {
+  return await getPrompts(limit, offset);
+}
+
+export async function fetchCategories(): Promise<Category[]> {
+  return await getCategories();
+}
+
+// Dados mock mantidos para fallback ou desenvolvimento
 export const mockPrompts: MockPrompt[] = [
   {
     id: "prompt-1",
@@ -98,37 +103,10 @@ export const mockPrompts: MockPrompt[] = [
     id: "prompt-9",
     tag: "Space Explorer",
     image: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=400&q=80",
-    views: 13500,
-    likes: 920,
-    category: "Sci-Fi",
+    views: 10500,
+    likes: 789,
+    category: "Cinematic",
     model: "Midjourney v6",
-  },
-  {
-    id: "prompt-10",
-    tag: "Ocean Depths",
-    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80",
-    views: 5400,
-    likes: 298,
-    category: "Nature",
-    model: "Stable Diffusion XL",
-  },
-  {
-    id: "prompt-11",
-    tag: "Dragon Kingdom",
-    image: "https://images.unsplash.com/photo-1551269901-5c5e14c25df7?w=400&q=80",
-    views: 18900,
-    likes: 1450,
-    category: "Fantasy",
-    model: "Midjourney v6",
-  },
-  {
-    id: "prompt-12",
-    tag: "Minimalist Interior",
-    image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&q=80",
-    views: 4200,
-    likes: 231,
-    category: "Architecture",
-    model: "DALL-E 3",
   },
 ];
 
@@ -147,8 +125,8 @@ export function getPromptById(id: string): DetailedPrompt | undefined {
     promptText: "A highly detailed cinematic portrait of a " + prompt.tag.toLowerCase() + " character, masterpiece, 8k resolution, photorealistic, volumetric lighting, ray tracing, sharp focus, intricate details.",
     images: [
       prompt.image,
-      "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80",
-      "https://images.unsplash.com/photo-1633167606207-d840b5070fc2?w=800&q=80",
+      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&q=80",
+      "https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?w=400&q=80",
     ],
   };
 }
