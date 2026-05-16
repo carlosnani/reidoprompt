@@ -1,6 +1,6 @@
 "use client";
 
-import { DetailedPrompt } from "@/lib/data/mockPrompts";
+import type { DetailedPrompt } from "@/lib/supabase/queries";
 import { Button } from "@/components/ui/button";
 import { Copy, Terminal } from "lucide-react";
 import { toast } from "sonner";

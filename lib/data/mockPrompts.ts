@@ -29,6 +29,8 @@ export async function fetchCategories(): Promise<Category[]> {
 export const mockPrompts: MockPrompt[] = [
   {
     id: "prompt-1",
+    title: "Cinematic Sci-Fi",
+    is_premium: false,
     tag: "Cinematic Sci-Fi",
     image: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=400&q=80",
     views: 12400,
@@ -38,6 +40,8 @@ export const mockPrompts: MockPrompt[] = [
   },
   {
     id: "prompt-2",
+    title: "Cyberpunk City",
+    is_premium: false,
     tag: "Cyberpunk City",
     image: "https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?w=400&q=80",
     views: 9800,
@@ -47,6 +51,8 @@ export const mockPrompts: MockPrompt[] = [
   },
   {
     id: "prompt-3",
+    title: "Portrait Realism",
+    is_premium: false,
     tag: "Portrait Realism",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
     views: 8200,
@@ -56,6 +62,8 @@ export const mockPrompts: MockPrompt[] = [
   },
   {
     id: "prompt-4",
+    title: "Anime Fantasy",
+    is_premium: false,
     tag: "Anime Fantasy",
     image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&q=80",
     views: 15700,
@@ -65,6 +73,8 @@ export const mockPrompts: MockPrompt[] = [
   },
   {
     id: "prompt-5",
+    title: "Gothic Architecture",
+    is_premium: false,
     tag: "Gothic Architecture",
     image: "https://images.unsplash.com/photo-1548712765-b8d90f5a4c9d?w=400&q=80",
     views: 6300,
@@ -74,6 +84,8 @@ export const mockPrompts: MockPrompt[] = [
   },
   {
     id: "prompt-6",
+    title: "Neon Dreamscape",
+    is_premium: false,
     tag: "Neon Dreamscape",
     image: "https://images.unsplash.com/photo-1608306448197-e83633f1261c?w=400&q=80",
     views: 11200,
@@ -83,6 +95,8 @@ export const mockPrompts: MockPrompt[] = [
   },
   {
     id: "prompt-7",
+    title: "Forest Spirit",
+    is_premium: false,
     tag: "Forest Spirit",
     image: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=400&q=80",
     views: 7800,
@@ -92,6 +106,8 @@ export const mockPrompts: MockPrompt[] = [
   },
   {
     id: "prompt-8",
+    title: "Vintage Portrait",
+    is_premium: false,
     tag: "Vintage Portrait",
     image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80",
     views: 9100,
@@ -101,6 +117,8 @@ export const mockPrompts: MockPrompt[] = [
   },
   {
     id: "prompt-9",
+    title: "Space Explorer",
+    is_premium: false,
     tag: "Space Explorer",
     image: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=400&q=80",
     views: 10500,

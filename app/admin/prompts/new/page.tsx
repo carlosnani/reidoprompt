@@ -5,8 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { ArrowLeft, Upload, Save, Info, FileText, CheckCircle2 } from "lucide-react";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { SubmitToastButton } from "@/components/admin/SubmitToastButton";
+import { getCategories, getAiModels } from "@/lib/supabase/queries";
+import { addPromptAction } from "../../actions";
 
-export default function NewPromptPage() {
+export default async function NewPromptPage() {
+  const categories = await getCategories();
+  const models = await getAiModels();
   return (
     <div className="flex-1 space-y-8 max-w-4xl mx-auto w-full pb-10">
       <div className="flex items-center gap-4">
@@ -21,7 +25,7 @@ export default function NewPromptPage() {
         </div>
       </div>
 
-      <form className="space-y-8">
+      <form action={addPromptAction as unknown as (payload: FormData) => void} className="space-y-8">
         {/* Basic Information */}
         <Card className="bg-admin-surface border-admin-border shadow-sm overflow-hidden">
           <CardHeader className="border-b border-admin-border-light bg-admin-muted/30">
@@ -40,36 +44,46 @@ export default function NewPromptPage() {
               <label htmlFor="title" className="text-sm font-semibold text-admin-text">Title</label>
               <Input 
                 id="title" 
+                name="title"
                 placeholder="Ex: Cinematic Sci-Fi Cityscape" 
+                required
                 className="bg-admin-bg border-admin-border-strong text-admin-text focus-visible:ring-admin-primary"
               />
             </div>
             
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label htmlFor="category" className="text-sm font-semibold text-admin-text">Category</label>
+                <label htmlFor="categories" className="text-sm font-semibold text-admin-text">Categories</label>
                 <select 
-                  id="category" 
+                  id="categories" 
+                  name="categories"
+                  required
                   className="flex h-10 w-full rounded-md border border-admin-border-strong bg-admin-bg px-3 py-2 text-sm text-admin-text ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-primary focus-visible:ring-offset-2 transition-all"
                 >
                   <option value="">Select a category</option>
-                  <option value="cinematic">Cinematic</option>
-                  <option value="portrait">Portrait</option>
-                  <option value="cyberpunk">Cyberpunk</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
                 </select>
+                {categories.length === 0 && <p className="text-xs text-admin-text-muted mt-1">Nenhuma categoria cadastrada. Cadastre primeiro na página de categorias.</p>}
               </div>
               
               <div className="space-y-2">
-                <label htmlFor="model" className="text-sm font-semibold text-admin-text">AI Model</label>
+                <label htmlFor="ai_model_id" className="text-sm font-semibold text-admin-text">AI Model</label>
                 <select 
-                  id="model" 
+                  id="ai_model_id" 
+                  name="ai_model_id"
+                  required
                   className="flex h-10 w-full rounded-md border border-admin-border-strong bg-admin-bg px-3 py-2 text-sm text-admin-text ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-primary focus-visible:ring-offset-2 transition-all"
                 >
                   <option value="">Select a model</option>
-                  <option value="midjourney_v6">Midjourney v6</option>
-                  <option value="dalle3">DALL-E 3</option>
-                  <option value="stable_diffusion">Stable Diffusion XL</option>
+                  {models.map(model => (
+                    <option key={model.id} value={model.id}>{model.name} {model.provider ? `(${model.provider})` : ''}</option>
+                  ))}
                 </select>
+                {models.length === 0 && <p className="text-xs text-admin-text-muted mt-1">Nenhum modelo cadastrado. Cadastre primeiro na página de modelos de IA.</p>}
               </div>
             </div>
 
@@ -77,6 +91,7 @@ export default function NewPromptPage() {
               <label htmlFor="description" className="text-sm font-semibold text-admin-text">Description (Optional)</label>
               <textarea 
                 id="description" 
+                name="description"
                 rows={3}
                 className="flex w-full rounded-md border border-admin-border-strong bg-admin-bg px-3 py-2 text-sm text-admin-text ring-offset-background placeholder:text-admin-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-primary focus-visible:ring-offset-2 transition-all"
                 placeholder="Brief description of what this prompt achieves..."
@@ -107,7 +122,9 @@ export default function NewPromptPage() {
                 </div>
                 <input 
                   type="checkbox" 
-                  id="isPremium" 
+                  id="is_premium" 
+                  name="is_premium"
+                  value="true"
                   className="w-5 h-5 rounded border-admin-border-strong text-admin-primary focus:ring-admin-primary transition-all cursor-pointer" 
                   defaultChecked 
                 />
@@ -116,7 +133,9 @@ export default function NewPromptPage() {
               <div className="space-y-2">
                 <label htmlFor="promptText" className="text-sm font-semibold text-admin-text">Prompt Text</label>
                 <textarea 
-                  id="promptText" 
+                  id="prompt_text" 
+                  name="prompt_text"
+                  required
                   rows={6}
                   className="flex w-full rounded-md border border-admin-border-strong bg-admin-bg px-3 py-2 text-sm text-admin-text ring-offset-background placeholder:text-admin-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-primary focus-visible:ring-offset-2 font-mono transition-all"
                   placeholder="/imagine prompt: highly detailed, cinematic lighting..."

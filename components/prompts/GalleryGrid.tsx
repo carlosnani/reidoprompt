@@ -1,4 +1,4 @@
-import { Prompt } from "@/lib/data/mockPrompts";
+import type { Prompt } from "@/lib/supabase/queries";
 import { PromptCard } from "./PromptCard";
 
 interface GalleryGridProps {

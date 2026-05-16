@@ -27,16 +27,16 @@ export default async function PromptPage(props: PromptPageProps) {
 
   try {
     const basicPrompt = await getPromptById(params.id);
-    // Convert to DetailedPrompt
+    // Convert to DetailedPrompt using real data from Supabase
     prompt = {
       ...basicPrompt,
       title: basicPrompt.title || basicPrompt.tag,
-      categories: basicPrompt.category ? [basicPrompt.category, "AI Art"] : ["AI Art", "Digital"],
-      author: "Prompt Master",
+      categories: basicPrompt.category ? [{ id: '1', name: basicPrompt.category, slug: basicPrompt.category.toLowerCase() }, { id: '2', name: "AI Art", slug: "ai-art" }] : [{ id: '2', name: "AI Art", slug: "ai-art" }, { id: '3', name: "Digital", slug: "digital" }],
+      author: "Rei do Prompt",
       date: basicPrompt.created_at ? new Date(basicPrompt.created_at).toLocaleDateString('pt-BR') : "24 Mai 2024",
-      description: "Um prompt profissional e altamente otimizado para gerar imagens de altíssima qualidade.",
-      promptText: `A highly detailed ${basicPrompt.category?.toLowerCase() || 'artistic'} scene of ${basicPrompt.tag.toLowerCase()}, masterpiece, 8k resolution, photorealistic.`,
-      images: [basicPrompt.image],
+      description: basicPrompt.description || "Um prompt profissional e altamente otimizado para gerar imagens de altíssima qualidade.",
+      promptText: basicPrompt.prompt_text || `A highly detailed ${basicPrompt.category?.toLowerCase() || 'artistic'} scene of ${basicPrompt.tag.toLowerCase()}, masterpiece, 8k resolution, photorealistic.`,
+      images: basicPrompt.images && basicPrompt.images.length > 0 ? basicPrompt.images : [basicPrompt.image],
     };
   } catch (error) {
     notFound();

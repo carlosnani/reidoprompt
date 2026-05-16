@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Eye, Heart, Tag } from "lucide-react";
-import { Prompt } from "@/lib/data/mockPrompts";
+import type { Prompt } from "@/lib/supabase/queries";
 
 interface PromptCardProps {
   prompt: Prompt;

@@ -4,7 +4,7 @@ import { Footer } from "@/components/Footer";
 import { GalleryHeader } from "@/components/prompts/GalleryHeader";
 import { GalleryGrid } from "@/components/prompts/GalleryGrid";
 import { GalleryPagination } from "@/components/prompts/GalleryPagination";
-import { fetchPrompts } from "@/lib/data/mockPrompts";
+import { getPrompts } from "@/lib/supabase/queries";
 
 export const metadata: Metadata = {
   title: "Galeria de Prompts | Rei do Prompt",
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PromptsGalleryPage() {
-  const prompts = await fetchPrompts();
+  const prompts = await getPrompts();
 
   return (
     <div className="min-h-screen flex flex-col bg-[#121212] selection:bg-green-neon/30 selection:text-white">

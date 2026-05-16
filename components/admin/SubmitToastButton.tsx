@@ -9,19 +9,9 @@ interface SubmitToastButtonProps extends React.ComponentProps<typeof Button> {
 }
 
 export function SubmitToastButton({ message, onClick, children, ...props }: SubmitToastButtonProps) {
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    // Evita o reload da página enquanto estamos usando dados mockados (sem action real de form)
-    e.preventDefault();
-    
-    // Mostra a confirmação visual
-    toast.success(message);
-    
-    // Se houver lógica adicional passada via prop, executa
-    if (onClick) onClick(e);
-  };
-
+  // Se estamos usando em um formulário real com Server Actions, NÃO fazemos preventDefault
   return (
-    <Button onClick={handleClick} {...props}>
+    <Button type="submit" onClick={onClick} {...props}>
       {children}
     </Button>
   );

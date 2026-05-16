@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DetailedPrompt } from "@/lib/data/mockPrompts";
+import type { DetailedPrompt } from "@/lib/supabase/queries";
 import { Eye, Heart, Tag } from "lucide-react";
 import Image from "next/image";
 

@@ -1,26 +1,16 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import { Prompt, fetchPrompts } from "@/lib/data/mockPrompts";
+import { Prompt, getPrompts } from "@/lib/supabase/queries";
 import { PromptCard } from "@/components/prompts/PromptCard";
 import { Sparkles } from "lucide-react";
 
-export function RelatedPrompts() {
-  const [related, setRelated] = useState<Prompt[]>([]);
-
-  useEffect(() => {
-    const loadRelated = async () => {
-      try {
-        const prompts = await fetchPrompts(10);
-        const shuffled = [...prompts].sort(() => 0.5 - Math.random()).slice(0, 4);
-        setRelated(shuffled);
-      } catch (error) {
-        console.error('Error loading related prompts:', error);
-      }
-    };
-
-    loadRelated();
-  }, []);
+export async function RelatedPrompts() {
+  let related: Prompt[] = [];
+  try {
+    const prompts = await getPrompts(10);
+    // Shuffle and pick 4
+    related = [...prompts].sort(() => 0.5 - Math.random()).slice(0, 4);
+  } catch (error) {
+    console.error('Error loading related prompts:', error);
+  }
 
   if (related.length === 0) return null;
 

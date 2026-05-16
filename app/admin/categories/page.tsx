@@ -6,15 +6,12 @@ import { TablePagination } from "@/components/admin/TablePagination";
 import { DeleteAction } from "@/components/admin/DeleteAction";
 import { SubmitToastButton } from "@/components/admin/SubmitToastButton";
 
-const mockCategories = [
-  { id: "1", name: "Cinematic", slug: "cinematic", promptsCount: 145 },
-  { id: "2", name: "Portrait", slug: "portrait", promptsCount: 89 },
-  { id: "3", name: "Cyberpunk", slug: "cyberpunk", promptsCount: 210 },
-  { id: "4", name: "Anime", slug: "anime", promptsCount: 304 },
-  { id: "5", name: "Architecture", slug: "architecture", promptsCount: 67 },
-];
+import { getCategories } from "@/lib/supabase/queries";
+import { addCategoryAction, deleteCategoryAction } from "../actions";
 
-export default function AdminCategoriesPage() {
+export default async function AdminCategoriesPage() {
+  const categories = await getCategories();
+
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between">
@@ -30,20 +27,22 @@ export default function AdminCategoriesPage() {
                 Create a new category to organize prompts.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="name" className="text-sm font-medium text-admin-text">Name</label>
-                <Input id="name" placeholder="e.g. Fantasy" className="bg-admin-bg border-admin-border text-admin-text" />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="slug" className="text-sm font-medium text-admin-text">Slug</label>
-                <Input id="slug" placeholder="e.g. fantasy" className="bg-admin-bg border-admin-border text-admin-text" />
-                <p className="text-xs text-admin-text-muted">URL friendly name</p>
-              </div>
-              <SubmitToastButton className="w-full bg-admin-primary hover:bg-admin-primary-hover text-white" message="Categoria criada com sucesso!">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Category
-              </SubmitToastButton>
+            <CardContent>
+              <form action={addCategoryAction as unknown as (payload: FormData) => void} className="space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="name" className="text-sm font-medium text-admin-text">Name</label>
+                  <Input id="name" name="name" placeholder="e.g. Fantasy" required className="bg-admin-bg border-admin-border text-admin-text" />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="slug" className="text-sm font-medium text-admin-text">Slug</label>
+                  <Input id="slug" name="slug" placeholder="e.g. fantasy" required className="bg-admin-bg border-admin-border text-admin-text" />
+                  <p className="text-xs text-admin-text-muted">URL friendly name</p>
+                </div>
+                <SubmitToastButton className="w-full bg-admin-primary hover:bg-admin-primary-hover text-white" message="Categoria adicionada.">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Category
+                </SubmitToastButton>
+              </form>
             </CardContent>
           </Card>
         </div>
@@ -61,7 +60,7 @@ export default function AdminCategoriesPage() {
                   </tr>
                 </thead>
                 <tbody className="text-admin-text">
-                  {mockCategories.map((category) => (
+                  {categories.map((category) => (
                     <tr
                       key={category.id}
                       className="border-b border-admin-border transition-all duration-200 hover:bg-admin-muted/50 even:bg-admin-bg/30"
@@ -73,7 +72,7 @@ export default function AdminCategoriesPage() {
                         /{category.slug}
                       </td>
                       <td className="p-4 align-middle text-right">
-                        {category.promptsCount}
+                        -
                       </td>
                       <td className="p-4 align-middle text-right">
                         <div className="flex items-center justify-end gap-2">
@@ -81,11 +80,16 @@ export default function AdminCategoriesPage() {
                             <Edit className="w-4 h-4" />
                             <span className="sr-only">Edit</span>
                           </Button>
-                          <DeleteAction id={category.id} entityName="Categoria" />
+                          <DeleteAction id={category.id} entityName="Categoria" action={deleteCategoryAction} />
                         </div>
                       </td>
                     </tr>
                   ))}
+                  {categories.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="p-4 text-center text-admin-text-muted">Nenhuma categoria cadastrada.</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

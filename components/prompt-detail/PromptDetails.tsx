@@ -1,4 +1,4 @@
-import { DetailedPrompt } from "@/lib/data/mockPrompts";
+import type { DetailedPrompt } from "@/lib/supabase/queries";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Heart, BookmarkPlus, Calendar, User } from "lucide-react";
@@ -15,7 +15,7 @@ export function PromptDetails({ prompt }: PromptDetailsProps) {
         <div className="flex flex-wrap gap-2 mb-4">
           {prompt.categories.map((category, idx) => (
             <Badge key={idx} variant="secondary" className="bg-white/5 text-gray-300 hover:bg-white/10 border-white/10">
-              {category}
+              {category.name}
             </Badge>
           ))}
         </div>

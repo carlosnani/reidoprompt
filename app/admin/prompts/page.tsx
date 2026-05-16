@@ -2,12 +2,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Edit } from "lucide-react";
-import { fetchPrompts } from "@/lib/data/mockPrompts";
+import { getPrompts } from "@/lib/supabase/queries";
 import { TablePagination } from "@/components/admin/TablePagination";
 import { DeleteAction } from "@/components/admin/DeleteAction";
+import { deletePromptAction } from "../actions";
 
 export default async function AdminPromptsPage() {
-  const prompts = await fetchPrompts(10);
+  const prompts = await getPrompts(50);
 
   return (
     <div className="flex-1 space-y-4">
@@ -27,7 +28,7 @@ export default async function AdminPromptsPage() {
             <thead className="border-b border-admin-border bg-admin-muted/50 text-admin-text-secondary">
               <tr>
                 <th className="h-12 px-4 align-middle font-medium">Image</th>
-                <th className="h-12 px-4 align-middle font-medium">Title/Tag</th>
+                <th className="h-12 px-4 align-middle font-medium">Title</th>
                 <th className="h-12 px-4 align-middle font-medium">Status</th>
                 <th className="h-12 px-4 align-middle font-medium">Views</th>
                 <th className="h-12 px-4 align-middle font-medium">Likes</th>
@@ -45,16 +46,15 @@ export default async function AdminPromptsPage() {
                   <td className="p-4 align-middle">
                     <img
                       src={prompt.image}
-                      alt={prompt.tag}
+                      alt={prompt.title || prompt.tag}
                       className="w-12 h-12 object-cover rounded-md"
                     />
                   </td>
                   <td className="p-4 align-middle font-medium">
-                    {prompt.tag} Concept
+                    {prompt.title || prompt.tag}
                   </td>
                   <td className="p-4 align-middle">
-                    {/* Mocking random premium status */}
-                    {parseInt(prompt.id.split("-")[1]) % 3 === 0 ? (
+                    {prompt.is_premium ? (
                       <Badge variant="default" className="bg-admin-success hover:bg-admin-success text-white">
                         Premium
                       </Badge>
@@ -66,15 +66,24 @@ export default async function AdminPromptsPage() {
                   <td className="p-4 align-middle text-admin-text-secondary">{prompt.likes}</td>
                   <td className="p-4 align-middle text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <Button variant="ghost" size="icon" className="hover:text-admin-primary hover:bg-admin-primary-soft">
-                        <Edit className="w-4 h-4" />
-                        <span className="sr-only">Edit</span>
-                      </Button>
-                      <DeleteAction id={prompt.id} entityName="Prompt" />
+                      <Link href={`/admin/prompts/${prompt.id}`}>
+                        <Button variant="ghost" size="icon" className="hover:text-admin-primary hover:bg-admin-primary-soft">
+                          <Edit className="w-4 h-4" />
+                          <span className="sr-only">Edit</span>
+                        </Button>
+                      </Link>
+                      <DeleteAction id={prompt.id} entityName="Prompt" action={deletePromptAction} />
                     </div>
                   </td>
                 </tr>
               ))}
+              {prompts.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="p-8 text-center text-admin-text-muted">
+                    No prompts found. Click "New Prompt" to add one.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

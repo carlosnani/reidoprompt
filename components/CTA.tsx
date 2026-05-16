@@ -76,7 +76,7 @@ export function CTA() {
                 initial={{ opacity: 0, x: 50, rotate: 5 }}
                 whileInView={{ opacity: 1, x: 0, rotate: -8 }}
                 viewport={{ once: true }}
-                transition={{ duration: 1, ease: "easeOut" }}
+                transition={{ duration: 1, ease: "easeOut" as any }}
                 className="relative w-[280px] md:w-[320px] aspect-[9/19] overflow-hidden group-hover:rotate-[-5deg] transition-transform duration-700"
               >
                 {/* Screen Content */}

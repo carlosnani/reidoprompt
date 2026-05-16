@@ -1,34 +1,16 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { GalleryGrid } from "@/components/prompts/GalleryGrid";
 import { GalleryPagination } from "@/components/prompts/GalleryPagination";
 import { getUserFavorites } from "@/lib/supabase/queries";
-import { useUser } from "@/lib/supabase/hooks";
+import { createClient } from "@/lib/supabase/server";
 import { Heart } from "lucide-react";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default function FavoritosPage() {
-  const { user, loading } = useUser();
-  const [favoritePrompts, setFavoritePrompts] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (user) {
-      getUserFavorites(user.id).then((favorites) => {
-        // Extract prompts from favorites
-        const prompts = favorites.map((fav: any) => fav.prompts);
-        setFavoritePrompts(prompts);
-      }).catch(console.error);
-    }
-  }, [user]);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+export default async function FavoritosPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     return (
@@ -47,6 +29,14 @@ export default function FavoritosPage() {
         </div>
       </div>
     );
+  }
+
+  let favoritePrompts: any[] = [];
+  try {
+    const favorites = await getUserFavorites(user.id);
+    favoritePrompts = favorites.map((fav: any) => fav.prompts);
+  } catch (error) {
+    console.error("Error loading favorites:", error);
   }
 
   return (
@@ -69,12 +59,7 @@ export default function FavoritosPage() {
 
       <main className="flex-grow relative z-10 pt-40 pb-24 px-4 sm:px-6 lg:px-8 max-w-[1920px] mx-auto w-full">
         {/* Header Específico de Favoritos */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-20 flex flex-col items-center justify-center text-center"
-        >
+        <div className="mb-20 flex flex-col items-center justify-center text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-neon/10 border border-green-neon/20 text-green-neon text-xs font-bold uppercase tracking-wider backdrop-blur-md mb-8">
             <Heart className="w-3 h-3 fill-current" />
             Sua Coleção Pessoal
@@ -90,25 +75,17 @@ export default function FavoritosPage() {
           <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
             Todos os prompts que você curtiu e salvou para usar mais tarde estão aqui, organizados para sua produtividade.
           </p>
-        </motion.div>
+        </div>
         
         {favoritePrompts.length > 0 ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-          >
+          <div className="animate-in fade-in duration-500 delay-200">
             <GalleryGrid prompts={favoritePrompts} />
             <div className="mt-20">
               <GalleryPagination />
             </div>
-          </motion.div>
+          </div>
         ) : (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center py-32 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-xl max-w-4xl mx-auto"
-          >
+          <div className="text-center py-32 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-xl max-w-4xl mx-auto animate-in zoom-in-95 duration-500">
             <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-8 border border-white/10">
               <Heart className="w-10 h-10 text-gray-600" />
             </div>
@@ -119,7 +96,7 @@ export default function FavoritosPage() {
                 Explorar Prompts
               </Button>
             </Link>
-          </motion.div>
+          </div>
         )}
       </main>
 

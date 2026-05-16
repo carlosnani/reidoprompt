@@ -1,19 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Plus, Edit } from "lucide-react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { TablePagination } from "@/components/admin/TablePagination";
 import { DeleteAction } from "@/components/admin/DeleteAction";
 import { SubmitToastButton } from "@/components/admin/SubmitToastButton";
 
-const mockModels = [
-  { id: "1", name: "Midjourney v6", slug: "midjourney-v6", provider: "Midjourney", promptsCount: 845 },
-  { id: "2", name: "DALL-E 3", slug: "dalle-3", provider: "OpenAI", promptsCount: 423 },
-  { id: "3", name: "Stable Diffusion XL", slug: "sdxl", provider: "Stability AI", promptsCount: 215 },
-  { id: "4", name: "Claude 3 Opus", slug: "claude-3-opus", provider: "Anthropic", promptsCount: 156 },
-];
+import { getAiModels } from "@/lib/supabase/queries";
+import { addAiModelAction, deleteAiModelAction } from "../actions";
 
-export default function AdminModelsPage() {
+export default async function AdminModelsPage() {
+  const models = await getAiModels();
+
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between">
@@ -29,23 +28,25 @@ export default function AdminModelsPage() {
                 Register a new AI model for prompts.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="name" className="text-sm font-medium text-admin-text">Model Name</label>
-                <Input id="name" placeholder="e.g. Midjourney v6" className="bg-admin-bg border-admin-border text-admin-text" />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="provider" className="text-sm font-medium text-admin-text">Provider</label>
-                <Input id="provider" placeholder="e.g. Midjourney" className="bg-admin-bg border-admin-border text-admin-text" />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="slug" className="text-sm font-medium text-admin-text">Slug</label>
-                <Input id="slug" placeholder="e.g. midjourney-v6" className="bg-admin-bg border-admin-border text-admin-text" />
-              </div>
-              <SubmitToastButton className="w-full bg-admin-primary hover:bg-admin-primary-hover text-white" message="Modelo de IA criado com sucesso!">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Model
-              </SubmitToastButton>
+            <CardContent>
+              <form action={addAiModelAction as unknown as (payload: FormData) => void} className="space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="name" className="text-sm font-medium text-admin-text">Model Name</label>
+                  <Input id="name" name="name" placeholder="e.g. Midjourney v6" required className="bg-admin-bg border-admin-border text-admin-text" />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="provider" className="text-sm font-medium text-admin-text">Provider</label>
+                  <Input id="provider" name="provider" placeholder="e.g. Midjourney" className="bg-admin-bg border-admin-border text-admin-text" />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="slug" className="text-sm font-medium text-admin-text">Slug</label>
+                  <Input id="slug" name="slug" placeholder="e.g. midjourney-v6" required className="bg-admin-bg border-admin-border text-admin-text" />
+                </div>
+                <SubmitToastButton className="w-full bg-admin-primary hover:bg-admin-primary-hover text-white" message="Modelo criado.">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Model
+                </SubmitToastButton>
+              </form>
             </CardContent>
           </Card>
         </div>
@@ -63,7 +64,7 @@ export default function AdminModelsPage() {
                   </tr>
                 </thead>
                 <tbody className="text-admin-text">
-                  {mockModels.map((model) => (
+                  {models.map((model) => (
                     <tr
                       key={model.id}
                       className="border-b border-admin-border transition-all duration-200 hover:bg-admin-muted/50 even:bg-admin-bg/30"
@@ -72,22 +73,29 @@ export default function AdminModelsPage() {
                         {model.name}
                       </td>
                       <td className="p-4 align-middle text-admin-text-secondary">
-                        {model.provider}
+                        {model.provider || "-"}
                       </td>
                       <td className="p-4 align-middle text-right">
-                        {model.promptsCount}
+                        -
                       </td>
                       <td className="p-4 align-middle text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <Button variant="ghost" size="icon" className="hover:text-admin-primary hover:bg-admin-primary-soft">
-                            <Edit className="w-4 h-4" />
-                            <span className="sr-only">Edit</span>
-                          </Button>
-                          <DeleteAction id={model.id} entityName="Modelo" />
+                          <Link href={`/admin/models/${model.id}/edit`}>
+                            <Button variant="ghost" size="icon" className="hover:text-admin-primary hover:bg-admin-primary-soft">
+                              <Edit className="w-4 h-4" />
+                              <span className="sr-only">Edit</span>
+                            </Button>
+                          </Link>
+                          <DeleteAction id={model.id} entityName="Modelo" action={deleteAiModelAction} />
                         </div>
                       </td>
                     </tr>
                   ))}
+                  {models.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="p-4 text-center text-admin-text-muted">Nenhum modelo cadastrado.</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -97,4 +105,4 @@ export default function AdminModelsPage() {
       </div>
     </div>
   );
-}
+} 

@@ -3,6 +3,7 @@
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import React, { useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,15 +19,22 @@ import {
 interface DeleteActionProps {
   id: string | number;
   entityName?: string;
+  action: (id: string) => Promise<{success?: boolean; error?: string}>;
 }
 
-export function DeleteAction({ id, entityName = "item" }: DeleteActionProps) {
-  const handleDelete = () => {
-    // Aqui no futuro adicionaremos a chamada para a Server Action de deleção
-    // Exemplo: await deleteItem(id);
+export function DeleteAction({ id, entityName = "item", action }: DeleteActionProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    const result = await action(id.toString());
+    setIsDeleting(false);
     
-    // Mostra o toast de sucesso
-    toast.success(`${entityName} deletado com sucesso!`);
+    if (result.error) {
+      toast.error(result.error);
+    } else {
+      toast.success(`${entityName} deletado com sucesso!`);
+    }
   };
 
   return (
@@ -45,12 +53,16 @@ export function DeleteAction({ id, entityName = "item" }: DeleteActionProps) {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
           <AlertDialogAction 
-            onClick={handleDelete} 
+            onClick={(e) => {
+              e.preventDefault();
+              handleDelete();
+            }} 
+            disabled={isDeleting}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            Deletar
+            {isDeleting ? "Deletando..." : "Deletar"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

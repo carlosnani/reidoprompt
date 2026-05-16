@@ -92,7 +92,7 @@ export default function AdminUsersPage() {
                         <Edit className="h-4 w-4" />
                         <span className="sr-only">Edit</span>
                       </Button>
-                      <DeleteAction id={user.id} entityName="Usuário" />
+                      <DeleteAction id={user.id} entityName="Usuário" action={async (id) => { "use server"; return { success: true }; }} />
                     </div>
                   </td>
                 </tr>
