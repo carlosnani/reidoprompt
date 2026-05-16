@@ -3,8 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { createAiModel, deleteAiModel, createCategory, deleteCategory, deletePrompt, createPrompt, updatePrompt, updateAiModel } from "@/lib/supabase/queries";
 import { redirect } from "next/navigation";
+import { requireAdmin } from "@/lib/supabase/auth";
 
 export async function addAiModelAction(formData: FormData) {
+  await requireAdmin();
   const name = formData.get("name") as string;
   const slug = formData.get("slug") as string;
   const provider = formData.get("provider") as string;
@@ -28,6 +30,7 @@ export async function addAiModelAction(formData: FormData) {
 }
 
 export async function deleteAiModelAction(id: string) {
+  await requireAdmin();
   try {
     await deleteAiModel(id);
     revalidatePath("/admin/models");
@@ -38,6 +41,7 @@ export async function deleteAiModelAction(id: string) {
 }
 
 export async function addCategoryAction(formData: FormData) {
+  await requireAdmin();
   const name = formData.get("name") as string;
   const slug = formData.get("slug") as string;
 
@@ -55,6 +59,7 @@ export async function addCategoryAction(formData: FormData) {
 }
 
 export async function deleteCategoryAction(id: string) {
+  await requireAdmin();
   try {
     await deleteCategory(id);
     revalidatePath("/admin/categories");
@@ -65,6 +70,7 @@ export async function deleteCategoryAction(id: string) {
 }
 
 export async function deletePromptAction(id: string) {
+  await requireAdmin();
   try {
     await deletePrompt(id);
     revalidatePath("/admin/prompts");
@@ -75,6 +81,7 @@ export async function deletePromptAction(id: string) {
 }
 
 export async function addPromptAction(formData: FormData) {
+  await requireAdmin();
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
   const prompt_text = formData.get("prompt_text") as string;
@@ -117,6 +124,7 @@ export async function addPromptAction(formData: FormData) {
 }
 
 export async function editPromptAction(id: string, formData: FormData) {
+  await requireAdmin();
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
   const prompt_text = formData.get("prompt_text") as string;
@@ -154,6 +162,7 @@ export async function editPromptAction(id: string, formData: FormData) {
 }
 
 export async function editAiModelAction(id: string, formData: FormData) {
+  await requireAdmin();
   const name = formData.get("name") as string;
   const slug = formData.get("slug") as string;
   const provider = formData.get("provider") as string;
