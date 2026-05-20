@@ -90,16 +90,19 @@ export async function addPromptAction(formData: FormData) {
   
   // Categorias (pode haver múltiplas)
   const categoryIds = formData.getAll("categories") as string[];
+  
+  // Imagens enviadas pelo ImageUploader (URLs do Supabase Storage)
+  const images = formData.getAll("images") as string[];
+
+  console.log("addPromptAction: received images:", images);
 
   if (!title || !prompt_text || !ai_model_id) {
     return { error: "Título, texto do prompt e modelo são obrigatórios" };
   }
 
-  // To do a real creation we need to handle image uploading if it was submitted via formData, 
-  // but let's assume image URL is handled client side and passed, or just hardcode a placeholder for now
-  // since ImageUploader doesn't natively integrate with standard FormData without hidden inputs.
-  const image = "https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?w=400&q=80"; // Placeholder
-  const tag = title.toLowerCase().replace(/ /g, '-');
+  // Define a imagem principal como a primeira da lista, ou um placeholder
+  const mainImage = images.length > 0 ? images[0] : "https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?w=400&q=80";
+  const tag = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
   try {
     await createPrompt({
@@ -109,16 +112,17 @@ export async function addPromptAction(formData: FormData) {
       prompt_text,
       ai_model_id,
       is_premium,
-      image,
+      image: mainImage,
+      images: images,
       views: 0,
       likes: 0
     }, categoryIds);
     
   } catch (err: any) {
+    console.error("Erro ao criar prompt:", err);
     return { error: err.message || "Erro ao criar prompt" };
   }
 
-  // Redirect should be outside try-catch
   revalidatePath("/admin/prompts");
   redirect("/admin/prompts");
 }
@@ -133,14 +137,18 @@ export async function editPromptAction(id: string, formData: FormData) {
   
   // Categorias (pode haver múltiplas)
   const categoryIds = formData.getAll("categories") as string[];
+  
+  // Imagens
+  const images = formData.getAll("images") as string[];
+
+  console.log("editPromptAction: received images:", images);
 
   if (!title || !prompt_text || !ai_model_id) {
     return { error: "Título, texto do prompt e modelo são obrigatórios" };
   }
 
-  // Placeholder image (if no real handling yet)
-  // we could keep the old image if not updated, but we'll assume we pass it or ignore for now.
-  const tag = title.toLowerCase().replace(/ /g, '-');
+  const mainImage = images.length > 0 ? images[0] : undefined;
+  const tag = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
   try {
     await updatePrompt(id, {
@@ -150,13 +158,15 @@ export async function editPromptAction(id: string, formData: FormData) {
       prompt_text,
       ai_model_id,
       is_premium,
+      ...(mainImage ? { image: mainImage } : {}),
+      images: images
     }, categoryIds);
     
   } catch (err: any) {
+    console.error("Erro ao editar prompt:", err);
     return { error: err.message || "Erro ao editar prompt" };
   }
 
-  // Redirect should be outside try-catch
   revalidatePath("/admin/prompts");
   redirect("/admin/prompts");
 }

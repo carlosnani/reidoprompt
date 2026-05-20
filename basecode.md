@@ -3,7 +3,7 @@
 Este arquivo contém as definições fundamentais, arquitetura e diretrizes do projeto **Rei do Prompt**.
 
 ## 🚀 Tecnologias e Stack
-- **Framework:** [Next.js 15+](https://nextjs.org/) (App Router)
+- **Framework:** [Next.js 16+](https://nextjs.org/) (App Router)
 - **Linguagem:** [TypeScript 5+](https://www.typescriptlang.org/)
 - **Frontend:** [React 19](https://react.dev/)
 - **Estilização:** [Tailwind CSS 3.4+](https://tailwindcss.com/)
@@ -32,16 +32,17 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
 - `favoritos/`: Prompts salvos pelo usuário.
 - `planos/`: Página de precificação.
 - `faq/`, `suporte/`, `sobre/`: Páginas institucionais.
-- `termos-de-uso/`, `privacidade/`: Documentação legal.
+- `termos/`, `termos-de-uso/`, `privacidade/`: Documentação legal.
 
 ### `components/` (Componentes React)
-- `admin/`: Componentes específicos do dashboard (Sidebar, Header, TablePagination, ImageUploader).
-- `auth/`: Formulários e containers de autenticação (LoginForm, RegisterForm, SocialLogin).
-- `prompt-detail/`: Fragmentos da página de detalhes (PromptText, ImageGallery, RelatedPrompts).
-- `prompts/`: Elementos da galeria (PromptCard, GalleryGrid, GalleryHeader).
-- `ui/`: Componentes base do shadcn/ui (Button, Input, Card, Select, Tabs, etc.).
+- `admin/`: Componentes específicos do dashboard (Sidebar, Header, TablePagination, ImageUploader, SubmitToastButton, DeleteAction).
+- `auth/`: Formulários e containers de autenticação (LoginForm, RegisterForm, SocialLogin, AuthContainer).
+- `prompt-detail/`: Fragmentos da página de detalhes (PromptText, ImageGallery, RelatedPrompts, PromptDetails).
+- `prompts/`: Elementos da galeria (PromptCard, GalleryGrid, GalleryHeader, GalleryPagination).
+- `ui/`: Componentes base do shadcn/ui (Button, Input, Card, Select, Tabs, Textarea, Accordion, Alert-Dialog, etc.).
 - `Header.tsx`, `Footer.tsx`: Layout principal.
-- `Hero.tsx`, `PromptGallery.tsx`, `CategoryGrid.tsx`: Seções da Landing Page.
+- `Hero.tsx`, `PromptGallery.tsx`, `CategoryGrid.tsx`, `Automations.tsx`, `BlogReviews.tsx`, `ToolsGrid.tsx`, `PremiumPrompts.tsx`, `HowItWorks.tsx`, `CTA.tsx`: Seções da Landing Page.
+- `auth-button.tsx`, `logout-button.tsx`, `theme-switcher.tsx`: Utilitários de UI.
 
 ### `lib/` (Lógica e Utilitários)
 - `supabase/`: 
@@ -50,6 +51,8 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
   - `queries.ts`: Funções de acesso ao banco de dados (CRUD).
   - `auth.ts`: Utilitários de autenticação.
   - `proxy.ts`: Lógica de proxy para imagens/requisições.
+  - `hooks.ts`: Custom hooks para integração com Supabase.
+  - `storage.ts`: Lógica de gerenciamento de arquivos no bucket.
 - `data/`: Mock data (ex: `mockPrompts.ts`).
 - `utils.ts`: Utilitários gerais (ex: formatação de classes com `clsx` e `tailwind-merge`).
 
@@ -69,7 +72,9 @@ interface Prompt {
   is_premium: boolean;
   views: number;
   likes: number;
-  ai_model_id?: string;
+  category?: string;    // Legacy
+  model?: string;       // Legacy
+  ai_model_id?: string; // Foreign key
   author_id?: string;
   created_at?: string;
   updated_at?: string;
@@ -88,6 +93,8 @@ interface AiModel {
   slug: string;
   provider?: string;
   description?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 ```
 
@@ -98,6 +105,19 @@ interface Category {
   id: string;
   name: string;
   slug: string;
+  description?: string;
+  created_at?: string;
+}
+```
+
+### DetailedPrompt
+Extensão para visualização detalhada.
+```typescript
+interface DetailedPrompt extends Prompt {
+  categories: Category[];
+  author: string;
+  date: string;
+  promptText?: string;
 }
 ```
 
@@ -172,16 +192,22 @@ CREATE TABLE public.favorites (
 - **Estética:** Premium, glassmorphism, gradientes neon (foco em `green-neon`).
 - **Componentes:** Altamente baseados em Radix UI para acessibilidade.
 - **Responsividade:** Mobile-first, utilizando containers do Tailwind.
+- **Cores Admin:** Paleta específica para o dashboard admin (ex: `admin-surface`, `admin-border`).
 
 ## 🛠️ Funcionalidades de Backend
-1. **Server Actions:** Utilizadas para operações de escrita (admin e auth) para máxima segurança.
-2. **RLS (Row Level Security):** Configurado no Supabase para proteger dados de usuários e restringir acesso administrativo.
+1. **Server Actions:** Utilizadas para operações de escrita (admin e auth) em `app/admin/actions.ts` e fluxos de auth.
+2. **RLS (Row Level Security):** Configurado no Supabase para proteger dados de usuários e restringir acesso administrativo via função `requireAdmin`.
 3. **Joins Complexos:** O arquivo `queries.ts` realiza fetches relacionais (ex: prompt + model + categorias em uma única query).
-4. **Gestão de Imagens:** Upload via admin com suporte a múltiplos arquivos e previews.
+4. **Gestão de Imagens (Supabase Storage):**
+   - Bucket: `reidoprompt`.
+   - Upload realizado via `ImageUploader` (Client Component) integrado com `lib/supabase/storage.ts`.
+   - Suporte a múltiplas imagens por prompt.
+   - Deleção automática do storage ao remover imagens no admin.
 
 ## 📝 Convenções de Desenvolvimento
 - **Server Components:** Utilizar por padrão para buscar dados e SEO.
 - **Client Components:** Apenas para interatividade (forms, sliders, botões de ação).
 - **TypeScript:** Tipagem estrita em todas as funções de `queries.ts`.
 - **Commits:** Seguir o padrão de commits semânticos se possível.
-- **Supabase:** Sempre usar `createClient` do arquivo `lib/supabase/server.ts` dentro de Server Components.
+- **Supabase:** Sempre usar `createClient` do arquivo `lib/supabase/server.ts` dentro de Server Components e `client.ts` em Client Components.
+- **Revalidação:** Utilizar `revalidatePath` em Server Actions para manter o cache atualizado.

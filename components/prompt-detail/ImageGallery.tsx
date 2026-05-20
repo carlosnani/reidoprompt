@@ -3,7 +3,6 @@
 import { useState } from "react";
 import type { DetailedPrompt } from "@/lib/supabase/queries";
 import { Eye, Heart, Tag } from "lucide-react";
-import Image from "next/image";
 
 interface ImageGalleryProps {
   prompt: DetailedPrompt;
@@ -20,15 +19,12 @@ export function ImageGallery({ prompt }: ImageGalleryProps) {
       
       {/* 🖼️ IMAGEM PRINCIPAL */}
       <div className="relative w-full aspect-[3/4] md:aspect-square lg:aspect-[4/5] rounded-2xl overflow-hidden bg-white/5 border border-white/10">
-        
-        {/* IMAGEM */}
-        <Image
+
+        {/* IMAGEM (fallback para debug: usar <img> para evitar problemas do loader do Next/Image) */}
+        <img
           src={activeImage}
           alt={prompt.title}
-          fill
           className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-          sizes="(max-width: 768px) 100vw, 50vw"
-          priority
         />
 
         {/* OVERLAY */}
@@ -76,12 +72,7 @@ export function ImageGallery({ prompt }: ImageGalleryProps) {
                   }`}
               >
                 <div className="relative w-full h-full">
-                  <Image
-                    src={img}
-                    alt={`Variação ${index + 1}`}
-                    fill
-                    className="object-cover"
-                  />
+                  <img src={img} alt={`Variação ${index + 1}`} className="w-full h-full object-cover" />
                 </div>
               </button>
             );

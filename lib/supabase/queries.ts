@@ -115,13 +115,21 @@ export async function createPrompt(
 ) {
   const supabase = await createClient();
 
+  console.log('createPrompt: inserting prompt payload:', {
+    ...prompt,
+    images: Array.isArray(prompt.images) ? prompt.images : prompt.images
+  });
+
   const { data, error } = await supabase
     .from('prompts')
     .insert(prompt)
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error('createPrompt: insert error', error);
+    throw error;
+  }
   
   const createdPrompt = data as Prompt;
 

@@ -1,28 +1,45 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Upload, X } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useRef, useEffect } from "react";
+import { Upload, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { uploadImage, deleteImage } from "@/lib/supabase/storage";
+import { toast } from "sonner";
 
 interface ImageUploaderProps {
   maxImages?: number;
+  onImagesChange?: (urls: string[]) => void;
+  defaultValue?: string[];
+  name?: string; // name for the hidden input
 }
 
-export function ImageUploader({ maxImages = 6 }: ImageUploaderProps) {
-  const [images, setImages] = useState<{ id: string; url: string; file: File }[]>([]);
+export function ImageUploader({ 
+  maxImages = 6, 
+  onImagesChange, 
+  defaultValue = [],
+  name = "images"
+}: ImageUploaderProps) {
+  const [images, setImages] = useState<{ id: string; url: string; path?: string; uploading: boolean }[]>(
+    defaultValue.map((url, i) => ({ id: i.toString(), url, uploading: false }))
+  );
+  const imagesRef = useRef(images);
+
+  // Keep a ref in sync with latest images state so async callbacks can read current value
+  useEffect(() => {
+    imagesRef.current = images;
+  }, [images]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      addFiles(Array.from(e.target.files));
+      await addFiles(Array.from(e.target.files));
     }
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     if (e.dataTransfer.files) {
-      addFiles(Array.from(e.dataTransfer.files));
+      await addFiles(Array.from(e.dataTransfer.files));
     }
   };
 
@@ -30,38 +47,81 @@ export function ImageUploader({ maxImages = 6 }: ImageUploaderProps) {
     e.preventDefault();
   };
 
-  const addFiles = (files: File[]) => {
-    // Filter out non-images
+  const addFiles = async (files: File[]) => {
     const validFiles = files.filter((file) => file.type.startsWith("image/"));
-    
-    // Calculate how many more we can add
     const remainingSlots = maxImages - images.length;
-    if (remainingSlots <= 0) return;
+    if (remainingSlots <= 0) {
+      toast.error(`Você só pode enviar até ${maxImages} imagens.`);
+      return;
+    }
 
     const filesToAdd = validFiles.slice(0, remainingSlots);
-
-    const newImages = filesToAdd.map((file) => ({
+    
+    // Create placeholder states
+    const placeholders = filesToAdd.map((file) => ({
       id: Math.random().toString(36).substring(7),
       url: URL.createObjectURL(file),
-      file,
+      uploading: true,
     }));
 
-    setImages((prev) => [...prev, ...newImages]);
+    setImages((prev) => [...prev, ...placeholders]);
+
+    // Upload files sequentially or in parallel? Parallel for better UX
+    const uploadPromises = filesToAdd.map(async (file, index) => {
+      const placeholderId = placeholders[index].id;
+      try {
+        const { url, path } = await uploadImage(file);
+        console.debug("ImageUploader: upload success", { file: file.name, url, path });
+        
+        setImages((prev) => 
+          prev.map((img) => 
+            img.id === placeholderId ? { ...img, url, path, uploading: false } : img
+          )
+        );
+        return url;
+      } catch (error) {
+        console.error("Upload error:", error);
+        toast.error(`Erro ao enviar ${file.name}`);
+        setImages((prev) => prev.filter((img) => img.id !== placeholderId));
+        return null;
+      }
+    });
+
+    const results = await Promise.all(uploadPromises);
+    const successfulUrls = results.filter((url): url is string => url !== null);
     
-    // Reset file input so the same file can be selected again if removed
+    if (onImagesChange) {
+      const currentUrls = imagesRef.current.filter(img => !img.uploading).map(img => img.url);
+      const all = [...currentUrls, ...successfulUrls];
+      console.debug("ImageUploader: reporting images to form", { all });
+      onImagesChange(all);
+    }
+
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-  const removeImage = (idToRemove: string) => {
-    setImages((prev) => {
-      const filtered = prev.filter((img) => img.id !== idToRemove);
-      // Revoke the object URL to avoid memory leaks
-      const removed = prev.find((img) => img.id === idToRemove);
-      if (removed) URL.revokeObjectURL(removed.url);
-      return filtered;
-    });
+  const removeImage = async (idToRemove: string) => {
+    const imageToRemove = images.find(img => img.id === idToRemove);
+    
+    // Optimistic UI update
+    setImages((prev) => prev.filter((img) => img.id !== idToRemove));
+
+    if (imageToRemove?.path) {
+      try {
+        await deleteImage(imageToRemove.path);
+      } catch (error) {
+        console.error("Error deleting image from storage:", error);
+      }
+    }
+    console.debug("ImageUploader: removed image", { idToRemove, remaining: imagesRef.current.map(i=>i.url) });
+    if (onImagesChange) {
+      const remainingUrls = imagesRef.current
+        .filter(img => img.id !== idToRemove && !img.uploading)
+        .map(img => img.url);
+      onImagesChange(remainingUrls);
+    }
   };
 
   return (
@@ -71,21 +131,31 @@ export function ImageUploader({ maxImages = 6 }: ImageUploaderProps) {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {images.map((image) => (
             <div key={image.id} className="relative group aspect-square rounded-2xl overflow-hidden border border-admin-border-strong bg-admin-bg shadow-sm">
-              <img src={image.url} alt="Preview" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-              <div className="absolute inset-0 bg-admin-text/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-start justify-end p-2 backdrop-blur-[2px]">
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="icon"
-                  className="h-8 w-8 rounded-xl shadow-lg"
-                  onClick={() => removeImage(image.id)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent">
-                <p className="text-[10px] text-white font-medium truncate">{image.file.name}</p>
-              </div>
+              <img src={image.url} alt="Preview" className={`w-full h-full object-cover transition-transform duration-500 ${image.uploading ? 'opacity-50 blur-sm' : 'group-hover:scale-110'}`} />
+              
+              {image.uploading && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Loader2 className="w-8 h-8 text-admin-primary animate-spin" />
+                </div>
+              )}
+
+              {!image.uploading && (
+                <>
+                  <div className="absolute inset-0 bg-admin-text/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-start justify-end p-2 backdrop-blur-[2px]">
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="h-8 w-8 rounded-xl shadow-lg"
+                      onClick={() => removeImage(image.id)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {/* Hidden inputs to send URLs with the form */}
+                  <input type="hidden" name={name} value={image.url} />
+                </>
+              )}
             </div>
           ))}
         </div>
@@ -105,7 +175,7 @@ export function ImageUploader({ maxImages = 6 }: ImageUploaderProps) {
               <Upload className="w-8 h-8" />
             </div>
             <div className="space-y-1">
-              <p className="text-lg font-bold text-admin-text">Click to upload or drag and drop</p>
+              <p className="text-lg font-bold text-admin-text">Clique para enviar ou arraste e solte</p>
               <p className="text-sm text-admin-text-muted">
                 Suporta PNG, JPG, WEBP e SVG (Máx. 5MB)
               </p>
