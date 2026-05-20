@@ -27,12 +27,17 @@ export function PromptCard({ prompt }: PromptCardProps) {
         {/* Overlay Hover */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
           
-          {/* Tag */}
-          <div className="mb-auto mt-2">
+          {/* Tag & PRO Badge */}
+          <div className="mb-auto mt-2 flex flex-wrap gap-2">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-xs font-medium text-white shadow-lg">
               <Tag className="w-3 h-3 text-green-neon" />
               {prompt.tag}
             </span>
+            {prompt.is_premium && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-green-neon text-black text-[10px] font-black uppercase tracking-wider shadow-lg">
+                PRO
+              </span>
+            )}
           </div>
 
           {/* Stats Footer */}

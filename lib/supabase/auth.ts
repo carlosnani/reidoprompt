@@ -24,6 +24,17 @@ export function isAdmin(user: any) {
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function isPro(user: any) {
+  return (
+    isAdmin(user) ||
+    user?.user_metadata?.plan === "pro" ||
+    user?.user_metadata?.subscription === "active" ||
+    user?.app_metadata?.plan === "pro" ||
+    user?.app_metadata?.subscription === "active"
+  );
+}
+
 export async function requireAdmin() {
   const user = await requireUser();
   if (!isAdmin(user)) {

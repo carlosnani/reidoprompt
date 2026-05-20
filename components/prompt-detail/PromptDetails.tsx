@@ -12,7 +12,12 @@ export function PromptDetails({ prompt }: PromptDetailsProps) {
     <div className="flex flex-col gap-6">
       {/* Header and Title */}
       <div>
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          {prompt.is_premium && (
+            <Badge className="bg-green-neon text-black hover:bg-green-neon/90 font-bold border-none">
+              PRO
+            </Badge>
+          )}
           {prompt.categories.map((category, idx) => (
             <Badge key={idx} variant="secondary" className="bg-white/5 text-gray-300 hover:bg-white/10 border-white/10">
               {category.name}

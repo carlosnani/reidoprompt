@@ -45,12 +45,11 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
 - `auth-button.tsx`, `logout-button.tsx`, `theme-switcher.tsx`: Utilitários de UI.
 
 ### `lib/` (Lógica e Utilitários)
-- `supabase/`: 
+- `middleware.ts`: Lógica de gerenciamento de sessão e proteção de rotas (localizado na raiz).
+  - `auth.ts`: Utilitários de autenticação.
   - `client.ts`: Cliente para Client Components.
   - `server.ts`: Cliente para Server Components / Server Actions.
   - `queries.ts`: Funções de acesso ao banco de dados (CRUD).
-  - `auth.ts`: Utilitários de autenticação.
-  - `proxy.ts`: Lógica de proxy para imagens/requisições.
   - `hooks.ts`: Custom hooks para integração com Supabase.
   - `storage.ts`: Lógica de gerenciamento de arquivos no bucket.
 - `data/`: Mock data (ex: `mockPrompts.ts`).
