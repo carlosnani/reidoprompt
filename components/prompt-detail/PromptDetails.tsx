@@ -28,17 +28,6 @@ export function PromptDetails({ prompt }: PromptDetailsProps) {
           {prompt.title}
         </h1>
 
-        {/* Author & Date */}
-        <div className="flex items-center gap-6 text-sm text-gray-400">
-          <div className="flex items-center gap-2">
-            <User className="w-4 h-4 text-green-neon" />
-            <span className="text-gray-300">{prompt.author}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
-            <span>{prompt.date}</span>
-          </div>
-        </div>
       </div>
 
       {/* Stats & Actions */}

@@ -31,9 +31,12 @@ export default async function PromptPage(props: PromptPageProps) {
     prompt = {
       ...basicPrompt,
       title: basicPrompt.title || basicPrompt.tag,
-      categories: basicPrompt.category ? [{ id: '1', name: basicPrompt.category, slug: basicPrompt.category.toLowerCase() }, { id: '2', name: "AI Art", slug: "ai-art" }] : [{ id: '2', name: "AI Art", slug: "ai-art" }, { id: '3', name: "Digital", slug: "digital" }],
-      author: "Rei do Prompt",
-      date: basicPrompt.created_at ? new Date(basicPrompt.created_at).toLocaleDateString('pt-BR') : "24 Mai 2024",
+      categories:
+        basicPrompt.prompt_categories && basicPrompt.prompt_categories.length > 0
+          ? basicPrompt.prompt_categories.map((item) => item.category)
+          : basicPrompt.category
+          ? [{ id: basicPrompt.category, name: basicPrompt.category, slug: basicPrompt.category.toLowerCase() }]
+          : [],
       description: basicPrompt.description || "Um prompt profissional e altamente otimizado para gerar imagens de altíssima qualidade.",
       promptText: basicPrompt.prompt_text || `A highly detailed ${basicPrompt.category?.toLowerCase() || 'artistic'} scene of ${basicPrompt.tag.toLowerCase()}, masterpiece, 8k resolution, photorealistic.`,
       images: basicPrompt.images && basicPrompt.images.length > 0 ? basicPrompt.images : [basicPrompt.image],

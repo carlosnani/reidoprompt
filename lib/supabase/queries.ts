@@ -34,8 +34,8 @@ export interface AiModel {
 
 export interface DetailedPrompt extends Prompt {
   categories: Category[];
-  author: string;
-  date: string;
+  author?: string;
+  date?: string;
   promptText?: string;
 }
 
