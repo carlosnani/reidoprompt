@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { ArrowLeft, Upload, Save, Info, FileText, CheckCircle2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { ArrowLeft, Upload, Save, Info, FileText } from "lucide-react";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { SubmitToastButton } from "@/components/admin/SubmitToastButton";
+import { CategoryMultiSelect } from "@/components/admin/CategoryMultiSelect";
 import { getCategories, getAiModels } from "@/lib/supabase/queries";
 import { addPromptAction } from "../../actions";
 
@@ -57,20 +58,7 @@ export default async function NewPromptPage() {
                   Categories
                   <span className="text-[10px] bg-admin-muted px-2 py-0.5 rounded text-admin-text-secondary">Multiple</span>
                 </label>
-                <div className="grid grid-cols-2 gap-2 max-h-[160px] overflow-y-auto p-3 rounded-md border border-admin-border-strong bg-admin-bg">
-                  {categories.map(cat => (
-                    <label key={cat.id} className="flex items-center gap-2 text-xs text-admin-text-secondary hover:text-admin-text cursor-pointer transition-colors">
-                      <input 
-                        type="checkbox" 
-                        name="categories" 
-                        value={cat.id} 
-                        className="w-4 h-4 rounded border-admin-border-strong text-admin-primary focus:ring-admin-primary"
-                      />
-                      {cat.name}
-                    </label>
-                  ))}
-                  {categories.length === 0 && <p className="text-xs text-admin-text-muted col-span-2">Nenhuma categoria cadastrada.</p>}
-                </div>
+                <CategoryMultiSelect categories={categories} />
               </div>
               
               <div className="space-y-2">

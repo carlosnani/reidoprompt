@@ -80,7 +80,7 @@ export default async function AdminPromptsPage() {
               {prompts.length === 0 && (
                 <tr>
                   <td colSpan={6} className="p-8 text-center text-admin-text-muted">
-                    No prompts found. Click "New Prompt" to add one.
+                    No prompts found. Click &quot;New Prompt&quot; to add one.
                   </td>
                 </tr>
               )}
