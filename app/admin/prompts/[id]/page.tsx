@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { ArrowLeft, Upload, Save, Info, FileText, CheckCircle2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { ArrowLeft, Upload, Save, Info, FileText} from "lucide-react";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { SubmitToastButton } from "@/components/admin/SubmitToastButton";
 import { getCategories, getAiModels, getPromptById } from "@/lib/supabase/queries";
@@ -16,6 +16,7 @@ export default async function EditPromptPage({ params }: { params: { id: string 
   let prompt;
   try {
     prompt = await getPromptById(params.id);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     notFound();
   }
