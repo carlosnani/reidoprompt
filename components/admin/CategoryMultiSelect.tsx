@@ -34,10 +34,6 @@ const customStyles: StylesConfig<CategoryOption, true> = {
     ...provided,
     color: "var(--admin-text-primary)",
   }),
-  singleValue: (provided) => ({
-    ...provided,
-    color: "var(--admin-text-primary)",
-  }),
   placeholder: (provided) => ({
     ...provided,
     color: "var(--admin-text-muted)",

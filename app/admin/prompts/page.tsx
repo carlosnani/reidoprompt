@@ -66,7 +66,7 @@ export default async function AdminPromptsPage() {
                   <td className="p-4 align-middle text-admin-text-secondary">{prompt.likes}</td>
                   <td className="p-4 align-middle text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <Link href={`/admin/prompts/${prompt.id}`}>
+                      <Link href={`/admin/prompts/edit/${prompt.id}`}>
                         <Button variant="ghost" size="icon" className="hover:text-admin-primary hover:bg-admin-primary-soft">
                           <Edit className="w-4 h-4" />
                           <span className="sr-only">Edit</span>

@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 
 import { getAiModelById } from "@/lib/supabase/queries";
-import { editAiModelAction } from "../../actions";
+import { editAiModelAction } from "../../../actions";
 
 export default async function EditModelPage({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -27,7 +27,7 @@ export default async function EditModelPage({ params }: { params: { id: string }
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form action={(formData: FormData) => editAiModelAction(id, formData)} className="space-y-4">
+              <form action={editAiModelAction.bind(null, id) as unknown as (formData: FormData) => void} className="space-y-4">
                 <div className="space-y-2">
                   <label htmlFor="name" className="text-sm font-medium text-admin-text">Model Name</label>
                   <Input id="name" name="name" defaultValue={model.name} placeholder="e.g. Midjourney v6" required className="bg-admin-bg border-admin-border text-admin-text" />
