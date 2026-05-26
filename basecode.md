@@ -35,8 +35,9 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
 - `termos/`, `termos-de-uso/`, `privacidade/`: Documentação legal.
 
 ### `components/` (Componentes React)
-- `admin/`: Componentes específicos do dashboard (Sidebar, Header, TablePagination, ImageUploader, SubmitToastButton, DeleteAction).
+- `admin/`: Componentes específicos do dashboard (Sidebar, Header, TablePagination - Legacy, ImageUploader, SubmitToastButton, DeleteAction).
 - `auth/`: Formulários e containers de autenticação (LoginForm, RegisterForm, SocialLogin, AuthContainer).
+- `AppPagination.tsx`: Componente de paginação universal com suporte a temas 'admin' e 'public'.
 - `prompt-detail/`: Fragmentos da página de detalhes (PromptText, ImageGallery, RelatedPrompts, PromptDetails).
 - `prompts/`: Elementos da galeria (PromptCard, GalleryGrid, GalleryHeader, GalleryPagination).
 - `ui/`: Componentes base do shadcn/ui (Button, Input, Card, Select, Tabs, Textarea, Accordion, Alert-Dialog, etc.).
@@ -45,11 +46,11 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
 - `auth-button.tsx`, `logout-button.tsx`, `theme-switcher.tsx`: Utilitários de UI.
 
 ### `lib/` (Lógica e Utilitários)
-- `middleware.ts`: Lógica de gerenciamento de sessão e proteção de rotas (localizado na raiz).
-  - `auth.ts`: Utilitários de autenticação.
+- `middleware.ts`: Lógica de gerenciamento de sessão e proteção de rotas (localizado na raiz). Protege rotas `/admin` validando o papel administrativo do usuário.
+  - `auth.ts`: Utilitários de autenticação (requireUser, isAdmin, requireAdmin).
   - `client.ts`: Cliente para Client Components.
-  - `server.ts`: Cliente para Server Components / Server Actions.
-  - `queries.ts`: Funções de acesso ao banco de dados (CRUD).
+  - `server.ts`: Cliente para Server Components / Server Actions (inclui `createServiceRoleClient`).
+  - `queries.ts`: Funções de acesso ao banco de dados (CRUD). Agora inclui gestão de usuários via Admin Auth API.
   - `hooks.ts`: Custom hooks para integração com Supabase.
   - `storage.ts`: Lógica de gerenciamento de arquivos no bucket.
 - `data/`: Mock data (ex: `mockPrompts.ts`).
@@ -189,6 +190,7 @@ CREATE TABLE public.favorites (
 ## 🎨 Design System e UI/UX
 - **Tema:** Dark Mode (Next Themes).
 - **Estética:** Premium, glassmorphism, gradientes neon (foco em `green-neon`).
+- **Feedback Visual:** Estados de carregamento (Skeletons) implementados via `loading.tsx` para garantir uma transição suave entre rotas.
 - **Componentes:** Altamente baseados em Radix UI para acessibilidade.
 - **Responsividade:** Mobile-first, utilizando containers do Tailwind.
 - **Cores Admin:** Paleta específica para o dashboard admin (ex: `admin-surface`, `admin-border`).

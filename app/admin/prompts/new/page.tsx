@@ -7,9 +7,11 @@ import { ImageUploader } from "@/components/admin/ImageUploader";
 import { SubmitToastButton } from "@/components/admin/SubmitToastButton";
 import { CategoryMultiSelect } from "@/components/admin/CategoryMultiSelect";
 import { getCategories, getAiModels } from "@/lib/supabase/queries";
+import { requireAdmin } from "@/lib/supabase/auth";
 import { addPromptAction } from "../../actions";
 
 export default async function NewPromptPage() {
+  await requireAdmin();
   const categories = await getCategories();
   const models = await getAiModels();
   return (

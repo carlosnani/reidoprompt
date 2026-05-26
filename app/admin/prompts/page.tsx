@@ -3,12 +3,26 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Edit } from "lucide-react";
 import { getPrompts } from "@/lib/supabase/queries";
+import { requireAdmin } from "@/lib/supabase/auth";
 import { TablePagination } from "@/components/admin/TablePagination";
 import { DeleteAction } from "@/components/admin/DeleteAction";
 import { deletePromptAction } from "../actions";
 
-export default async function AdminPromptsPage() {
-  const prompts = await getPrompts(50);
+import { AppPagination } from "@/components/AppPagination";
+
+export default async function AdminPromptsPage({ 
+  searchParams 
+}: { 
+  searchParams: Promise<{ page?: string }> 
+}) {
+  await requireAdmin();
+  const params = await searchParams;
+  const currentPage = Number(params.page) || 1;
+  const limit = 10;
+  const offset = (currentPage - 1) * limit;
+
+  const { data: prompts, count } = await getPrompts(limit, offset);
+  const totalPages = Math.ceil(count / limit);
 
   return (
     <div className="flex-1 space-y-4">
@@ -87,7 +101,14 @@ export default async function AdminPromptsPage() {
             </tbody>
           </table>
         </div>
-        <TablePagination />
+        <div className="border-t border-admin-border bg-admin-muted/30">
+          <AppPagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            baseUrl="/admin/prompts" 
+            variant="admin"
+          />
+        </div>
       </div>
     </div>
   );

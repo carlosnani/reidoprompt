@@ -1,7 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, ImageIcon, CreditCard, Activity } from "lucide-react";
+import { requireAdmin } from "@/lib/supabase/auth";
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
+  await requireAdmin();
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between space-y-2">

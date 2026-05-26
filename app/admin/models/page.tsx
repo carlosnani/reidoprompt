@@ -8,10 +8,24 @@ import { DeleteAction } from "@/components/admin/DeleteAction";
 import { SubmitToastButton } from "@/components/admin/SubmitToastButton";
 
 import { getAiModels } from "@/lib/supabase/queries";
+import { requireAdmin } from "@/lib/supabase/auth";
 import { addAiModelAction, deleteAiModelAction } from "../actions";
 
-export default async function AdminModelsPage() {
-  const models = await getAiModels();
+import { AppPagination } from "@/components/AppPagination";
+
+export default async function AdminModelsPage({ 
+  searchParams 
+}: { 
+  searchParams: Promise<{ page?: string }> 
+}) {
+  await requireAdmin();
+  const params = await searchParams;
+  const currentPage = Number(params.page) || 1;
+  const limit = 10;
+  const offset = (currentPage - 1) * limit;
+
+  const { data: models, count } = await getAiModels(limit, offset);
+  const totalPages = Math.ceil(count / limit);
 
   return (
     <div className="flex-1 space-y-4">
@@ -99,10 +113,18 @@ export default async function AdminModelsPage() {
                 </tbody>
               </table>
             </div>
-            <TablePagination />
+            <div className="border-t border-admin-border bg-admin-muted/30">
+              <AppPagination 
+                currentPage={currentPage} 
+                totalPages={totalPages} 
+                baseUrl="/admin/models" 
+                variant="admin"
+              />
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
-} 
+}
+ 

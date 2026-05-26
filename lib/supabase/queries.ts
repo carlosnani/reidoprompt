@@ -55,41 +55,49 @@ export interface Favorite {
 
 // ==================== PROMPTS ====================
 
-export async function getPrompts(limit = 50, offset = 0, categoryId?: string) {
+export async function getPrompts(options: {
+  limit?: number;
+  offset?: number;
+  categoryId?: string;
+  search?: string;
+  orderBy?: 'recentes' | 'populares' | 'favoritos';
+} = {}) {
+  const { limit = 12, offset = 0, categoryId, search, orderBy = 'recentes' } = options;
   const supabase = await createClient();
 
-  let query;
+  let query = supabase
+    .from('prompts')
+    .select(`
+      *,
+      ai_model:ai_models(*),
+      prompt_categories${categoryId ? '!inner' : ''}(category:categories(*))
+    `, { count: 'exact' });
 
   if (categoryId) {
-    query = supabase
-      .from('prompts')
-      .select(`
-        *,
-        ai_model:ai_models(*),
-        prompt_categories!inner(category:categories(*))
-      `)
-      .eq('prompt_categories.category_id', categoryId)
-      .range(offset, offset + limit - 1)
-      .order('created_at', { ascending: false });
-  } else {
-    query = supabase
-      .from('prompts')
-      .select(`
-        *,
-        ai_model:ai_models(*),
-        prompt_categories(category:categories(*))
-      `)
-      .range(offset, offset + limit - 1)
-      .order('created_at', { ascending: false });
+    query = query.eq('prompt_categories.category_id', categoryId);
   }
 
-  const { data, error } = await query;
+  if (search) {
+    // Busca simples no título ou tag
+    query = query.or(`title.ilike.%${search}%,tag.ilike.%${search}%`);
+  }
+
+  // Ordenação
+  if (orderBy === 'recentes') {
+    query = query.order('created_at', { ascending: false });
+  } else if (orderBy === 'populares') {
+    query = query.order('views', { ascending: false });
+  } else if (orderBy === 'favoritos') {
+    query = query.order('likes', { ascending: false });
+  }
+
+  const { data, error, count } = await query.range(offset, offset + limit - 1);
 
   if (error) {
     console.error('Error fetching prompts:', error);
-    return [];
+    return { data: [], count: 0 };
   }
-  return data as unknown as Prompt[];
+  return { data: data as unknown as Prompt[], count: count || 0 };
 }
 
 export async function getPromptById(id: string) {
@@ -206,16 +214,17 @@ export async function deletePrompt(id: string) {
 
 // ==================== CATEGORIES ====================
 
-export async function getCategories() {
+export async function getCategories(limit = 100, offset = 0) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  const { data, error, count } = await supabase
     .from('categories')
-    .select('*')
+    .select('*', { count: 'exact' })
+    .range(offset, offset + limit - 1)
     .order('name');
 
   if (error) throw error;
-  return data as Category[];
+  return { data: data as Category[], count: count || 0 };
 }
 
 export async function createCategory(category: Omit<Category, 'id'>) {
@@ -261,16 +270,17 @@ export async function deleteCategory(id: string) {
 
 // ==================== AI MODELS ====================
 
-export async function getAiModels() {
+export async function getAiModels(limit = 100, offset = 0) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  const { data, error, count } = await supabase
     .from('ai_models')
-    .select('*')
+    .select('*', { count: 'exact' })
+    .range(offset, offset + limit - 1)
     .order('name');
 
   if (error) throw error;
-  return data as AiModel[];
+  return { data: data as AiModel[], count: count || 0 };
 }
 
 export async function createAiModel(model: Omit<AiModel, 'id' | 'created_at' | 'updated_at'>) {
@@ -337,6 +347,32 @@ export async function getAiModelById(id: string) {
 
   if (error) throw error;
   return data as AiModel;
+}
+
+// ==================== USERS ====================
+
+export async function getUsers(limit = 10, page = 1) {
+  const supabase = createServiceRoleClient();
+
+  const { data, error } = await supabase.auth.admin.listUsers({
+    page,
+    perPage: limit
+  });
+
+  if (error) {
+    console.error('Error fetching users:', error);
+    return { data: [], count: 0 };
+  }
+  
+  return { data: data.users, count: (data as any).total || data.users.length };
+}
+
+export async function deleteUser(id: string) {
+  const supabase = createServiceRoleClient();
+
+  const { error } = await supabase.auth.admin.deleteUser(id);
+
+  if (error) throw error;
 }
 
 // ==================== FAVORITES ====================

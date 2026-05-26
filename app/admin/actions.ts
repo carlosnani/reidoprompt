@@ -1,7 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache";
-import { createAiModel, deleteAiModel, createCategory, deleteCategory, deletePrompt, createPrompt, updatePrompt, updateAiModel } from "@/lib/supabase/queries";
+import { createAiModel, deleteAiModel, createCategory, deleteCategory, deletePrompt, createPrompt, updatePrompt, updateAiModel, deleteUser } from "@/lib/supabase/queries";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/supabase/auth";
 
@@ -187,5 +187,16 @@ export async function editAiModelAction(id: string, formData: FormData) {
     return { success: true };
   } catch (err: any) {
     return { error: err.message || "Erro ao editar modelo" };
+  }
+}
+
+export async function deleteUserAction(id: string) {
+  await requireAdmin();
+  try {
+    await deleteUser(id);
+    revalidatePath("/admin/users");
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message || "Erro ao deletar usuário" };
   }
 }

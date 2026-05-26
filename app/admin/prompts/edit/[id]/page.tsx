@@ -6,10 +6,12 @@ import { ArrowLeft, Upload, Save, Info, FileText } from "lucide-react";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { SubmitToastButton } from "@/components/admin/SubmitToastButton";
 import { getCategories, getAiModels, getPromptById } from "@/lib/supabase/queries";
+import { requireAdmin } from "@/lib/supabase/auth";
 import { editPromptAction } from "../../../actions";
 import { notFound } from "next/navigation";
 
 export default async function EditPromptPage({ params }: { params: { id: string } }) {
+  await requireAdmin();
   const categories = await getCategories();
   const models = await getAiModels();
   

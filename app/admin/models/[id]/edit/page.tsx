@@ -4,9 +4,11 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 
 import { getAiModelById } from "@/lib/supabase/queries";
+import { requireAdmin } from "@/lib/supabase/auth";
 import { editAiModelAction } from "../../../actions";
 
 export default async function EditModelPage({ params }: { params: { id: string } }) {
+  await requireAdmin();
   const { id } = params;
   const model = await getAiModelById(id);
 
