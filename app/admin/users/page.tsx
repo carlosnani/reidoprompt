@@ -47,8 +47,8 @@ export default async function AdminUsersPage({
             <thead className="border-b border-admin-border bg-admin-muted/50 text-admin-text-secondary">
               <tr>
                 <th className="h-12 px-4 align-middle font-medium">Usuário</th>
-                <th className="h-12 px-4 align-middle font-medium">Role</th>
-                <th className="h-12 px-4 align-middle font-medium">Inscrição</th>
+                <th className="h-12 px-4 align-middle font-medium">Papel</th>
+                <th className="h-12 px-4 align-middle font-medium">Assinatura</th>
                 <th className="h-12 px-4 align-middle font-medium">Criado em</th>
                 <th className="h-12 px-4 align-middle font-medium text-right">Ações</th>
               </tr>
@@ -56,8 +56,8 @@ export default async function AdminUsersPage({
             <tbody>
               {users.map((user) => {
                 const name = user.user_metadata?.full_name || user.email?.split('@')[0] || "Sem Nome";
-                const role = isAdmin(user) ? "ADMIN" : (user.user_metadata?.role || "USER");
-                const subStatus = user.user_metadata?.subscription || "INACTIVE";
+                const role = isAdmin(user) ? "ADMIN" : (user.user_metadata?.role?.toUpperCase() || "USUÁRIO");
+                const subStatus = user.user_metadata?.subscription === 'ACTIVE' ? "ATIVA" : "INATIVA";
                 const joinedAt = user.created_at ? new Date(user.created_at).toLocaleDateString('pt-BR') : "-";
                 
                 return (
@@ -83,9 +83,9 @@ export default async function AdminUsersPage({
                     </td>
                     <td className="p-4 align-middle">
                       <Badge 
-                        variant={subStatus === 'ACTIVE' ? 'default' : 'secondary'}
+                        variant={subStatus === 'ATIVA' ? 'default' : 'secondary'}
                         className={cn(
-                          subStatus === 'ACTIVE' ? 'bg-admin-success hover:bg-admin-success-hover text-white' : 'bg-admin-muted text-admin-text-secondary'
+                          subStatus === 'ATIVA' ? 'bg-admin-success hover:bg-admin-success-hover text-white' : 'bg-admin-muted text-admin-text-secondary'
                         )}
                       >
                         {subStatus}

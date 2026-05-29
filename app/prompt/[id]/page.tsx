@@ -4,7 +4,8 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { getPromptById } from "@/lib/supabase/queries";
+import { getPromptById, isFavorite } from "@/lib/supabase/queries";
+import { createClient } from "@/lib/supabase/server";
 import { ImageGallery } from "@/components/prompt-detail/ImageGallery";
 import { PromptDetails } from "@/components/prompt-detail/PromptDetails";
 import { PromptText } from "@/components/prompt-detail/PromptText";
@@ -23,10 +24,19 @@ interface PromptPageProps {
 
 export default async function PromptPage(props: PromptPageProps) {
   const params = await props.params;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   let prompt;
+  let favorited = false;
 
   try {
     const basicPrompt = await getPromptById(params.id);
+    
+    if (user) {
+      favorited = await isFavorite(user.id, params.id);
+    }
+
     // Convert to DetailedPrompt using real data from Supabase
     prompt = {
       ...basicPrompt,
@@ -89,7 +99,7 @@ export default async function PromptPage(props: PromptPageProps) {
 
           {/* Right Column: Details & Prompt */}
           <div className="w-full flex flex-col">
-            <PromptDetails prompt={prompt} />
+            <PromptDetails prompt={prompt} isFavorited={favorited} />
             <PromptText prompt={prompt} />
           </div>
 

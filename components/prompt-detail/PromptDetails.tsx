@@ -1,13 +1,14 @@
 import type { DetailedPrompt } from "@/lib/supabase/queries";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Eye, Heart, BookmarkPlus, Calendar, User } from "lucide-react";
+import { Eye, Heart, Calendar, User } from "lucide-react";
+import { FavoriteButton } from "./FavoriteButton";
 
 interface PromptDetailsProps {
   prompt: DetailedPrompt;
+  isFavorited?: boolean;
 }
 
-export function PromptDetails({ prompt }: PromptDetailsProps) {
+export function PromptDetails({ prompt, isFavorited = false }: PromptDetailsProps) {
   return (
     <div className="flex flex-col gap-6">
       {/* Header and Title */}
@@ -40,7 +41,7 @@ export function PromptDetails({ prompt }: PromptDetailsProps) {
             </div>
             <div>
               <p className="text-white font-semibold">{prompt.views.toLocaleString("pt-BR")}</p>
-              <p className="text-xs text-gray-500 uppercase tracking-wider">Views</p>
+              <p className="text-xs text-gray-500 uppercase tracking-wider">Visualizações</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -49,16 +50,13 @@ export function PromptDetails({ prompt }: PromptDetailsProps) {
             </div>
             <div>
               <p className="text-white font-semibold">{prompt.likes.toLocaleString("pt-BR")}</p>
-              <p className="text-xs text-gray-500 uppercase tracking-wider">Likes</p>
+              <p className="text-xs text-gray-500 uppercase tracking-wider">Curtidas</p>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" className="bg-transparent border-white/10 text-white hover:bg-green-neon/10 hover:text-green-neon hover:border-green-neon/30 transition-all h-10">
-            <BookmarkPlus className="w-4 h-4 mr-2" />
-            Favoritar
-          </Button>
+          <FavoriteButton promptId={prompt.id} initialIsFavorite={isFavorited} />
         </div>
 
       </div>

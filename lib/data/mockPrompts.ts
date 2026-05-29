@@ -18,11 +18,13 @@ export interface DetailedPrompt extends Prompt {
 
 // Funções para obter dados reais do Supabase
 export async function fetchPrompts(limit = 50, offset = 0): Promise<Prompt[]> {
-  return await getPrompts(limit, offset);
+  const { data } = await getPrompts({ limit, offset });
+  return data;
 }
 
 export async function fetchCategories(): Promise<Category[]> {
-  return await getCategories();
+  const { data } = await getCategories();
+  return data;
 }
 
 // Dados mock mantidos para fallback ou desenvolvimento

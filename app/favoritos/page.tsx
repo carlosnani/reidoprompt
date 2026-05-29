@@ -1,7 +1,7 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { GalleryGrid } from "@/components/prompts/GalleryGrid";
-import { GalleryPagination } from "@/components/prompts/GalleryPagination";
+import { AppPagination } from "@/components/AppPagination";
 import { getUserFavorites } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
 import { Heart } from "lucide-react";
@@ -32,9 +32,11 @@ export default async function FavoritosPage() {
   }
 
   let favoritePrompts: any[] = [];
+  let favoriteIds = new Set<string>();
   try {
     const favorites = await getUserFavorites(user.id);
     favoritePrompts = favorites.map((fav: any) => fav.prompts);
+    favoriteIds = new Set(favoritePrompts.map(p => p.id));
   } catch (error) {
     console.error("Error loading favorites:", error);
   }
@@ -79,9 +81,14 @@ export default async function FavoritosPage() {
         
         {favoritePrompts.length > 0 ? (
           <div className="animate-in fade-in duration-500 delay-200">
-            <GalleryGrid prompts={favoritePrompts} />
+            <GalleryGrid prompts={favoritePrompts} favoriteIds={favoriteIds} />
             <div className="mt-20">
-              <GalleryPagination />
+              <AppPagination 
+                currentPage={1} 
+                totalPages={1} 
+                baseUrl="/favoritos" 
+                className="animate-in fade-in duration-1000 delay-300"
+              />
             </div>
           </div>
         ) : (

@@ -4,7 +4,8 @@ import { Footer } from "@/components/Footer";
 import { GalleryHeader } from "@/components/prompts/GalleryHeader";
 import { GalleryGrid } from "@/components/prompts/GalleryGrid";
 import { GalleryPagination } from "@/components/prompts/GalleryPagination";
-import { getPrompts, getCategories } from "@/lib/supabase/queries";
+import { getPrompts, getCategories, getUserFavorites } from "@/lib/supabase/queries";
+import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -42,6 +43,11 @@ export default async function PromptsGalleryPage({
     categoryId,
     orderBy: sort
   });
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const favorites = user ? await getUserFavorites(user.id) : [];
+  const favoriteIds = new Set(favorites.map(f => f.prompt_id));
   
   const totalPages = Math.ceil(count / limit);
   const baseUrl = "/prompts";
@@ -78,7 +84,7 @@ export default async function PromptsGalleryPage({
         <GalleryHeader categories={categories} />
         
         {/* Passando os dados do Supabase */}
-        <GalleryGrid prompts={prompts} />
+        <GalleryGrid prompts={prompts} favoriteIds={favoriteIds} />
         
         {prompts.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 text-center">

@@ -102,7 +102,7 @@ export function CategoryMultiSelect({ categories, name = "categories" }: Categor
         options={options}
         value={selectedOptions}
         onChange={handleChange}
-        placeholder={categories.length > 0 ? "Select categories..." : "No categories available"}
+        placeholder={categories.length > 0 ? "Selecione as categorias..." : "Nenhuma categoria disponível"}
         styles={customStyles}
         isDisabled={categories.length === 0}
         classNamePrefix="react-select"

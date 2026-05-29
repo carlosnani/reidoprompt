@@ -29,32 +29,32 @@ export default async function AdminCategoriesPage({
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight text-admin-text">Categories</h2>
+        <h2 className="text-3xl font-bold tracking-tight text-admin-text">Categorias</h2>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
         <div className="md:col-span-1">
           <Card className="bg-admin-surface border-admin-border shadow-sm">
             <CardHeader>
-              <CardTitle className="text-admin-text">Add Category</CardTitle>
+              <CardTitle className="text-admin-text">Adicionar Categoria</CardTitle>
               <CardDescription className="text-admin-text-muted">
-                Create a new category to organize prompts.
+                Crie uma nova categoria para organizar os prompts.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form action={addCategoryAction as unknown as (payload: FormData) => void} className="space-y-4">
                 <div className="space-y-2">
-                  <label htmlFor="name" className="text-sm font-medium text-admin-text">Name</label>
-                  <Input id="name" name="name" placeholder="e.g. Fantasy" required className="bg-admin-bg border-admin-border text-admin-text" />
+                  <label htmlFor="name" className="text-sm font-medium text-admin-text">Nome</label>
+                  <Input id="name" name="name" placeholder="ex: Fantasia" required className="bg-admin-bg border-admin-border text-admin-text" />
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="slug" className="text-sm font-medium text-admin-text">Slug</label>
-                  <Input id="slug" name="slug" placeholder="e.g. fantasy" required className="bg-admin-bg border-admin-border text-admin-text" />
-                  <p className="text-xs text-admin-text-muted">URL friendly name</p>
+                  <Input id="slug" name="slug" placeholder="ex: fantasia" required className="bg-admin-bg border-admin-border text-admin-text" />
+                  <p className="text-xs text-admin-text-muted">Nome amigável para URL</p>
                 </div>
                 <SubmitToastButton className="w-full bg-admin-primary hover:bg-admin-primary-hover text-white" message="Categoria adicionada.">
                   <Plus className="w-4 h-4 mr-2" />
-                  Add Category
+                  Adicionar Categoria
                 </SubmitToastButton>
               </form>
             </CardContent>
@@ -67,10 +67,10 @@ export default async function AdminCategoriesPage({
               <table className="w-full text-sm text-left">
                 <thead className="border-b border-admin-border bg-admin-muted/50 text-admin-text-secondary">
                   <tr>
-                    <th className="h-12 px-4 align-middle font-medium">Name</th>
+                    <th className="h-12 px-4 align-middle font-medium">Nome</th>
                     <th className="h-12 px-4 align-middle font-medium">Slug</th>
                     <th className="h-12 px-4 align-middle font-medium text-right">Prompts</th>
-                    <th className="h-12 px-4 align-middle font-medium text-right">Actions</th>
+                    <th className="h-12 px-4 align-middle font-medium text-right">Ações</th>
                   </tr>
                 </thead>
                 <tbody className="text-admin-text">
@@ -92,7 +92,7 @@ export default async function AdminCategoriesPage({
                         <div className="flex items-center justify-end gap-2">
                           <Button variant="ghost" size="icon" className="hover:text-admin-primary hover:bg-admin-primary-soft">
                             <Edit className="w-4 h-4" />
-                            <span className="sr-only">Edit</span>
+                            <span className="sr-only">Editar</span>
                           </Button>
                           <DeleteAction id={category.id} entityName="Categoria" action={deleteCategoryAction} />
                         </div>

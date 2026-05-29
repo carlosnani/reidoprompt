@@ -5,7 +5,7 @@ import { Sparkles } from "lucide-react";
 export async function RelatedPrompts() {
   let related: Prompt[] = [];
   try {
-    const prompts = await getPrompts(10);
+    const { data: prompts } = await getPrompts({ limit: 10 });
     // Shuffle and pick 4
     related = [...prompts].sort(() => 0.5 - Math.random()).slice(0, 4);
   } catch (error) {

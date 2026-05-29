@@ -15,12 +15,12 @@ import {
 import Image from "next/image";
 
 export const sidebarLinks = [
-  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { name: "Painel", href: "/admin", icon: LayoutDashboard },
   { name: "Prompts", href: "/admin/prompts", icon: ImageIcon },
-  { name: "Categories", href: "/admin/categories", icon: Tags },
-  { name: "AI Models", href: "/admin/models", icon: Cpu },
-  { name: "Users", href: "/admin/users", icon: Users },
-  { name: "Settings", href: "/admin/settings", icon: Settings },
+  { name: "Categorias", href: "/admin/categories", icon: Tags },
+  { name: "Modelos de IA", href: "/admin/models", icon: Cpu },
+  { name: "Usuários", href: "/admin/users", icon: Users },
+  { name: "Configurações", href: "/admin/settings", icon: Settings },
 ];
 
 export function Sidebar() {
@@ -72,7 +72,7 @@ export function Sidebar() {
           className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-admin-text-secondary hover:text-admin-text hover:bg-admin-muted transition-all"
         >
           <LogOut className="w-4 h-4" />
-          Exit Admin
+          Sair do Admin
         </Link>
       </div>
     </aside>

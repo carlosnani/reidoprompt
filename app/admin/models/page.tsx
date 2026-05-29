@@ -30,35 +30,35 @@ export default async function AdminModelsPage({
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight text-admin-text">AI Models</h2>
+        <h2 className="text-3xl font-bold tracking-tight text-admin-text">Modelos de IA</h2>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
         <div className="md:col-span-1">
           <Card className="bg-admin-surface border-admin-border shadow-sm">
             <CardHeader>
-              <CardTitle className="text-admin-text">Add AI Model</CardTitle>
+              <CardTitle className="text-admin-text">Adicionar Modelo</CardTitle>
               <CardDescription className="text-admin-text-muted">
-                Register a new AI model for prompts.
+                Registre um novo modelo de IA para os prompts.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form action={addAiModelAction as unknown as (payload: FormData) => void} className="space-y-4">
                 <div className="space-y-2">
-                  <label htmlFor="name" className="text-sm font-medium text-admin-text">Model Name</label>
-                  <Input id="name" name="name" placeholder="e.g. Midjourney v6" required className="bg-admin-bg border-admin-border text-admin-text" />
+                  <label htmlFor="name" className="text-sm font-medium text-admin-text">Nome do Modelo</label>
+                  <Input id="name" name="name" placeholder="ex: Midjourney v6" required className="bg-admin-bg border-admin-border text-admin-text" />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="provider" className="text-sm font-medium text-admin-text">Provider</label>
-                  <Input id="provider" name="provider" placeholder="e.g. Midjourney" className="bg-admin-bg border-admin-border text-admin-text" />
+                  <label htmlFor="provider" className="text-sm font-medium text-admin-text">Provedor</label>
+                  <Input id="provider" name="provider" placeholder="ex: Midjourney" className="bg-admin-bg border-admin-border text-admin-text" />
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="slug" className="text-sm font-medium text-admin-text">Slug</label>
-                  <Input id="slug" name="slug" placeholder="e.g. midjourney-v6" required className="bg-admin-bg border-admin-border text-admin-text" />
+                  <Input id="slug" name="slug" placeholder="ex: midjourney-v6" required className="bg-admin-bg border-admin-border text-admin-text" />
                 </div>
                 <SubmitToastButton className="w-full bg-admin-primary hover:bg-admin-primary-hover text-white" message="Modelo criado.">
                   <Plus className="w-4 h-4 mr-2" />
-                  Add Model
+                  Adicionar Modelo
                 </SubmitToastButton>
               </form>
             </CardContent>
@@ -71,10 +71,10 @@ export default async function AdminModelsPage({
               <table className="w-full text-sm text-left">
                 <thead className="border-b border-admin-border bg-admin-muted/50 text-admin-text-secondary">
                   <tr>
-                    <th className="h-12 px-4 align-middle font-medium">Name</th>
-                    <th className="h-12 px-4 align-middle font-medium">Provider</th>
+                    <th className="h-12 px-4 align-middle font-medium">Nome</th>
+                    <th className="h-12 px-4 align-middle font-medium">Provedor</th>
                     <th className="h-12 px-4 align-middle font-medium text-right">Prompts</th>
-                    <th className="h-12 px-4 align-middle font-medium text-right">Actions</th>
+                    <th className="h-12 px-4 align-middle font-medium text-right">Ações</th>
                   </tr>
                 </thead>
                 <tbody className="text-admin-text">
@@ -97,7 +97,7 @@ export default async function AdminModelsPage({
                           <Link href={`/admin/models/${model.id}/edit`}>
                             <Button variant="ghost" size="icon" className="hover:text-admin-primary hover:bg-admin-primary-soft">
                               <Edit className="w-4 h-4" />
-                              <span className="sr-only">Edit</span>
+                              <span className="sr-only">Editar</span>
                             </Button>
                           </Link>
                           <DeleteAction id={model.id} entityName="Modelo" action={deleteAiModelAction} />

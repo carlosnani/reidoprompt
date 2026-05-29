@@ -7,9 +7,9 @@ import { getAiModelById } from "@/lib/supabase/queries";
 import { requireAdmin } from "@/lib/supabase/auth";
 import { editAiModelAction } from "../../../actions";
 
-export default async function EditModelPage({ params }: { params: { id: string } }) {
+export default async function EditModelPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();
-  const { id } = params;
+  const { id } = await params;
   const model = await getAiModelById(id);
 
   return (
@@ -23,7 +23,7 @@ export default async function EditModelPage({ params }: { params: { id: string }
         <div className="md:col-span-1">
           <Card className="bg-admin-surface border-admin-border shadow-sm">
             <CardHeader>
-              <CardTitle className="text-admin-text">Edit AI Model</CardTitle>
+              <CardTitle className="text-admin-text">Editar Modelo de IA</CardTitle>
               <CardDescription className="text-admin-text-muted">
                 Atualize os dados do modelo.
               </CardDescription>
@@ -31,16 +31,16 @@ export default async function EditModelPage({ params }: { params: { id: string }
             <CardContent>
               <form action={editAiModelAction.bind(null, id) as unknown as (formData: FormData) => void} className="space-y-4">
                 <div className="space-y-2">
-                  <label htmlFor="name" className="text-sm font-medium text-admin-text">Model Name</label>
-                  <Input id="name" name="name" defaultValue={model.name} placeholder="e.g. Midjourney v6" required className="bg-admin-bg border-admin-border text-admin-text" />
+                  <label htmlFor="name" className="text-sm font-medium text-admin-text">Nome do Modelo</label>
+                  <Input id="name" name="name" defaultValue={model.name} placeholder="ex: Midjourney v6" required className="bg-admin-bg border-admin-border text-admin-text" />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="provider" className="text-sm font-medium text-admin-text">Provider</label>
-                  <Input id="provider" name="provider" defaultValue={model.provider || ''} placeholder="e.g. Midjourney" className="bg-admin-bg border-admin-border text-admin-text" />
+                  <label htmlFor="provider" className="text-sm font-medium text-admin-text">Provedor</label>
+                  <Input id="provider" name="provider" defaultValue={model.provider || ''} placeholder="ex: Midjourney" className="bg-admin-bg border-admin-border text-admin-text" />
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="slug" className="text-sm font-medium text-admin-text">Slug</label>
-                  <Input id="slug" name="slug" defaultValue={model.slug} placeholder="e.g. midjourney-v6" required className="bg-admin-bg border-admin-border text-admin-text" />
+                  <Input id="slug" name="slug" defaultValue={model.slug} placeholder="ex: midjourney-v6" required className="bg-admin-bg border-admin-border text-admin-text" />
                 </div>
                 <Button type="submit" className="w-full bg-admin-primary hover:bg-admin-primary-hover text-white">Salvar</Button>
               </form>

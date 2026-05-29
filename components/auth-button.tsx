@@ -17,10 +17,10 @@ export async function AuthButton() {
 
   return user ? (
     <div className="flex flex-wrap items-center gap-4">
-      <div className="text-sm">Hey, {user.email}!</div>
+      <div className="text-sm">Olá, {user.email}!</div>
       <div className="flex flex-wrap gap-2">
         <Button asChild size="sm" variant="outline">
-          <Link href="/conta">Dashboard</Link>
+          <Link href="/conta">Minha Conta</Link>
         </Button>
         {isAdmin ? (
           <Button asChild size="sm" variant="outline">
@@ -33,10 +33,10 @@ export async function AuthButton() {
   ) : (
     <div className="flex gap-2">
       <Button asChild size="sm" variant={"outline"}>
-        <Link href="/auth/login">Sign in</Link>
+        <Link href="/auth/login">Entrar</Link>
       </Button>
       <Button asChild size="sm" variant={"default"}>
-        <Link href="/auth/sign-up">Sign up</Link>
+        <Link href="/auth/sign-up">Cadastrar</Link>
       </Button>
     </div>
   );

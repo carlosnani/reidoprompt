@@ -23,7 +23,7 @@ export function MobileSidebar() {
     <>
       <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen(true)}>
         <Menu className="w-5 h-5" />
-        <span className="sr-only">Toggle Menu</span>
+        <span className="sr-only">Abrir Menu</span>
       </Button>
 
       {open && mounted && createPortal(
@@ -83,7 +83,7 @@ export function MobileSidebar() {
                 onClick={() => setOpen(false)}
               >
                 <LogOut className="w-4 h-4" />
-                Exit Admin
+                Sair do Admin
               </Link>
             </div>
           </div>

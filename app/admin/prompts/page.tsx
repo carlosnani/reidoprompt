@@ -21,7 +21,7 @@ export default async function AdminPromptsPage({
   const limit = 10;
   const offset = (currentPage - 1) * limit;
 
-  const { data: prompts, count } = await getPrompts(limit, offset);
+  const { data: prompts, count } = await getPrompts({ limit, offset });
   const totalPages = Math.ceil(count / limit);
 
   return (
@@ -31,7 +31,7 @@ export default async function AdminPromptsPage({
         <Link href="/admin/prompts/new">
           <Button className="bg-admin-primary hover:bg-admin-primary-hover text-white">
             <Plus className="w-4 h-4 mr-2" />
-            New Prompt
+            Novo Prompt
           </Button>
         </Link>
       </div>
@@ -41,13 +41,13 @@ export default async function AdminPromptsPage({
           <table className="w-full text-sm text-left">
             <thead className="border-b border-admin-border bg-admin-muted/50 text-admin-text-secondary">
               <tr>
-                <th className="h-12 px-4 align-middle font-medium">Image</th>
-                <th className="h-12 px-4 align-middle font-medium">Title</th>
+                <th className="h-12 px-4 align-middle font-medium">Imagem</th>
+                <th className="h-12 px-4 align-middle font-medium">Título</th>
                 <th className="h-12 px-4 align-middle font-medium">Status</th>
-                <th className="h-12 px-4 align-middle font-medium">Views</th>
-                <th className="h-12 px-4 align-middle font-medium">Likes</th>
+                <th className="h-12 px-4 align-middle font-medium">Visualizações</th>
+                <th className="h-12 px-4 align-middle font-medium">Curtidas</th>
                 <th className="h-12 px-4 align-middle font-medium text-right">
-                  Actions
+                  Ações
                 </th>
               </tr>
             </thead>
@@ -73,7 +73,7 @@ export default async function AdminPromptsPage({
                         Premium
                       </Badge>
                     ) : (
-                      <Badge variant="secondary" className="bg-admin-muted text-admin-text-secondary hover:bg-admin-muted border-none">Free</Badge>
+                      <Badge variant="secondary" className="bg-admin-muted text-admin-text-secondary hover:bg-admin-muted border-none">Grátis</Badge>
                     )}
                   </td>
                   <td className="p-4 align-middle text-admin-text-secondary">{prompt.views}</td>
@@ -83,7 +83,7 @@ export default async function AdminPromptsPage({
                       <Link href={`/admin/prompts/edit/${prompt.id}`}>
                         <Button variant="ghost" size="icon" className="hover:text-admin-primary hover:bg-admin-primary-soft">
                           <Edit className="w-4 h-4" />
-                          <span className="sr-only">Edit</span>
+                          <span className="sr-only">Editar</span>
                         </Button>
                       </Link>
                       <DeleteAction id={prompt.id} entityName="Prompt" action={deletePromptAction} />
@@ -94,7 +94,7 @@ export default async function AdminPromptsPage({
               {prompts.length === 0 && (
                 <tr>
                   <td colSpan={6} className="p-8 text-center text-admin-text-muted">
-                    No prompts found. Click &quot;New Prompt&quot; to add one.
+                    Nenhum prompt encontrado. Clique em &quot;Novo Prompt&quot; para adicionar um.
                   </td>
                 </tr>
               )}

@@ -121,7 +121,12 @@ export async function createPrompt(
   prompt: Omit<Prompt, 'id' | 'created_at' | 'updated_at' | 'ai_model' | 'prompt_categories'>,
   categoryIds?: string[]
 ) {
-  const supabase = await createClient();
+  let supabase;
+  try {
+    supabase = createServiceRoleClient();
+  } catch {
+    supabase = await createClient();
+  }
 
   console.log('createPrompt: inserting prompt payload:', {
     ...prompt,
@@ -164,7 +169,12 @@ export async function updatePrompt(
   updates: Partial<Omit<Prompt, 'ai_model' | 'prompt_categories'>>,
   categoryIds?: string[]
 ) {
-  const supabase = await createClient();
+  let supabase;
+  try {
+    supabase = createServiceRoleClient();
+  } catch {
+    supabase = await createClient();
+  }
 
   const { data, error } = await supabase
     .from('prompts')
@@ -199,7 +209,12 @@ export async function updatePrompt(
 }
 
 export async function deletePrompt(id: string) {
-  const supabase = await createClient();
+  let supabase;
+  try {
+    supabase = createServiceRoleClient();
+  } catch {
+    supabase = await createClient();
+  }
 
   // Delete category associations first
   await supabase.from('prompt_categories').delete().eq('prompt_id', id);
@@ -223,12 +238,20 @@ export async function getCategories(limit = 100, offset = 0) {
     .range(offset, offset + limit - 1)
     .order('name');
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching categories:', error);
+    return { data: [], count: 0 };
+  }
   return { data: data as Category[], count: count || 0 };
 }
 
 export async function createCategory(category: Omit<Category, 'id'>) {
-  const supabase = await createClient();
+  let supabase;
+  try {
+    supabase = createServiceRoleClient();
+  } catch {
+    supabase = await createClient();
+  }
 
   const { data, error } = await supabase
     .from('categories')
@@ -241,7 +264,12 @@ export async function createCategory(category: Omit<Category, 'id'>) {
 }
 
 export async function updateCategory(id: string, updates: Partial<Category>) {
-  const supabase = await createClient();
+  let supabase;
+  try {
+    supabase = createServiceRoleClient();
+  } catch {
+    supabase = await createClient();
+  }
 
   const { data, error } = await supabase
     .from('categories')
@@ -255,7 +283,12 @@ export async function updateCategory(id: string, updates: Partial<Category>) {
 }
 
 export async function deleteCategory(id: string) {
-  const supabase = await createClient();
+  let supabase;
+  try {
+    supabase = createServiceRoleClient();
+  } catch {
+    supabase = await createClient();
+  }
 
   // Delete prompt_categories associations first
   await supabase.from('prompt_categories').delete().eq('category_id', id);
@@ -378,19 +411,32 @@ export async function deleteUser(id: string) {
 // ==================== FAVORITES ====================
 
 export async function getUserFavorites(userId: string) {
-  const supabase = await createClient();
+  let supabase;
+  try {
+    supabase = createServiceRoleClient();
+  } catch {
+    supabase = await createClient();
+  }
 
   const { data, error } = await supabase
     .from('favorites')
     .select('prompt_id, prompts(*)')
     .eq('user_id', userId);
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching favorites:', error);
+    return [];
+  }
   return data;
 }
 
 export async function addFavorite(userId: string, promptId: string) {
-  const supabase = await createClient();
+  let supabase;
+  try {
+    supabase = createServiceRoleClient();
+  } catch {
+    supabase = await createClient();
+  }
 
   const { data, error } = await supabase
     .from('favorites')
@@ -401,7 +447,12 @@ export async function addFavorite(userId: string, promptId: string) {
 }
 
 export async function removeFavorite(userId: string, promptId: string) {
-  const supabase = await createClient();
+  let supabase;
+  try {
+    supabase = createServiceRoleClient();
+  } catch {
+    supabase = await createClient();
+  }
 
   const { error } = await supabase
     .from('favorites')
@@ -410,4 +461,23 @@ export async function removeFavorite(userId: string, promptId: string) {
     .eq('prompt_id', promptId);
 
   if (error) throw error;
+}
+
+export async function isFavorite(userId: string, promptId: string) {
+  let supabase;
+  try {
+    supabase = createServiceRoleClient();
+  } catch {
+    supabase = await createClient();
+  }
+
+  const { data, error } = await supabase
+    .from('favorites')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('prompt_id', promptId)
+    .maybeSingle();
+
+  if (error) return false;
+  return !!data;
 }

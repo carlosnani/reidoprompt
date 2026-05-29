@@ -208,6 +208,8 @@ CREATE TABLE public.favorites (
 ## 📝 Convenções de Desenvolvimento
 - **Server Components:** Utilizar por padrão para buscar dados e SEO.
 - **Client Components:** Apenas para interatividade (forms, sliders, botões de ação).
+- **Next.js 15+ Dynamic Routes:** Os `params` e `searchParams` em páginas de rotas dinâmicas são **Promises** e devem ser sempre aguardados (`await params` ou `await searchParams`) antes do uso.
+- **Paginação e Retorno de Dados:** Funções de listagem (como `getPrompts`, `getCategories`, `getAiModels`) retornam um objeto `{ data: T[], count: number }`. Sempre desestruturar o resultado para acessar o array de dados.
 - **TypeScript:** Tipagem estrita em todas as funções de `queries.ts`.
 - **Commits:** Seguir o padrão de commits semânticos se possível.
 - **Supabase:** Sempre usar `createClient` do arquivo `lib/supabase/server.ts` dentro de Server Components e `client.ts` em Client Components.

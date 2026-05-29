@@ -12,7 +12,7 @@ export function Header() {
           <Search className="w-4 h-4 absolute left-3 text-admin-text-muted" />
           <Input
             type="search"
-            placeholder="Search across admin..."
+            placeholder="Pesquisar no admin..."
             className="w-full pl-9 bg-admin-muted border-transparent focus-visible:bg-admin-surface focus-visible:border-admin-primary text-admin-text placeholder:text-admin-text-muted"
           />
         </div>
@@ -22,7 +22,7 @@ export function Header() {
         <Button variant="ghost" size="icon" className="relative text-admin-text-secondary hover:text-admin-text hover:bg-admin-muted">
           <Bell className="w-5 h-5" />
           <span className="absolute top-2 right-2 w-2 h-2 bg-admin-primary rounded-full" />
-          <span className="sr-only">Notifications</span>
+          <span className="sr-only">Notificações</span>
         </Button>
         <div className="w-8 h-8 rounded-full bg-admin-muted overflow-hidden border border-admin-border">
           <img

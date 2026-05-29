@@ -8,8 +8,8 @@ export default function AdminSettingsPage() {
   return (
     <div className="flex-1 space-y-8 max-w-4xl mx-auto w-full pb-10">
       <div className="flex flex-col gap-2">
-        <h2 className="text-3xl font-bold tracking-tight text-admin-text">Settings</h2>
-        <p className="text-admin-text-secondary">Manage your platform global configurations and preferences.</p>
+        <h2 className="text-3xl font-bold tracking-tight text-admin-text">Configurações</h2>
+        <p className="text-admin-text-secondary">Gerencie as configurações globais e preferências da plataforma.</p>
       </div>
 
       <div className="space-y-6">
@@ -21,19 +21,19 @@ export default function AdminSettingsPage() {
                 <Layout className="w-5 h-5" />
               </div>
               <div>
-                <CardTitle className="text-xl text-admin-text">Platform Details</CardTitle>
-                <CardDescription className="text-admin-text-muted">Basic information about your SaaS platform.</CardDescription>
+                <CardTitle className="text-xl text-admin-text">Detalhes da Plataforma</CardTitle>
+                <CardDescription className="text-admin-text-muted">Informações básicas sobre sua plataforma SaaS.</CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-6 pt-6">
             <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-2">
-                <label htmlFor="platformName" className="text-sm font-semibold text-admin-text">Platform Name</label>
+                <label htmlFor="platformName" className="text-sm font-semibold text-admin-text">Nome da Plataforma</label>
                 <Input id="platformName" defaultValue="Rei do Prompt" className="bg-admin-bg border-admin-border-strong text-admin-text focus-visible:ring-admin-primary" />
               </div>
               <div className="space-y-2">
-                <label htmlFor="supportEmail" className="text-sm font-semibold text-admin-text">Support Email</label>
+                <label htmlFor="supportEmail" className="text-sm font-semibold text-admin-text">E-mail de Suporte</label>
                 <Input id="supportEmail" type="email" defaultValue="suporte@reidoprompt.com" className="bg-admin-bg border-admin-border-strong text-admin-text focus-visible:ring-admin-primary" />
               </div>
             </div>
@@ -41,7 +41,7 @@ export default function AdminSettingsPage() {
           <CardFooter className="bg-admin-muted/20 border-t border-admin-border-light px-6 py-4 flex justify-end">
             <SubmitToastButton message="Detalhes da plataforma salvos com sucesso!" className="bg-admin-primary hover:bg-admin-primary-hover text-white">
               <Save className="w-4 h-4 mr-2" />
-              Save Changes
+              Salvar Alterações
             </SubmitToastButton>
           </CardFooter>
         </Card>
@@ -54,32 +54,32 @@ export default function AdminSettingsPage() {
                 <CreditCard className="w-5 h-5" />
               </div>
               <div>
-                <CardTitle className="text-xl text-admin-text">Subscription Configuration</CardTitle>
-                <CardDescription className="text-admin-text-muted">Manage your pricing and payment gateway settings.</CardDescription>
+                <CardTitle className="text-xl text-admin-text">Configuração de Assinatura</CardTitle>
+                <CardDescription className="text-admin-text-muted">Gerencie os preços e as configurações do gateway de pagamento.</CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-6 pt-6">
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label htmlFor="monthlyPrice" className="text-sm font-semibold text-admin-text">Monthly Price (R$)</label>
+                <label htmlFor="monthlyPrice" className="text-sm font-semibold text-admin-text">Preço Mensal (R$)</label>
                 <Input id="monthlyPrice" type="number" defaultValue="39.90" step="0.01" className="bg-admin-bg border-admin-border-strong text-admin-text focus-visible:ring-admin-primary" />
               </div>
               <div className="space-y-2">
-                <label htmlFor="yearlyPrice" className="text-sm font-semibold text-admin-text">Yearly Price (R$)</label>
+                <label htmlFor="yearlyPrice" className="text-sm font-semibold text-admin-text">Preço Anual (R$)</label>
                 <Input id="yearlyPrice" type="number" defaultValue="399.00" step="0.01" className="bg-admin-bg border-admin-border-strong text-admin-text focus-visible:ring-admin-primary" />
               </div>
             </div>
             
             <div className="p-4 rounded-xl bg-admin-info-soft border border-admin-info/20 text-sm text-admin-info flex gap-3 shadow-sm">
               <div className="shrink-0 mt-0.5">ℹ️</div>
-              <p className="font-bold text-admin-text">Stripe API keys are securely managed via environment variables and are not exposed in this dashboard.</p>
+              <p className="font-bold text-admin-text">As chaves da API do Stripe são gerenciadas com segurança via variáveis de ambiente e não são expostas neste painel.</p>
             </div>
           </CardContent>
           <CardFooter className="bg-admin-muted/20 border-t border-admin-border-light px-6 py-4 flex justify-end">
             <SubmitToastButton message="Configurações de assinatura salvas com sucesso!" className="bg-admin-primary hover:bg-admin-primary-hover text-white">
               <Save className="w-4 h-4 mr-2" />
-              Save Configuration
+              Salvar Configuração
             </SubmitToastButton>
           </CardFooter>
         </Card>
@@ -92,18 +92,18 @@ export default function AdminSettingsPage() {
                 <Globe className="w-5 h-5" />
               </div>
               <div>
-                <CardTitle className="text-xl text-admin-text">SEO & Metadata</CardTitle>
-                <CardDescription className="text-admin-text-muted">Configure the default SEO tags for the platform.</CardDescription>
+                <CardTitle className="text-xl text-admin-text">SEO e Metadados</CardTitle>
+                <CardDescription className="text-admin-text-muted">Configure as tags de SEO padrão para a plataforma.</CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-6 pt-6">
             <div className="space-y-2">
-              <label htmlFor="seoTitle" className="text-sm font-semibold text-admin-text">Default Meta Title</label>
+              <label htmlFor="seoTitle" className="text-sm font-semibold text-admin-text">Título Meta Padrão</label>
               <Input id="seoTitle" defaultValue="Rei do Prompt - A maior galeria de Prompts" className="bg-admin-bg border-admin-border-strong text-admin-text focus-visible:ring-admin-primary" />
             </div>
             <div className="space-y-2">
-              <label htmlFor="seoDesc" className="text-sm font-semibold text-admin-text">Default Meta Description</label>
+              <label htmlFor="seoDesc" className="text-sm font-semibold text-admin-text">Descrição Meta Padrão</label>
               <textarea 
                 id="seoDesc" 
                 rows={4}
@@ -115,7 +115,7 @@ export default function AdminSettingsPage() {
           <CardFooter className="bg-admin-muted/20 border-t border-admin-border-light px-6 py-4 flex justify-end">
             <SubmitToastButton message="Dados de SEO salvos com sucesso!" className="bg-admin-primary hover:bg-admin-primary-hover text-white">
               <Save className="w-4 h-4 mr-2" />
-              Save SEO Data
+              Salvar Dados de SEO
             </SubmitToastButton>
           </CardFooter>
         </Card>

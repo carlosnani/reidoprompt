@@ -10,14 +10,15 @@ import { requireAdmin } from "@/lib/supabase/auth";
 import { editPromptAction } from "../../../actions";
 import { notFound } from "next/navigation";
 
-export default async function EditPromptPage({ params }: { params: { id: string } }) {
+export default async function EditPromptPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();
-  const categories = await getCategories();
-  const models = await getAiModels();
+  const { data: categories } = await getCategories();
+  const { data: models } = await getAiModels();
+  const { id } = await params;
   
   let prompt;
   try {
-    prompt = await getPromptById(params.id);
+    prompt = await getPromptById(id);
   } catch (error) {
     notFound();
   }
@@ -38,8 +39,8 @@ export default async function EditPromptPage({ params }: { params: { id: string 
           </Button>
         </Link>
         <div className="flex flex-col gap-1">
-          <h2 className="text-3xl font-bold tracking-tight text-admin-text">Edit Prompt</h2>
-          <p className="text-admin-text-secondary">Update details for this prompt in the gallery</p>
+          <h2 className="text-3xl font-bold tracking-tight text-admin-text">Editar Prompt</h2>
+          <p className="text-admin-text-secondary">Atualize os detalhes deste prompt na galeria</p>
         </div>
       </div>
 
@@ -51,14 +52,14 @@ export default async function EditPromptPage({ params }: { params: { id: string 
                 <Info className="w-5 h-5" />
               </div>
               <div>
-                <CardTitle className="text-xl text-admin-text">Basic Information</CardTitle>
-                <CardDescription className="text-admin-text-muted">Details about the prompt that will be displayed in the gallery.</CardDescription>
+                <CardTitle className="text-xl text-admin-text">Informações Básicas</CardTitle>
+                <CardDescription className="text-admin-text-muted">Detalhes sobre o prompt que serão exibidos na galeria.</CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-6 pt-6">
             <div className="space-y-2">
-              <label htmlFor="title" className="text-sm font-semibold text-admin-text">Title</label>
+              <label htmlFor="title" className="text-sm font-semibold text-admin-text">Título</label>
               <Input 
                 id="title" 
                 name="title"
@@ -72,8 +73,8 @@ export default async function EditPromptPage({ params }: { params: { id: string 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
                 <label className="text-sm font-semibold text-admin-text flex items-center gap-2">
-                  Categories
-                  <span className="text-[10px] bg-admin-muted px-2 py-0.5 rounded text-admin-text-secondary">Multiple</span>
+                  Categorias
+                  <span className="text-[10px] bg-admin-muted px-2 py-0.5 rounded text-admin-text-secondary">Múltiplas</span>
                 </label>
                 <div className="grid grid-cols-2 gap-2 max-h-[160px] overflow-y-auto p-3 rounded-md border border-admin-border-strong bg-admin-bg">
                   {categories.map((cat) => (
@@ -93,7 +94,7 @@ export default async function EditPromptPage({ params }: { params: { id: string 
               </div>
               
               <div className="space-y-2">
-                <label htmlFor="ai_model_id" className="text-sm font-semibold text-admin-text">AI Model</label>
+                <label htmlFor="ai_model_id" className="text-sm font-semibold text-admin-text">Modelo de IA</label>
                 <select 
                   id="ai_model_id" 
                   name="ai_model_id"
@@ -101,7 +102,7 @@ export default async function EditPromptPage({ params }: { params: { id: string 
                   required
                   className="flex h-10 w-full rounded-md border border-admin-border-strong bg-admin-bg px-3 py-2 text-sm text-admin-text ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-primary focus-visible:ring-offset-2 transition-all"
                 >
-                  <option value="">Select a model</option>
+                  <option value="">Selecione um modelo</option>
                   {models.map((model) => (
                     <option key={model.id} value={model.id}>{model.name} {model.provider ? `(${model.provider})` : ''}</option>
                   ))}
@@ -111,14 +112,14 @@ export default async function EditPromptPage({ params }: { params: { id: string 
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="description" className="text-sm font-semibold text-admin-text">Description (Optional)</label>
+              <label htmlFor="description" className="text-sm font-semibold text-admin-text">Descrição (Opcional)</label>
               <textarea 
                 id="description" 
                 name="description"
                 defaultValue={prompt.description || ""}
                 rows={3}
                 className="flex w-full rounded-md border border-admin-border-strong bg-admin-bg px-3 py-2 text-sm text-admin-text ring-offset-background placeholder:text-admin-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-primary focus-visible:ring-offset-2 transition-all"
-                placeholder="Brief description of what this achieves..."
+                placeholder="Breve descrição do que este prompt alcança..."
               />
             </div>
           </CardContent>
@@ -131,8 +132,8 @@ export default async function EditPromptPage({ params }: { params: { id: string 
                 <FileText className="w-5 h-5" />
               </div>
               <div>
-                <CardTitle className="text-xl text-admin-text">Prompt Content</CardTitle>
-                <CardDescription className="text-admin-text-muted">The actual prompt text that will be revealed to subscribers.</CardDescription>
+                <CardTitle className="text-xl text-admin-text">Conteúdo do Prompt</CardTitle>
+                <CardDescription className="text-admin-text-muted">O texto real do prompt que será revelado aos assinantes.</CardDescription>
               </div>
             </div>
           </CardHeader>
@@ -140,8 +141,8 @@ export default async function EditPromptPage({ params }: { params: { id: string 
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 rounded-xl bg-admin-muted/30 border border-admin-border-light">
                 <div className="space-y-0.5">
-                  <label htmlFor="is_premium" className="text-sm font-semibold text-admin-text">Premium Content</label>
-                  <p className="text-xs text-admin-text-muted">Make this prompt exclusive for Pro subscribers.</p>
+                  <label htmlFor="is_premium" className="text-sm font-semibold text-admin-text">Conteúdo Premium</label>
+                  <p className="text-xs text-admin-text-muted">Torne este prompt exclusivo para assinantes Pro.</p>
                 </div>
                 <input 
                   type="checkbox" 
@@ -154,7 +155,7 @@ export default async function EditPromptPage({ params }: { params: { id: string 
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="prompt_text" className="text-sm font-semibold text-admin-text">Prompt Text</label>
+                <label htmlFor="prompt_text" className="text-sm font-semibold text-admin-text">Texto do Prompt</label>
                 <textarea 
                   id="prompt_text" 
                   name="prompt_text"
@@ -176,8 +177,8 @@ export default async function EditPromptPage({ params }: { params: { id: string 
                 <Upload className="w-5 h-5" />
               </div>
               <div>
-                <CardTitle className="text-xl text-admin-text">Prompt Images</CardTitle>
-                <CardDescription className="text-admin-text-muted">Upload high-quality results to the reidoprompt bucket.</CardDescription>
+                <CardTitle className="text-xl text-admin-text">Imagens do Prompt</CardTitle>
+                <CardDescription className="text-admin-text-muted">Faça upload dos melhores resultados para o bucket reidoprompt.</CardDescription>
               </div>
             </div>
           </CardHeader>
@@ -193,12 +194,12 @@ export default async function EditPromptPage({ params }: { params: { id: string 
         <div className="flex justify-end items-center gap-4 pt-4">
           <Link href="/admin/prompts">
             <Button variant="ghost" className="text-admin-text-secondary hover:bg-admin-muted">
-              Cancel
+              Cancelar
             </Button>
           </Link>
           <SubmitToastButton message="Prompt atualizado com sucesso!" className="bg-admin-primary hover:bg-admin-primary-hover text-white h-12 px-8 rounded-xl shadow-md">
             <Save className="w-4 h-4 mr-2" />
-            Update Prompt
+            Atualizar Prompt
           </SubmitToastButton>
         </div>
       </form>
