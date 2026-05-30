@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { getPromptById, isFavorite } from "@/lib/supabase/queries";
+import { getPromptById, isFavorite, incrementPromptViews } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
 import { ImageGallery } from "@/components/prompt-detail/ImageGallery";
 import { PromptDetails } from "@/components/prompt-detail/PromptDetails";
@@ -24,6 +24,14 @@ interface PromptPageProps {
 
 export default async function PromptPage(props: PromptPageProps) {
   const params = await props.params;
+
+  // Incrementar visualizações
+  try {
+    await incrementPromptViews(params.id);
+  } catch (err) {
+    console.error("Failed to increment views:", err);
+  }
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 

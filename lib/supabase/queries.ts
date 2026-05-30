@@ -481,3 +481,31 @@ export async function isFavorite(userId: string, promptId: string) {
   if (error) return false;
   return !!data;
 }
+
+export async function incrementPromptViews(id: string) {
+  let supabase;
+  try {
+    supabase = createServiceRoleClient();
+  } catch {
+    supabase = await createClient();
+  }
+
+  // Tenta usar a função RPC do Supabase para incremento atômico
+  const { error: rpcError } = await supabase.rpc('increment_prompt_views', { prompt_id: id });
+
+  if (rpcError) {
+    // Se o RPC não estiver instalado, faz o fallback seguro de busca e atualização
+    const { data, error: selectError } = await supabase
+      .from('prompts')
+      .select('views')
+      .eq('id', id)
+      .single();
+
+    if (!selectError && data) {
+      await supabase
+        .from('prompts')
+        .update({ views: (data.views || 0) + 1 })
+        .eq('id', id);
+    }
+  }
+}
