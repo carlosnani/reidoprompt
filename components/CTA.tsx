@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
+import Link from "next/link";
 
 export function CTA() {
   return (
@@ -42,30 +43,37 @@ export function CTA() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                  <Button className="h-16 px-10 rounded-2xl bg-green-neon cursor-pointer text-black hover:bg-white transition-all font-black text-lg shadow-[0_20px_40px_-10px_rgba(72,255,36,0.3)] hover:shadow-none group">
-                    QUERO COMEÇAR AGORA
-                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                  <Button variant="ghost" className="h-16 px-10 rounded-2xl text-white hover:bg-white/5 font-bold text-lg">
-                    Ver Planos
-                  </Button>
+                  <Link href="/auth/sign-up">
+                    <Button className="h-16 px-10 rounded-2xl bg-green-neon cursor-pointer text-black hover:bg-white transition-all font-black text-lg shadow-[0_20px_40px_-10px_rgba(72,255,36,0.3)] hover:shadow-none group">
+                      QUERO COMEÇAR AGORA
+                      <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </Link>
+
+                  <Link href="/planos">
+                    <Button variant="ghost" className="h-16 px-10 rounded-2xl text-white hover:bg-white/5 font-bold text-lg">
+                      Ver Planos
+                    </Button>
+                  </Link>
+
+
                 </div>
 
                 <div className="flex items-center gap-6 pt-8 border-t border-white/5">
                   <div className="flex -space-x-3">
-                    {[1, 2, 3, 4].map((i) => (
+                    {/* {[1, 2, 3, 4].map((i) => (
                       <div
                         key={i}
                         className="w-10 h-10 rounded-full border-2 border-[#0a0a0a] bg-gradient-to-br from-zinc-700 to-zinc-900 flex items-center justify-center text-white text-sm font-bold"
                       >
                         {i}
                       </div>
-                    ))}
+                    ))} */}
                   </div>
 
-                  <p className="text-sm text-gray-500 font-medium">
+                  {/* <p className="text-sm text-gray-500 font-medium">
                     <span className="text-white font-bold">+2.9k</span> membros satisfeitos
-                  </p>
+                  </p> */}
                 </div>
               </motion.div>
             </div>
