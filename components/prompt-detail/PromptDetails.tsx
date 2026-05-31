@@ -44,7 +44,7 @@ export function PromptDetails({ prompt, isFavorited = false }: PromptDetailsProp
               <p className="text-xs text-gray-500 uppercase tracking-wider">Visualizações</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
               <Heart className="w-5 h-5 text-gray-400" />
             </div>
@@ -52,7 +52,7 @@ export function PromptDetails({ prompt, isFavorited = false }: PromptDetailsProp
               <p className="text-white font-semibold">{prompt.likes.toLocaleString("pt-BR")}</p>
               <p className="text-xs text-gray-500 uppercase tracking-wider">Curtidas</p>
             </div>
-          </div>
+          </div> */}
         </div>
 
         <div className="flex items-center gap-3">

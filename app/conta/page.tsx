@@ -10,7 +10,7 @@ export default function ContaPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#121212] selection:bg-green-neon/30 selection:text-white">
       {/* Background Effects */}
-      <div 
+      <div
         className="fixed inset-0 pointer-events-none opacity-[0.03] z-0"
         style={{
           backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
@@ -55,7 +55,7 @@ async function ContaContent() {
           <Card className="bg-white/5 border-white/10 backdrop-blur-md overflow-hidden">
             <CardHeader className="border-b border-white/5 bg-white/[0.02]">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-green-neon/20 flex items-center justify-center border border-green-neon/30">
+                <div className="w-16 h-16 rounded-full bg-green-neon/20 flex items-center justify-center border border-green-neon/30 p-4 m-2 mb-4">
                   <User className="w-8 h-8 text-green-neon" />
                 </div>
                 <div>
@@ -137,7 +137,7 @@ async function ContaContent() {
           </Card>
         </div>
       </div>
-      
+
       {/* Global Custom Scrollbar Styles */}
       <style dangerouslySetInnerHTML={{
         __html: `

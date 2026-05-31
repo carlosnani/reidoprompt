@@ -4,9 +4,10 @@ import { PromptCard } from "./PromptCard";
 interface GalleryGridProps {
   prompts: Prompt[];
   favoriteIds?: Set<string>;
+  showFavoriteButton?: boolean;
 }
 
-export function GalleryGrid({ prompts, favoriteIds = new Set() }: GalleryGridProps) {
+export function GalleryGrid({ prompts, favoriteIds = new Set(), showFavoriteButton = true }: GalleryGridProps) {
   return (
     <div className="w-full max-w-[1920px] mx-auto animate-in fade-in duration-1000 delay-150">
       {/* 
@@ -19,6 +20,7 @@ export function GalleryGrid({ prompts, favoriteIds = new Set() }: GalleryGridPro
             key={prompt.id} 
             prompt={prompt} 
             isFavorited={favoriteIds.has(prompt.id)} 
+            showFavoriteButton={showFavoriteButton}
           />
         ))}
       </div>

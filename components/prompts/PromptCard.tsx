@@ -1,28 +1,31 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Eye, Heart, Tag } from "lucide-react";
+import { Bookmark, Eye, Heart, Tag } from "lucide-react";
 import type { Prompt } from "@/lib/supabase/queries";
 import { FavoriteButtonCard } from "./FavoriteButtonCard";
 
 interface PromptCardProps {
   prompt: Prompt;
   isFavorited?: boolean;
+  showFavoriteButton?: boolean;
 }
 
-export function PromptCard({ prompt, isFavorited = false }: PromptCardProps) {
+export function PromptCard({ prompt, isFavorited = false, showFavoriteButton = true }: PromptCardProps) {
   // O masonry real é feito pelo break-inside-avoid e mb-4 no pai (GalleryGrid)
   return (
     <div className="relative group">
-      <FavoriteButtonCard promptId={prompt.id} initialIsFavorite={isFavorited} />
-      
-      <Link 
+      {/* {showFavoriteButton && (
+        <FavoriteButtonCard promptId={prompt.id} initialIsFavorite={isFavorited} />
+      )} */}
+
+      <Link
         href={`/prompt/${prompt.id}`}
         className="relative block w-full rounded-sm overflow-hidden bg-white/5 border border-white/5 cursor-pointer"
       >
         {/* Container da Imagem com tamanho fixo (aspect ratio 3:4) */}
         <div className="relative w-full h-full aspect-[3/4] overflow-hidden">
-          <Image 
-            src={prompt.image} 
+          <Image
+            src={prompt.image}
             alt={prompt.tag}
             fill
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, (max-width: 1536px) 20vw, 16vw"
@@ -31,7 +34,7 @@ export function PromptCard({ prompt, isFavorited = false }: PromptCardProps) {
 
           {/* Overlay Hover */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-            
+
             {/* Tag & PRO Badge */}
             <div className="mb-auto mt-2 flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-xs font-medium text-white shadow-lg">
@@ -53,11 +56,11 @@ export function PromptCard({ prompt, isFavorited = false }: PromptCardProps) {
                   {prompt.views.toLocaleString("pt-BR")}
                 </div>
                 <div className="flex items-center gap-1.5 text-sm font-medium">
-                  <Heart className={`w-4 h-4 transition-colors ${isFavorited ? 'text-green-neon fill-current' : 'text-gray-400 group-hover:text-green-neon'}`} />
+                  <Bookmark className={`w-4 h-4 transition-colors ${isFavorited ? 'text-green-neon fill-current' : 'text-gray-400 group-hover:text-green-neon'}`} />
                   {prompt.likes.toLocaleString("pt-BR")}
                 </div>
               </div>
-              
+
               {/* Call to action sutil */}
               <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm group-hover:bg-green-neon/20 transition-colors">
                 <ArrowUpRightIcon className="w-4 h-4 text-white group-hover:text-green-neon" />
