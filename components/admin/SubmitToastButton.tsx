@@ -2,16 +2,30 @@
 
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import { useFormStatus } from "react-dom";
 
 interface SubmitToastButtonProps extends React.ComponentProps<typeof Button> {
   message: string;
 }
 
 export function SubmitToastButton({ message, onClick, children, ...props }: SubmitToastButtonProps) {
-  // Se estamos usando em um formulário real com Server Actions, NÃO fazemos preventDefault
+  const { pending } = useFormStatus();
+  const wasPending = useRef(false);
+
+  useEffect(() => {
+    if (wasPending.current && !pending) {
+      // Pequeno delay para garantir que o redirecionamento ou revalidação começou
+      const timer = setTimeout(() => {
+        toast.success(message);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+    wasPending.current = pending;
+  }, [pending, message]);
+
   return (
-    <Button type="submit" onClick={onClick} {...props}>
+    <Button type="submit" disabled={pending} onClick={onClick} {...props}>
       {children}
     </Button>
   );
