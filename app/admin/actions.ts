@@ -2,8 +2,53 @@
 
 import { revalidatePath } from "next/cache";
 import { createAiModel, deleteAiModel, createCategory, deleteCategory, deletePrompt, createPrompt, updatePrompt, updateAiModel, deleteUser } from "@/lib/supabase/queries";
+import { createServiceRoleClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/supabase/auth";
+import { SiteSettings } from "@/lib/supabase/site-settings";
+
+export async function updateSiteSettingsAction(formData: FormData) {
+  await requireAdmin();
+
+  const platform_name = formData.get("platformName") as string;
+  const support_email = formData.get("supportEmail") as string;
+  const default_meta_title = formData.get("seoTitle") as string;
+  const default_meta_description = formData.get("seoDesc") as string;
+  const monthly_price = parseFloat(formData.get("monthlyPrice") as string);
+  const yearly_price = parseFloat(formData.get("yearlyPrice") as string);
+
+  try {
+    const supabase = createServiceRoleClient();
+    const { data: current } = await supabase.from('site_settings').select('id').maybeSingle();
+    
+    const updates: Partial<SiteSettings> = {
+      platform_name,
+      support_email,
+      default_meta_title,
+      default_meta_description,
+      monthly_price,
+      yearly_price,
+    };
+
+    if (current) {
+      await supabase
+        .from('site_settings')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('id', current.id);
+    } else {
+      await supabase
+        .from('site_settings')
+        .insert(updates);
+    }
+
+    revalidatePath("/");
+    revalidatePath("/admin/settings");
+    return { success: true };
+  } catch (err: any) {
+    console.error("Erro ao atualizar configurações:", err);
+    return { error: err.message || "Erro ao atualizar configurações" };
+  }
+}
 
 export async function addAiModelAction(formData: FormData) {
   await requireAdmin();

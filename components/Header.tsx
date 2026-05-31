@@ -8,11 +8,13 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
+import { fetchSiteSettings, SiteSettings } from "@/lib/supabase/site-settings";
 
 export function Header() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [isPending, setIsPending] = useState(true);
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -22,6 +24,9 @@ export function Header() {
       setUser(data.user);
       setIsPending(false);
     });
+
+    // Buscar configurações usando o cliente do browser
+    fetchSiteSettings(supabase).then(setSettings);
 
     // Escutar mudanças de auth
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -42,6 +47,7 @@ export function Header() {
   // Verificar se o usuário é admin pelo metadata ou role
   const isAdmin = user?.user_metadata?.role === "admin" || user?.app_metadata?.role === "admin";
   const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Usuário";
+  const platformName = settings?.platform_name || "REI DO PROMPT";
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-md border-b border-white/5">
@@ -51,7 +57,7 @@ export function Header() {
           <div className="p-2 rounded-full bg-green-deep/30 border border-green-neon/20 group-hover:shadow-[0_0_15px_rgba(72,255,36,0.5)] transition-all duration-300">
             <Image src="/logo.svg" alt="Logo" width={24} height={24} className="w-6 h-6 object-contain" onError={() => { }} />
           </div>
-          <span className="text-xl font-bold tracking-tight text-white">REI DO PROMPT</span>
+          <span className="text-xl font-bold tracking-tight text-white uppercase">{platformName}</span>
         </Link>
 
         {/* Navigation */}

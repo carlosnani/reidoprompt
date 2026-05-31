@@ -2,8 +2,21 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { fetchSiteSettings, SiteSettings } from "@/lib/supabase/site-settings";
+import { createClient } from "@/lib/supabase/client";
 
 export function Footer() {
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    fetchSiteSettings(supabase).then(setSettings);
+  }, []);
+
+  const platformName = settings?.platform_name || "REI DO PROMPT";
+  const supportEmail = settings?.support_email || "contato@reidoprompt.com";
+
   return (
     <footer className="border-t border-white/5 bg-black/80 backdrop-blur-lg pt-20 pb-10 px-6">
       <div className="max-w-360 mx-auto">
@@ -14,7 +27,7 @@ export function Footer() {
               <div className="p-2 rounded-full bg-green-deep/30 border border-green-neon/20">
                 <Image src="/logo.svg" alt="Logo" width={24} height={24} className="w-6 h-6 object-contain" />
               </div>
-              <span className="text-xl font-bold tracking-tight text-white">REI DO PROMPT</span>
+              <span className="text-xl font-bold tracking-tight text-white uppercase">{platformName}</span>
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
               A maior e mais completa biblioteca de prompts premium do Brasil. Eleve seus resultados com inteligência artificial.
@@ -47,14 +60,14 @@ export function Footer() {
             <ul className="space-y-4">
               <li><Link href="/suporte" className="text-gray-400 hover:text-green-neon text-sm transition-colors">Suporte</Link></li>
               <li><Link href="/faq" className="text-gray-400 hover:text-green-neon text-sm transition-colors">FAQ</Link></li>
-              <li><Link href="mailto:contato@reidoprompt.com" className="text-gray-400 hover:text-green-neon text-sm transition-colors">contato@reidoprompt.com</Link></li>
+              <li><Link href={`mailto:${supportEmail}`} className="text-gray-400 hover:text-green-neon text-sm transition-colors">{supportEmail}</Link></li>
             </ul>
           </div>
         </div>
 
         <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-gray-500 text-sm">
-            &copy; 2026 Rei do Prompt. Todos os direitos reservados.
+            &copy; {new Date().getFullYear()} {platformName}. Todos os direitos reservados.
           </p>
           <div className="flex gap-4">
             <Link href="/privacidade" className="text-gray-500 hover:text-white transition-colors text-sm">Privacidade</Link>
