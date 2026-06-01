@@ -3,7 +3,7 @@
 Este arquivo contém as definições fundamentais, arquitetura e diretrizes do projeto **Rei do Prompt**.
 
 ## 🚀 Tecnologias e Stack
-- **Framework:** [Next.js 16+](https://nextjs.org/) (App Router)
+- **Framework:** [Next.js 15+](https://nextjs.org/) (App Router)
 - **Linguagem:** [TypeScript 5+](https://www.typescriptlang.org/)
 - **Frontend:** [React 19](https://react.dev/)
 - **Estilização:** [Tailwind CSS 3.4+](https://tailwindcss.com/)
@@ -22,7 +22,7 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
   - `models/`: Gestão de modelos de IA.
   - `prompts/`: Listagem e edição de prompts (CRUD completo).
   - `users/`: Visualização de usuários.
-  - `settings/`: Configurações do sistema.
+  - `settings/`: Configurações dinâmicas do sistema (Branding, SEO, Preços).
 - `auth/`: Fluxos de autenticação.
   - `login/`, `sign-up/`, `forgot-password/`, `update-password/`.
   - `confirm/`: Rota de confirmação de e-mail/auth.
@@ -41,7 +41,7 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
 - `prompt-detail/`: Fragmentos da página de detalhes (PromptText, ImageGallery, RelatedPrompts, PromptDetails).
 - `prompts/`: Elementos da galeria (PromptCard, GalleryGrid, GalleryHeader, GalleryPagination).
 - `ui/`: Componentes base do shadcn/ui (Button, Input, Card, Select, Tabs, Textarea, Accordion, Alert-Dialog, etc.).
-- `Header.tsx`, `Footer.tsx`: Layout principal.
+- `Header.tsx`, `Footer.tsx`: Layout principal com branding dinâmico.
 - `Hero.tsx`, `PromptGallery.tsx`, `CategoryGrid.tsx`, `Automations.tsx`, `BlogReviews.tsx`, `ToolsGrid.tsx`, `PremiumPrompts.tsx`, `HowItWorks.tsx`, `CTA.tsx`: Seções da Landing Page.
 - `auth-button.tsx`, `logout-button.tsx`, `theme-switcher.tsx`: Utilitários de UI.
 
@@ -50,13 +50,29 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
   - `auth.ts`: Utilitários de autenticação (requireUser, isAdmin, requireAdmin).
   - `client.ts`: Cliente para Client Components.
   - `server.ts`: Cliente para Server Components / Server Actions (inclui `createServiceRoleClient`).
-  - `queries.ts`: Funções de acesso ao banco de dados (CRUD). Agora inclui gestão de usuários via Admin Auth API.
+  - `queries.ts`: Funções de acesso ao banco de dados (CRUD).
+  - `site-settings.ts`: Lógica neutra para busca de configurações globais da plataforma (Nome, E-mail, Meta Tags). Compatível com Server e Client Components.
   - `hooks.ts`: Custom hooks para integração com Supabase.
   - `storage.ts`: Lógica de gerenciamento de arquivos no bucket.
 - `data/`: Mock data (ex: `mockPrompts.ts`).
 - `utils.ts`: Utilitários gerais (ex: formatação de classes com `clsx` e `tailwind-merge`).
 
 ## 📊 Modelos de Dados (Tipagens)
+
+### SiteSettings
+Configurações globais da plataforma gerenciadas via Admin.
+```typescript
+interface SiteSettings {
+  id?: string;
+  platform_name: string;
+  support_email: string;
+  default_meta_title: string;
+  default_meta_description: string;
+  monthly_price: number;
+  yearly_price: number;
+  updated_at?: string;
+}
+```
 
 ### Prompt
 Representa um item de IA no banco de dados.
@@ -72,8 +88,6 @@ interface Prompt {
   is_premium: boolean;
   views: number;
   likes: number;
-  category?: string;    // Legacy
-  model?: string;       // Legacy
   ai_model_id?: string; // Foreign key
   author_id?: string;
   created_at?: string;
@@ -85,7 +99,7 @@ interface Prompt {
 ```
 
 ### AiModel
-Modelos de IA suportados (ex: GPT-4, Midjourney v6).
+Modelos de IA suportados.
 ```typescript
 interface AiModel {
   id: string;
@@ -110,18 +124,21 @@ interface Category {
 }
 ```
 
-### DetailedPrompt
-Extensão para visualização detalhada.
-```typescript
-interface DetailedPrompt extends Prompt {
-  categories: Category[];
-  author: string;
-  date: string;
-  promptText?: string;
-}
-```
-
 ## 🗄️ SQL Database Schema (Supabase)
+
+### Tabela `site_settings`
+```sql
+CREATE TABLE public.site_settings (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    platform_name TEXT NOT NULL DEFAULT 'Rei do Prompt',
+    support_email TEXT NOT NULL DEFAULT 'suporte@reidoprompt.com',
+    default_meta_title TEXT NOT NULL DEFAULT 'Rei do Prompt - A maior galeria de Prompts',
+    default_meta_description TEXT NOT NULL DEFAULT 'Encontre e copie os melhores prompts testados para Midjourney, DALL-E, ChatGPT e muito mais.',
+    monthly_price NUMERIC(10, 2) NOT NULL DEFAULT 39.90,
+    yearly_price NUMERIC(10, 2) NOT NULL DEFAULT 399.00,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+```
 
 ### Tabela `prompts`
 ```sql
@@ -190,27 +207,23 @@ CREATE TABLE public.favorites (
 ## 🎨 Design System e UI/UX
 - **Tema:** Dark Mode (Next Themes).
 - **Estética:** Premium, glassmorphism, gradientes neon (foco em `green-neon`).
-- **Feedback Visual:** Estados de carregamento (Skeletons) implementados via `loading.tsx` para garantir uma transição suave entre rotas.
-- **Componentes:** Altamente baseados em Radix UI para acessibilidade.
-- **Responsividade:** Mobile-first, utilizando containers do Tailwind.
+- **Branding Dinâmico:** Nome da plataforma e metadados SEO são injetados em tempo real via banco de dados.
+- **Feedback Visual:** `SubmitToastButton` aprimorado para exibir notificações automáticas via `sonner` após a conclusão de Server Actions.
+- **Estados de Carregamento:** Skeletons implementados via `loading.tsx` para transições suaves.
 - **Cores Admin:** Paleta específica para o dashboard admin (ex: `admin-surface`, `admin-border`).
 
 ## 🛠️ Funcionalidades de Backend
-1. **Server Actions:** Utilizadas para operações de escrita (admin e auth) em `app/admin/actions.ts` e fluxos de auth.
-2. **RLS (Row Level Security):** Configurado no Supabase para proteger dados de usuários e restringir acesso administrativo via função `requireAdmin`.
-3. **Joins Complexos:** O arquivo `queries.ts` realiza fetches relacionais (ex: prompt + model + categorias em uma única query).
+1. **Server Actions:** Utilizadas para operações de escrita (admin e auth), incluindo `updateSiteSettingsAction` para configurações globais.
+2. **RLS (Row Level Security):** Configurado no Supabase para proteger dados e restringir acesso administrativo via função `requireAdmin`.
+3. **Joins Complexos:** O arquivo `queries.ts` realiza fetches relacionais eficientes.
 4. **Gestão de Imagens (Supabase Storage):**
    - Bucket: `reidoprompt`.
-   - Upload realizado via `ImageUploader` (Client Component) integrado com `lib/supabase/storage.ts`.
-   - Suporte a múltiplas imagens por prompt.
+   - Upload centralizado integrado com `lib/supabase/storage.ts`.
    - Deleção automática do storage ao remover imagens no admin.
 
 ## 📝 Convenções de Desenvolvimento
-- **Server Components:** Utilizar por padrão para buscar dados e SEO.
+- **Server Components:** Utilizar por padrão para buscar dados e SEO (Metadata dinâmico).
 - **Client Components:** Apenas para interatividade (forms, sliders, botões de ação).
-- **Next.js 15+ Dynamic Routes:** Os `params` e `searchParams` em páginas de rotas dinâmicas são **Promises** e devem ser sempre aguardados (`await params` ou `await searchParams`) antes do uso.
-- **Paginação e Retorno de Dados:** Funções de listagem (como `getPrompts`, `getCategories`, `getAiModels`) retornam um objeto `{ data: T[], count: number }`. Sempre desestruturar o resultado para acessar o array de dados.
-- **TypeScript:** Tipagem estrita em todas as funções de `queries.ts`.
-- **Commits:** Seguir o padrão de commits semânticos se possível.
-- **Supabase:** Sempre usar `createClient` do arquivo `lib/supabase/server.ts` dentro de Server Components e `client.ts` em Client Components.
-- **Revalidação:** Utilizar `revalidatePath` em Server Actions para manter o cache atualizado.
+- **fetchSiteSettings:** Sempre utilizar este utilitário para acessar as configurações globais, passando o cliente Supabase adequado (server ou client).
+- **Next.js 15+ Dynamic Routes:** Aguardar sempre `params` e `searchParams` antes do uso.
+- **Revalidação:** Utilizar `revalidatePath` em Server Actions para manter o cache atualizado (especialmente em `/` e `/admin/settings`).
