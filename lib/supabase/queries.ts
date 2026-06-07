@@ -465,8 +465,37 @@ export const getAiModelById = cache(async (id: string) => {
 
 // ==================== USERS ====================
 
-export async function getUsers(limit = 10, page = 1) {
+export async function getUsers(limit = 10, page = 1, search?: string) {
   const supabase = createServiceRoleClient();
+
+  if (search) {
+    // Busca administrativa: traz uma lista maior de usuários e filtra em memória
+    // O Supabase Auth Admin API não suporta filtros complexos ou buscas textuais diretamente por parâmetro.
+    // Para simplificar e evitar queries em esquemas protegidos (auth.users) sem configurações extras,
+    // buscamos uma quantidade maior de usuários (máx 1000) e aplicamos o filtro.
+    const { data, error } = await supabase.auth.admin.listUsers({
+      page: 1,
+      perPage: 1000
+    });
+
+    if (error) {
+      console.error('Error fetching users for search:', error);
+      return { data: [], count: 0 };
+    }
+
+    const query = search.toLowerCase();
+    const filteredUsers = data.users.filter(user => {
+      const name = (user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || "").toLowerCase();
+      const email = (user.email || "").toLowerCase();
+      return name.includes(query) || email.includes(query);
+    });
+
+    const totalCount = filteredUsers.length;
+    const offset = (page - 1) * limit;
+    const paginatedUsers = filteredUsers.slice(offset, offset + limit);
+
+    return { data: paginatedUsers, count: totalCount };
+  }
 
   const { data, error } = await supabase.auth.admin.listUsers({
     page,

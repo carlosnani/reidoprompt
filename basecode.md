@@ -27,7 +27,7 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
 - `faq/`, `suporte/`, `sobre/`, `termos/`, `privacidade/`: Páginas institucionais e legais.
 
 ### `components/` (Componentes React)
-- `admin/`: Componentes específicos do dashboard (Sidebar, Header, TablePagination - Legacy, ImageUploader, SubmitToastButton, DeleteAction, UserActionButtons).
+- `admin/`: Componentes específicos do dashboard (Sidebar, Header, TablePagination - Legacy, ImageUploader, SubmitToastButton, DeleteAction, UserActionButtons, UserSearchInput).
 - `auth/`: Formulários e containers de autenticação (LoginForm, RegisterForm, SocialLogin, AuthContainer).
 - `AppPagination.tsx`: Componente de paginação universal com suporte a temas 'admin' e 'public'.
 - `prompt-detail/`: Fragmentos da página de detalhes (PromptText, ImageGallery, RelatedPrompts, PromptDetails).
@@ -232,6 +232,7 @@ CREATE INDEX idx_prompts_title_trgm ON prompts USING gin (title gin_trgm_ops); -
 4. **Gestão de Usuários (Admin):**
    - **Ações Administrativas:** Deleção física de usuários do Supabase Auth (`deleteUserAction`), controle de banimento por tempo determinado (`toggleUserBanAction`) e controle de acesso PRO (`toggleProAccessAction`).
    - **UserActionButtons:** Painel interativo com diálogo de confirmação (Alert Dialog) para operações críticas de banimento.
+   - **Busca Administrativa:** Busca em tempo real de usuários por nome ou e-mail (`UserSearchInput`), realizada no servidor com suporte a paginação integrada e preservação dos parâmetros de busca na URL.
 5. **Controle de Acesso Seguro (Premium/PRO):**
    - **Bypass de Cache no Servidor:** Para garantir que a visualização do prompt premium seja imediata após o upgrade para PRO, a página `app/prompt/[id]/page.tsx` no servidor utiliza o cliente administrativo do Supabase (`createServiceRoleClient`) para buscar o status atualizado do usuário diretamente no banco de dados, ignorando tokens JWT potencialmente obsoletos contidos no cookie.
    - **Simplificação no Cliente:** O componente cliente `PromptText.tsx` baseia seu estado de bloqueio (`isRestricted`) unicamente no fato de o servidor ter fornecido ou não o `promptText`, já que a lógica de segurança e a omissão do texto real são processadas e aplicadas do lado do servidor.

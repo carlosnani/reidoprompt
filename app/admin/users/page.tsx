@@ -1,10 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, UserX, UserCheck, Edit, ShieldAlert } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { TablePagination } from "@/components/admin/TablePagination";
+import { Edit, ShieldAlert } from "lucide-react";
 import { DeleteAction } from "@/components/admin/DeleteAction";
 import { UserActionButtons } from "@/components/admin/UserActionButtons";
+import { UserSearchInput } from "@/components/admin/UserSearchInput";
 import { cn } from "@/lib/utils";
 import { requireAdmin, isAdmin, isPro } from "@/lib/supabase/auth";
 import { getUsers } from "@/lib/supabase/queries";
@@ -15,14 +14,15 @@ import { AppPagination } from "@/components/AppPagination";
 export default async function AdminUsersPage({ 
   searchParams 
 }: { 
-  searchParams: Promise<{ page?: string }> 
+  searchParams: Promise<{ page?: string; q?: string }> 
 }) {
   await requireAdmin();
   const params = await searchParams;
   const currentPage = Number(params.page) || 1;
+  const searchQuery = params.q || "";
   const limit = 10;
   
-  const { data: users, count } = await getUsers(limit, currentPage);
+  const { data: users, count } = await getUsers(limit, currentPage, searchQuery);
   const totalPages = Math.ceil(count / limit);
 
   return (
@@ -32,14 +32,7 @@ export default async function AdminUsersPage({
       </div>
 
       <div className="flex items-center gap-2 mb-4">
-        <div className="relative w-full max-sm:max-w-none max-w-sm">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-admin-text-muted" />
-          <Input
-            type="search"
-            placeholder="Buscar usuários por nome ou e-mail..."
-            className="pl-8 bg-admin-surface border-admin-border text-admin-text"
-          />
-        </div>
+        <UserSearchInput />
       </div>
 
       <div className="border border-admin-border rounded-md bg-admin-surface shadow-sm">
@@ -146,7 +139,7 @@ export default async function AdminUsersPage({
           <AppPagination 
             currentPage={currentPage} 
             totalPages={totalPages} 
-            baseUrl="/admin/users" 
+            baseUrl={searchQuery ? `/admin/users?q=${encodeURIComponent(searchQuery)}` : "/admin/users"} 
             variant="admin"
           />
         </div>
