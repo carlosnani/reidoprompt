@@ -15,7 +15,9 @@ type ActionState = {
 
 export function AddAiModelForm() {
   const [state, formAction, isPending] = useActionState<ActionState, FormData>(
-    addAiModelAction,
+    async (_prevState, formData) => {
+      return await addAiModelAction(formData);
+    },
     null
   );
 

@@ -97,7 +97,7 @@ export default async function AdminUsersPage({
                     <td className="p-4 align-middle text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Button variant="ghost" size="icon" title="Alternar Acesso" className="text-admin-text-muted hover:bg-admin-muted">
-                          {subStatus === 'ACTIVE' ? (
+                          {subStatus === 'ATIVA' ? (
                             <UserX className="h-4 w-4 hover:text-admin-danger" />
                           ) : (
                             <UserCheck className="h-4 w-4 hover:text-admin-success" />

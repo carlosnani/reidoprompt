@@ -18,7 +18,7 @@ export default async function AdminSettingsPage() {
       </div>
 
       <div className="space-y-6">
-        <form action={updateSiteSettingsAction}>
+        <form action={updateSiteSettingsAction as unknown as (formData: FormData) => void}>
           <div className="space-y-6">
             {/* General Settings */}
             <Card className="bg-admin-surface border-admin-border shadow-sm overflow-hidden">
