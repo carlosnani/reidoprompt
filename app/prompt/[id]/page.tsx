@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { getPromptById, isFavorite, incrementPromptViews } from "@/lib/supabase/queries";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { isPro } from "@/lib/supabase/auth";
 import { ImageGallery } from "@/components/prompt-detail/ImageGallery";
 import { PromptDetails } from "@/components/prompt-detail/PromptDetails";
@@ -66,7 +66,20 @@ export default async function PromptPage(props: PromptPageProps) {
 
   let prompt;
   let favorited = false;
-  const userIsPro = isPro(user);
+  
+  let userIsPro = false;
+  if (user) {
+    userIsPro = isPro(user);
+    try {
+      const adminSupabase = createServiceRoleClient();
+      const { data: freshUser, error: freshUserError } = await adminSupabase.auth.admin.getUserById(user.id);
+      if (!freshUserError && freshUser?.user) {
+        userIsPro = isPro(freshUser.user);
+      }
+    } catch (err) {
+      console.error("Erro ao obter metadados atualizados do usuário:", err);
+    }
+  }
 
   try {
     const basicPrompt = await getPromptById(params.id);
@@ -91,7 +104,7 @@ export default async function PromptPage(props: PromptPageProps) {
       // SECURITY: Redact prompt text on server if user is not Pro
       prompt_text: isRestricted ? undefined : basicPrompt.prompt_text,
       promptText: isRestricted 
-        ? null 
+        ? undefined 
         : (basicPrompt.prompt_text || `A highly detailed ${basicPrompt.category?.toLowerCase() || 'artistic'} scene of ${basicPrompt.tag.toLowerCase()}, masterpiece, 8k resolution, photorealistic.`),
       images: basicPrompt.images && basicPrompt.images.length > 0 ? basicPrompt.images : [basicPrompt.image],
     };

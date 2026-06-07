@@ -4,7 +4,6 @@ import type { DetailedPrompt } from "@/lib/supabase/queries";
 import { Button } from "@/components/ui/button";
 import { Copy, Terminal, Lock } from "lucide-react";
 import { toast } from "sonner";
-import { useUser } from "@/lib/supabase/hooks";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -15,9 +14,9 @@ interface PromptTextProps {
 const RESTRICTED_TEXT = "ESTE CONTEÚDO É EXCLUSIVO PARA ASSINANTES PRO. AO ASSINAR O PLANO PRO, VOCÊ TERÁ ACESSO COMPLETO A ESTE PROMPT PROFISSIONAL E MILHARES DE OUTROS EXEMPLOS VALIDADOS PARA MAXIMIZAR SEUS RESULTADOS COM INTELIGÊNCIA ARTIFICIAL. ESTE É UM EXEMPLO DE COMO O PROMPT SERÁ EXIBIDO PARA VOCÊ APÓS O DESBLOQUEIO.";
 
 export function PromptText({ prompt }: PromptTextProps) {
-  const { isPro, loading } = useUser();
-  
-  const isRestricted = prompt.is_premium && (loading || !isPro);
+  // O prompt é restrito no cliente se ele for premium e o servidor não enviou o texto.
+  // Isso é seguro porque o servidor se encarrega de omitir o texto se o usuário não for Pro.
+  const isRestricted = prompt.is_premium && !prompt.promptText;
 
   const handleCopy = async () => {
     if (isRestricted) {
@@ -124,7 +123,7 @@ export function PromptText({ prompt }: PromptTextProps) {
       {/* Copy Button */}
       <Button
         onClick={handleCopy}
-        disabled={isRestricted && !loading}
+        disabled={isRestricted}
         className={cn(
           "w-full sm:w-auto self-start mt-4 bg-white text-black hover:bg-white/90 font-bold h-12 px-8 rounded-xl transition-all shadow-md flex items-center justify-center gap-2",
           isRestricted && "opacity-50 grayscale cursor-not-allowed"
