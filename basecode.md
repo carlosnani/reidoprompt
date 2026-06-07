@@ -17,22 +17,14 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
 ## 📂 Estrutura de Pastas Detalhada
 
 ### `app/` (Rotas e Páginas)
-- `admin/`: Painel administrativo.
-  - `categories/`: Gestão de categorias.
-  - `models/`: Gestão de modelos de IA.
-  - `prompts/`: Listagem e edição de prompts (CRUD completo).
-  - `users/`: Visualização de usuários.
-  - `settings/`: Configurações dinâmicas do sistema (Branding, SEO, Preços).
-- `auth/`: Fluxos de autenticação.
-  - `login/`, `sign-up/`, `forgot-password/`, `update-password/`.
-  - `confirm/`: Rota de confirmação de e-mail/auth.
+- `admin/`: Painel administrativo (Gestão de prompts, categorias, modelos, usuários e settings).
+- `auth/`: Fluxos de autenticação (Login, Sign-up, etc).
 - `prompts/`: Galeria principal com filtros e busca.
-- `prompt/[id]/`: Detalhes de um prompt (inclui texto original, galeria de imagens, metadados do modelo de IA e prompts relacionados).
-- `conta/`: Perfil do usuário e preferências.
-- `favoritos/`: Prompts salvos pelo usuário.
-- `planos/`: Página de precificação.
-- `faq/`, `suporte/`, `sobre/`: Páginas institucionais.
-- `termos/`, `termos-de-uso/`, `privacidade/`: Documentação legal.
+- `prompt/[id]/`: Detalhes de um prompt.
+- `sitemap.ts`: Gerador dinâmico de Sitemap para SEO.
+- `robots.ts`: Configurações de indexação para motores de busca.
+- `conta/`, `favoritos/`, `planos/`: Áreas do usuário e precificação.
+- `faq/`, `suporte/`, `sobre/`, `termos/`, `privacidade/`: Páginas institucionais e legais.
 
 ### `components/` (Componentes React)
 - `admin/`: Componentes específicos do dashboard (Sidebar, Header, TablePagination - Legacy, ImageUploader, SubmitToastButton, DeleteAction).
@@ -46,16 +38,14 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
 - `auth-button.tsx`, `logout-button.tsx`, `theme-switcher.tsx`: Utilitários de UI.
 
 ### `lib/` (Lógica e Utilitários)
-- `middleware.ts`: Lógica de gerenciamento de sessão e proteção de rotas (localizado na raiz). Protege rotas `/admin` validando o papel administrativo do usuário.
-  - `auth.ts`: Utilitários de autenticação (requireUser, isAdmin, requireAdmin).
-  - `client.ts`: Cliente para Client Components.
-  - `server.ts`: Cliente para Server Components / Server Actions (inclui `createServiceRoleClient`).
-  - `queries.ts`: Funções de acesso ao banco de dados (CRUD).
-  - `site-settings.ts`: Lógica neutra para busca de configurações globais da plataforma (Nome, E-mail, Meta Tags). Compatível com Server e Client Components.
-  - `hooks.ts`: Custom hooks para integração com Supabase.
-  - `storage.ts`: Lógica de gerenciamento de arquivos no bucket.
-- `data/`: Mock data (ex: `mockPrompts.ts`).
-- `utils.ts`: Utilitários gerais (ex: formatação de classes com `clsx` e `tailwind-merge`).
+- `supabase/`:
+  - `queries.ts`: CRUD otimizado com **seleção de colunas específica** e **React cache** para memoização.
+  - `storage.ts`: Gestão de arquivos (Upload/Delete) com suporte a extração de caminhos via URL.
+  - `auth.ts`, `client.ts`, `server.ts`, `site-settings.ts`: Gestão de auth e configurações globais.
+- `utils/`:
+  - `image.ts`: Utilitário de **compressão de imagem** (Client-side, 1200px, 80% qualidade).
+- `data/`: Mock data.
+- `utils.ts`: Utilitários gerais.
 
 ## 📊 Modelos de Dados (Tipagens)
 
@@ -214,6 +204,14 @@ CREATE TABLE public.favorites (
 );
 ```
 
+### Índices de Performance Recomendados
+```sql
+CREATE INDEX idx_prompts_created_at ON prompts (created_at DESC);
+CREATE INDEX idx_prompts_views ON prompts (views DESC);
+CREATE INDEX idx_prompts_likes ON prompts (likes DESC);
+CREATE INDEX idx_prompts_title_trgm ON prompts USING gin (title gin_trgm_ops); -- Requer pg_trgm
+```
+
 ## 🎨 Design System e UI/UX
 - **Tema:** Dark Mode (Next Themes).
 - **Estética:** Premium, glassmorphism, gradientes neon (foco em `green-neon`).
@@ -223,14 +221,18 @@ CREATE TABLE public.favorites (
 - **Estados de Carregamento:** Skeletons implementados via `loading.tsx` para transições suaves.
 - **Cores Admin:** Paleta específica para o dashboard admin (ex: `admin-surface`, `admin-border`).
 
-## 🛠️ Funcionalidades de Backend
+## 🛠️ Funcionalidades de Backend e SEO
 1. **Server Actions:** Utilizadas para operações de escrita (admin e auth), incluindo `updateSiteSettingsAction` para configurações globais.
-2. **RLS (Row Level Security):** Configurado no Supabase para proteger dados e restringir acesso administrativo via função `requireAdmin`.
-3. **Joins Complexos:** O arquivo `queries.ts` realiza fetches relacionais eficientes.
-4. **Gestão de Imagens (Supabase Storage):**
-   - Bucket: `reidoprompt`.
-   - Upload centralizado integrado com `lib/supabase/storage.ts`.
-   - Deleção automática do storage ao remover imagens no admin.
+2. **Otimização de Performance:**
+   - **Queries Seletivas:** Busca apenas colunas necessárias para reduzir o payload.
+   - **Memoização:** Uso do `cache` do React para evitar múltiplas chamadas ao Supabase no mesmo render.
+3. **Gestão Inteligente de Imagens:**
+   - **Compressão no Cliente:** Redução de tamanho antes do upload (máx 1200px, 80% JPEG).
+   - **Sincronização de Storage:** Limpeza automática de arquivos órfãos no Storage durante `update` e `delete` de prompts.
+4. **SEO & Marketing Dinâmico:**
+   - **Metadata Dinâmico:** Títulos e descrições gerados em tempo real com base no banco e dados do prompt.
+   - **OpenGraph:** Social cards dinâmicos que utilizam as imagens reais dos prompts.
+   - **Sitemap & Robots:** Gerados dinamicamente para indexação total (`app/sitemap.ts` e `app/robots.ts`).
 
 ## 📝 Convenções de Desenvolvimento
 - **Server Components:** Utilizar por padrão para buscar dados e SEO (Metadata dinâmico).
