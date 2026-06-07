@@ -27,7 +27,7 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
   - `login/`, `sign-up/`, `forgot-password/`, `update-password/`.
   - `confirm/`: Rota de confirmação de e-mail/auth.
 - `prompts/`: Galeria principal com filtros e busca.
-- `prompt/[id]/`: Detalhes de um prompt (inclui texto original, autor e relacionados).
+- `prompt/[id]/`: Detalhes de um prompt (inclui texto original, galeria de imagens, metadados do modelo de IA e prompts relacionados).
 - `conta/`: Perfil do usuário e preferências.
 - `favoritos/`: Prompts salvos pelo usuário.
 - `planos/`: Página de precificação.
@@ -95,6 +95,16 @@ interface Prompt {
   // Relacionamentos (via Joins)
   ai_model?: AiModel;
   prompt_categories?: { category: Category }[];
+}
+
+### DetailedPrompt
+Extensão do Prompt com dados processados para a página de detalhes.
+```typescript
+interface DetailedPrompt extends Prompt {
+  categories: Category[];
+  author?: string;
+  date?: string;
+  promptText?: string;
 }
 ```
 
@@ -209,6 +219,7 @@ CREATE TABLE public.favorites (
 - **Estética:** Premium, glassmorphism, gradientes neon (foco em `green-neon`).
 - **Branding Dinâmico:** Nome da plataforma e metadados SEO são injetados em tempo real via banco de dados.
 - **Feedback Visual:** `SubmitToastButton` aprimorado para exibir notificações automáticas via `sonner` após a conclusão de Server Actions.
+- **Galeria de Imagens (Multi-image):** Suporte a múltiplas imagens por prompt (armazenadas em `TEXT[]`), com visualizador dinâmico e thumbnails na página de detalhes.
 - **Estados de Carregamento:** Skeletons implementados via `loading.tsx` para transições suaves.
 - **Cores Admin:** Paleta específica para o dashboard admin (ex: `admin-surface`, `admin-border`).
 

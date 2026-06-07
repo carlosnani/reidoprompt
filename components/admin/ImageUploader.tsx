@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Upload, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { uploadImage, deleteImage } from "@/lib/supabase/storage";
+import { compressImage } from "@/lib/utils/image";
 import { toast } from "sonner";
 
 interface ImageUploaderProps {
@@ -70,8 +71,10 @@ export function ImageUploader({
     const uploadPromises = filesToAdd.map(async (file, index) => {
       const placeholderId = placeholders[index].id;
       try {
-        const { url, path } = await uploadImage(file);
-        console.debug("ImageUploader: upload success", { file: file.name, url, path });
+        // 🚀 Otimização: Comprime a imagem antes de enviar para o Supabase
+        const compressedFile = await compressImage(file, 1200, 0.8);
+        const { url, path } = await uploadImage(compressedFile);
+        console.debug("ImageUploader: upload success", { file: file.name, url, path, originalSize: file.size, compressedSize: compressedFile.size });
         
         setImages((prev) => 
           prev.map((img) => 
@@ -103,19 +106,10 @@ export function ImageUploader({
   };
 
   const removeImage = async (idToRemove: string) => {
-    const imageToRemove = images.find(img => img.id === idToRemove);
-    
     // Optimistic UI update
     setImages((prev) => prev.filter((img) => img.id !== idToRemove));
 
-    if (imageToRemove?.path) {
-      try {
-        await deleteImage(imageToRemove.path);
-      } catch (error) {
-        console.error("Error deleting image from storage:", error);
-      }
-    }
-    console.debug("ImageUploader: removed image", { idToRemove, remaining: imagesRef.current.map(i=>i.url) });
+    console.debug("ImageUploader: removed image from UI", { idToRemove, remaining: imagesRef.current.map(i=>i.url) });
     if (onImagesChange) {
       const remainingUrls = imagesRef.current
         .filter(img => img.id !== idToRemove && !img.uploading)

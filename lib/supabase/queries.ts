@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { createClient, createServiceRoleClient } from './server';
 
 export interface Prompt {
@@ -68,9 +69,16 @@ export async function getPrompts(options: {
   let query = supabase
     .from('prompts')
     .select(`
-      *,
-      ai_model:ai_models(*),
-      prompt_categories${categoryId ? '!inner' : ''}(category:categories(*))
+      id,
+      title,
+      tag,
+      image,
+      is_premium,
+      views,
+      likes,
+      created_at,
+      ai_model:ai_models(id, name, slug),
+      prompt_categories${categoryId ? '!inner' : ''}(category:categories(id, name, slug))
     `, { count: 'exact' });
 
   if (categoryId) {
@@ -176,6 +184,48 @@ export async function updatePrompt(
     supabase = await createClient();
   }
 
+  // 1. Otimização: Se houver atualização de imagens, limpar as antigas do Storage
+  if (updates.image !== undefined || updates.images !== undefined) {
+    const { data: oldPrompt } = await supabase
+      .from('prompts')
+      .select('image, images')
+      .eq('id', id)
+      .single();
+
+    if (oldPrompt) {
+      const oldUrls = new Set<string>();
+      if (oldPrompt.image) oldUrls.add(oldPrompt.image);
+      if (Array.isArray(oldPrompt.images)) {
+        oldPrompt.images.forEach((url: string) => oldUrls.add(url));
+      }
+
+      const newUrls = new Set<string>();
+      if (updates.image) newUrls.add(updates.image);
+      if (Array.isArray(updates.images)) {
+        updates.images.forEach((url: string) => newUrls.add(url));
+      }
+
+      // URLs que estavam no antigo mas não estão no novo
+      const urlsToDelete = Array.from(oldUrls).filter(url => !newUrls.has(url));
+
+      if (urlsToDelete.length > 0) {
+        const bucket = "reidoprompt";
+        const paths = urlsToDelete
+          .map(url => {
+            const searchString = `/storage/v1/object/public/${bucket}/`;
+            const index = url.indexOf(searchString);
+            return index !== -1 ? url.substring(index + searchString.length) : null;
+          })
+          .filter((p): p is string => !!p);
+
+        if (paths.length > 0) {
+          console.log(`Cleaning up ${paths.length} orphaned images for prompt ${id}`);
+          await supabase.storage.from(bucket).remove(paths);
+        }
+      }
+    }
+  }
+
   const { data, error } = await supabase
     .from('prompts')
     .update({ ...updates, updated_at: new Date().toISOString() })
@@ -216,6 +266,37 @@ export async function deletePrompt(id: string) {
     supabase = await createClient();
   }
 
+  // 1. Buscar o prompt para pegar as URLs das imagens
+  const { data: prompt } = await supabase
+    .from('prompts')
+    .select('image, images')
+    .eq('id', id)
+    .single();
+
+  if (prompt) {
+    // 2. Coletar todas as URLs
+    const urlsToDelete = new Set<string>();
+    if (prompt.image) urlsToDelete.add(prompt.image);
+    if (Array.isArray(prompt.images)) {
+      prompt.images.forEach((url: string) => urlsToDelete.add(url));
+    }
+
+    // 3. Extrair caminhos e deletar do Storage
+    const bucket = "reidoprompt";
+    const paths = Array.from(urlsToDelete)
+      .map(url => {
+        const searchString = `/storage/v1/object/public/${bucket}/`;
+        const index = url.indexOf(searchString);
+        return index !== -1 ? url.substring(index + searchString.length) : null;
+      })
+      .filter((p): p is string => !!p);
+
+    if (paths.length > 0) {
+      console.log(`Deleting ${paths.length} images from storage for prompt ${id}`);
+      await supabase.storage.from(bucket).remove(paths);
+    }
+  }
+
   // Delete category associations first
   await supabase.from('prompt_categories').delete().eq('prompt_id', id);
 
@@ -229,7 +310,7 @@ export async function deletePrompt(id: string) {
 
 // ==================== CATEGORIES ====================
 
-export async function getCategories(limit = 100, offset = 0) {
+export const getCategories = cache(async (limit = 100, offset = 0) => {
   const supabase = await createClient();
 
   const { data, error, count } = await supabase
@@ -243,7 +324,7 @@ export async function getCategories(limit = 100, offset = 0) {
     return { data: [], count: 0 };
   }
   return { data: data as Category[], count: count || 0 };
-}
+});
 
 export async function createCategory(category: Omit<Category, 'id'>) {
   let supabase;
@@ -303,7 +384,7 @@ export async function deleteCategory(id: string) {
 
 // ==================== AI MODELS ====================
 
-export async function getAiModels(limit = 100, offset = 0) {
+export const getAiModels = cache(async (limit = 100, offset = 0) => {
   const supabase = await createClient();
 
   const { data, error, count } = await supabase
@@ -314,7 +395,7 @@ export async function getAiModels(limit = 100, offset = 0) {
 
   if (error) throw error;
   return { data: data as AiModel[], count: count || 0 };
-}
+});
 
 export async function createAiModel(model: Omit<AiModel, 'id' | 'created_at' | 'updated_at'>) {
   let supabase;
@@ -369,7 +450,7 @@ export async function deleteAiModel(id: string) {
   if (error) throw error;
 }
 
-export async function getAiModelById(id: string) {
+export const getAiModelById = cache(async (id: string) => {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -380,7 +461,7 @@ export async function getAiModelById(id: string) {
 
   if (error) throw error;
   return data as AiModel;
-}
+});
 
 // ==================== USERS ====================
 

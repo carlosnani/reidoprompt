@@ -16,8 +16,35 @@ export async function generateMetadata(): Promise<Metadata> {
   
   return {
     metadataBase: new URL(defaultUrl),
-    title: settings.platform_name,
+    title: {
+      default: settings.default_meta_title,
+      template: `%s | ${settings.platform_name}`,
+    },
     description: settings.default_meta_description,
+    openGraph: {
+      title: settings.default_meta_title,
+      description: settings.default_meta_description,
+      siteName: settings.platform_name,
+      locale: "pt_BR",
+      type: "website",
+      images: [
+        {
+          url: "/opengraph-image.png",
+          width: 1200,
+          height: 630,
+          alt: settings.platform_name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: settings.default_meta_title,
+      description: settings.default_meta_description,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
   };
 }
 

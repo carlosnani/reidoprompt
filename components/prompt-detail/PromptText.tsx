@@ -97,7 +97,7 @@ export function PromptText({ prompt }: PromptTextProps) {
             "text-gray-300 font-mono text-sm leading-relaxed whitespace-pre-wrap selection:bg-[#48FF24]/30 selection:text-white transition-all duration-500",
             isRestricted && "blur-md select-none opacity-50"
           )}>
-            {isRestricted ? RESTRICTED_TEXT : prompt.promptText}
+            {isRestricted || !prompt.promptText ? RESTRICTED_TEXT : prompt.promptText}
           </p>
 
           {isRestricted && (

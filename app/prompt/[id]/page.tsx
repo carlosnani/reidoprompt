@@ -6,15 +6,44 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { getPromptById, isFavorite, incrementPromptViews } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
+import { isPro } from "@/lib/supabase/auth";
 import { ImageGallery } from "@/components/prompt-detail/ImageGallery";
 import { PromptDetails } from "@/components/prompt-detail/PromptDetails";
 import { PromptText } from "@/components/prompt-detail/PromptText";
 import { RelatedPrompts } from "@/components/prompt-detail/RelatedPrompts";
 
-export const metadata: Metadata = {
-  title: "Detalhes do Prompt | Rei do Prompt",
-  description: "Visualização detalhada do prompt premium.",
-};
+import { fetchSiteSettings } from "@/lib/supabase/site-settings";
+
+export async function generateMetadata(props: PromptPageProps): Promise<Metadata> {
+  const params = await props.params;
+  const supabase = await createClient();
+  const [prompt, settings] = await Promise.all([
+    getPromptById(params.id),
+    fetchSiteSettings(supabase)
+  ]);
+
+  if (!prompt) return {};
+
+  const title = `${prompt.title || prompt.tag} - Prompt para IA`;
+  const description = prompt.description || `Veja como gerar esta imagem usando o prompt de ${prompt.tag} no Rei do Prompt.`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title: `${title} | ${settings.platform_name}`,
+      description,
+      images: [
+        {
+          url: prompt.image,
+          width: 1200,
+          height: 630,
+          alt: prompt.title || prompt.tag,
+        },
+      ],
+    },
+  };
+}
 
 interface PromptPageProps {
   params: Promise<{
@@ -37,6 +66,7 @@ export default async function PromptPage(props: PromptPageProps) {
 
   let prompt;
   let favorited = false;
+  const userIsPro = isPro(user);
 
   try {
     const basicPrompt = await getPromptById(params.id);
@@ -44,6 +74,8 @@ export default async function PromptPage(props: PromptPageProps) {
     if (user) {
       favorited = await isFavorite(user.id, params.id);
     }
+
+    const isRestricted = basicPrompt.is_premium && !userIsPro;
 
     // Convert to DetailedPrompt using real data from Supabase
     prompt = {
@@ -56,7 +88,11 @@ export default async function PromptPage(props: PromptPageProps) {
           ? [{ id: basicPrompt.category, name: basicPrompt.category, slug: basicPrompt.category.toLowerCase() }]
           : [],
       description: basicPrompt.description || "Um prompt profissional e altamente otimizado para gerar imagens de altíssima qualidade.",
-      promptText: basicPrompt.prompt_text || `A highly detailed ${basicPrompt.category?.toLowerCase() || 'artistic'} scene of ${basicPrompt.tag.toLowerCase()}, masterpiece, 8k resolution, photorealistic.`,
+      // SECURITY: Redact prompt text on server if user is not Pro
+      prompt_text: isRestricted ? undefined : basicPrompt.prompt_text,
+      promptText: isRestricted 
+        ? null 
+        : (basicPrompt.prompt_text || `A highly detailed ${basicPrompt.category?.toLowerCase() || 'artistic'} scene of ${basicPrompt.tag.toLowerCase()}, masterpiece, 8k resolution, photorealistic.`),
       images: basicPrompt.images && basicPrompt.images.length > 0 ? basicPrompt.images : [basicPrompt.image],
     };
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

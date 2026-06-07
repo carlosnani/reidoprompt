@@ -192,7 +192,7 @@ export async function editPromptAction(id: string, formData: FormData) {
     return { error: "Título, texto do prompt e modelo são obrigatórios" };
   }
 
-  const mainImage = images.length > 0 ? images[0] : undefined;
+  const mainImage = images.length > 0 ? images[0] : "https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?w=400&q=80";
   const tag = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
   try {
@@ -203,7 +203,7 @@ export async function editPromptAction(id: string, formData: FormData) {
       prompt_text,
       ai_model_id,
       is_premium,
-      ...(mainImage ? { image: mainImage } : {}),
+      image: mainImage,
       images: images
     }, categoryIds);
     

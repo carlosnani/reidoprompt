@@ -10,10 +10,17 @@ import { isAdmin } from "@/lib/supabase/auth";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export const metadata: Metadata = {
-  title: "Galeria de Prompts | Rei do Prompt",
-  description: "Explore prompts premium para criação de imagens cinematográficas, retratos, cenas urbanas e identidades visuais realistas.",
-};
+import { fetchSiteSettings } from "@/lib/supabase/site-settings";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const supabase = await createClient();
+  const settings = await fetchSiteSettings(supabase);
+  
+  return {
+    title: `Galeria de Prompts`,
+    description: `Explore a maior galeria de prompts premium para criação de imagens. ${settings.default_meta_description}`,
+  };
+}
 
 import { AppPagination } from "@/components/AppPagination";
 
