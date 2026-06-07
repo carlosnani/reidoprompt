@@ -1,7 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache";
-import { createAiModel, deleteAiModel, createCategory, deleteCategory, deletePrompt, createPrompt, updatePrompt, updateAiModel, deleteUser } from "@/lib/supabase/queries";
+import { createAiModel, deleteAiModel, createCategory, deleteCategory, deletePrompt, createPrompt, updatePrompt, updateAiModel, deleteUser, toggleProAccess, toggleUserBan } from "@/lib/supabase/queries";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/supabase/auth";
@@ -243,5 +243,27 @@ export async function deleteUserAction(id: string) {
     return { success: true };
   } catch (err: any) {
     return { error: err.message || "Erro ao deletar usuário" };
+  }
+}
+
+export async function toggleProAccessAction(userId: string, isCurrentlyPro: boolean) {
+  await requireAdmin();
+  try {
+    await toggleProAccess(userId, isCurrentlyPro);
+    revalidatePath("/admin/users");
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message || "Erro ao alterar acesso Pro" };
+  }
+}
+
+export async function toggleUserBanAction(userId: string, isCurrentlyBanned: boolean) {
+  await requireAdmin();
+  try {
+    await toggleUserBan(userId, isCurrentlyBanned);
+    revalidatePath("/admin/users");
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message || "Erro ao alterar status de banimento" };
   }
 }

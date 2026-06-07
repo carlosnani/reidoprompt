@@ -489,6 +489,41 @@ export async function deleteUser(id: string) {
   if (error) throw error;
 }
 
+export async function toggleProAccess(userId: string, isCurrentlyPro: boolean) {
+  const supabase = createServiceRoleClient();
+
+  const { data: user, error: getError } = await supabase.auth.admin.getUserById(userId);
+  if (getError) throw getError;
+
+  const currentMetadata = user.user.user_metadata || {};
+  const newMetadata = {
+    ...currentMetadata,
+    subscription: isCurrentlyPro ? 'inactive' : 'active',
+    plan: isCurrentlyPro ? 'free' : 'pro'
+  };
+
+  const { error: updateError } = await supabase.auth.admin.updateUserById(userId, {
+    user_metadata: newMetadata
+  });
+
+  if (updateError) throw updateError;
+}
+
+export async function toggleUserBan(userId: string, isCurrentlyBanned: boolean) {
+  const supabase = createServiceRoleClient();
+
+  // Ban duration "none" means unbanned. Any other value (like a long time) means banned.
+  // Alternatively, we can use user_metadata to track banned status if we want more control.
+  // But Auth ban is more robust.
+  const banDuration = isCurrentlyBanned ? 'none' : '876000h'; // 100 years
+
+  const { error } = await supabase.auth.admin.updateUserById(userId, {
+    ban_duration: banDuration
+  });
+
+  if (error) throw error;
+}
+
 // ==================== FAVORITES ====================
 
 export async function getUserFavorites(userId: string) {
