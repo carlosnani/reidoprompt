@@ -71,11 +71,12 @@ export function PromptText({ prompt }: PromptTextProps) {
   };
 
   return (
-    <div className="flex flex-col gap-4 mt-8">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Terminal className="w-5 h-5 text-[#48FF24]" />
-          <h2 className="text-xl font-bold text-white tracking-tight">Prompt</h2>
+    <div className="flex flex-col mt-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2 text-lg font-bold">
+          <span className="text-[#48FF24] font-mono select-none">&gt;_</span>
+          <span className="text-white">Prompt</span>
         </div>
         {isRestricted && (
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#48FF24]/10 border border-[#48FF24]/20 text-[#48FF24] text-xs font-bold uppercase tracking-wider">
@@ -85,11 +86,12 @@ export function PromptText({ prompt }: PromptTextProps) {
         )}
       </div>
 
+      {/* Prompt Box */}
       <div className="relative group">
-        {/* Glassmorphism Background */}
-        <div className="absolute inset-0 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm pointer-events-none"></div>
+        {/* Background & Border */}
+        <div className="absolute inset-0 bg-[#161616] rounded-2xl border border-white/10 pointer-events-none"></div>
 
-        {/* Text Content - SEM SCROLL, adaptando ao conteúdo */}
+        {/* Text Content */}
         <div className="relative p-6 pr-8 h-auto">
           <p className={cn(
             "text-gray-300 font-mono text-sm leading-relaxed whitespace-pre-wrap selection:bg-[#48FF24]/30 selection:text-white transition-all duration-500",
@@ -119,15 +121,16 @@ export function PromptText({ prompt }: PromptTextProps) {
         </div>
       </div>
 
+      {/* Copy Button */}
       <Button
         onClick={handleCopy}
         disabled={isRestricted && !loading}
         className={cn(
-          "w-full sm:w-auto self-start mt-2 bg-white text-black hover:bg-[#48FF24] hover:text-black font-semibold h-12 px-8 rounded-xl transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(72,255,36,0.3)]",
+          "w-full sm:w-auto self-start mt-4 bg-white text-black hover:bg-white/90 font-bold h-12 px-8 rounded-xl transition-all shadow-md flex items-center justify-center gap-2",
           isRestricted && "opacity-50 grayscale cursor-not-allowed"
         )}
       >
-        <Copy className="w-4 h-4 mr-2" />
+        <Copy className="w-4 h-4" />
         {isRestricted ? "Prompt Bloqueado" : "Copiar Prompt"}
       </Button>
     </div>
