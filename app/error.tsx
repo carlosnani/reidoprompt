@@ -67,7 +67,7 @@ export default function Error({
       </div>
 
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-600 text-sm font-medium">
-        Rei do Prompt &copy; {new Date().getFullYear()}
+        O Rei do Prompt &copy; {new Date().getFullYear()}
       </div>
     </div>
   );

@@ -25,7 +25,7 @@ export async function generateMetadata(props: PromptPageProps): Promise<Metadata
   if (!prompt) return {};
 
   const title = `${prompt.title || prompt.tag} - Prompt para IA`;
-  const description = prompt.description || `Veja como gerar esta imagem usando o prompt de ${prompt.tag} no Rei do Prompt.`;
+  const description = prompt.description || `Veja como gerar esta imagem usando o prompt de ${prompt.tag} no O Rei do Prompt.`;
 
   return {
     title,

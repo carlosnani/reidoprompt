@@ -24,7 +24,7 @@ export function AuthContainer({ title, description, children, showSocial = true 
           <div className="p-1.5 rounded-full bg-green-deep/30 border border-green-neon/20 shadow-[0_0_10px_rgba(72,255,36,0.3)]">
             <Crown className="w-4 h-4 text-green-neon" />
           </div>
-          <span className="text-sm font-bold tracking-tight text-green-neon">REI DO PROMPT</span>
+          <span className="text-sm font-bold tracking-tight text-green-neon">O REI DO PROMPT</span>
         </div>
         <div className="w-10"></div> {/* Placeholder for centering */}
       </div>

@@ -37,7 +37,7 @@ const categories = [
 const faqs = [
   {
     id: "1", category: "geral", icon: Sparkles,
-    question: "O que é o Rei do Prompt?",
+    question: "O que é O Rei do Prompt?",
     answer: "O Rei do Prompt é a maior biblioteca de prompts premium do Brasil. Reunimos prompts organizados, validados e prontos para uso nas principais ferramentas de inteligência artificial — como ChatGPT, Midjourney, Claude, Stable Diffusion, entre outras. Nossa missão é ajudar criadores, profissionais e empresas a acelerarem seus resultados com IA."
   },
   {
@@ -103,7 +103,7 @@ export default function FAQPage() {
               Perguntas <span className="text-green-neon">Frequentes</span>
             </h1>
             <p className="text-gray-400 text-lg max-w-xl mx-auto">
-              Encontre respostas para as dúvidas mais comuns sobre a plataforma Rei do Prompt.
+              Encontre respostas para as dúvidas mais comuns sobre a plataforma O Rei do Prompt.
             </p>
 
             {/* Search */}

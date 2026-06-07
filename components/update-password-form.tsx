@@ -94,7 +94,7 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
           {/* Logo + header */}
           <motion.div variants={fadeUp} custom={0} className="flex flex-col items-center mb-8 gap-3">
             <div className="p-3 rounded-2xl bg-green-deep/30 border border-green-neon/20 shadow-[0_0_20px_rgba(72,255,36,0.15)]">
-              <Image src="/logo.svg" alt="Rei do Prompt" width={32} height={32} className="w-8 h-8 object-contain" />
+              <Image src="/logo.svg" alt="O Rei do Prompt" width={32} height={32} className="w-8 h-8 object-contain" />
             </div>
             <div className="text-center">
               <h1 className="text-2xl font-black tracking-tight text-white">Nova senha</h1>

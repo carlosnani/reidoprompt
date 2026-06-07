@@ -12,9 +12,9 @@ export interface SiteSettings {
 }
 
 export const SITE_SETTINGS_DEFAULTS: SiteSettings = {
-  platform_name: 'Rei do Prompt',
+  platform_name: 'O Rei do Prompt',
   support_email: 'suporte@reidoprompt.com',
-  default_meta_title: 'Rei do Prompt - A maior galeria de Prompts',
+  default_meta_title: 'O Rei do Prompt - A maior galeria de Prompts',
   default_meta_description: 'Encontre e copie os melhores prompts testados para Midjourney, DALL-E, ChatGPT e muito mais.',
   monthly_price: 39.90,
   yearly_price: 399.00

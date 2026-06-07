@@ -82,7 +82,7 @@ export default function TermosPage() {
               Central <span className="text-green-neon">Legal</span>
             </h1>
             <p className="text-gray-400 text-lg max-w-xl mx-auto leading-relaxed">
-              Acesse todos os documentos legais, políticas e canais de suporte do Rei do Prompt em um único lugar.
+              Acesse todos os documentos legais, políticas e canais de suporte do O Rei do Prompt em um único lugar.
             </p>
           </motion.div>
         </AnimSection>

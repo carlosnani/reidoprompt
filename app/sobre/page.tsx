@@ -71,7 +71,7 @@ export default function SobrePage() {
               <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.9] text-white">
                 Sobre o{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-neon via-green-400 to-green-dark drop-shadow-[0_0_30px_rgba(72,255,36,0.3)]">
-                  Rei do Prompt
+                  O Rei do Prompt
                 </span>
               </h1>
               <p className="text-xl text-gray-300 leading-relaxed">
@@ -101,7 +101,7 @@ export default function SobrePage() {
               <motion.div animate={{ y: [0, -12, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="relative">
                 <div className="absolute -inset-4 rounded-3xl bg-green-neon/10 blur-2xl" />
                 <div className="relative w-[320px] h-[400px] rounded-3xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm shadow-[0_0_60px_rgba(72,255,36,0.15)]">
-                  <Image src="/sobre/reidoprompt.jpg" alt="Carlos Nani — Criador do Rei do Prompt" fill className="object-cover" priority />
+                  <Image src="/sobre/reidoprompt.jpg" alt="Carlos Nani — Criador do O Rei do Prompt" fill className="object-cover" priority />
                   <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/80 to-transparent" />
                 </div>
                 <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.8 }} className="absolute -bottom-4 -left-6 bg-black/80 backdrop-blur-md border border-green-neon/30 rounded-2xl px-5 py-3 shadow-[0_0_20px_rgba(72,255,36,0.2)]">

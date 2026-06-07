@@ -47,7 +47,7 @@ export function Header() {
   // Verificar se o usuário é admin pelo metadata ou role
   const isAdmin = user?.user_metadata?.role === "admin" || user?.app_metadata?.role === "admin";
   const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Usuário";
-  const platformName = settings?.platform_name || "REI DO PROMPT";
+  const platformName = settings?.platform_name || "O REI DO PROMPT";
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-md border-b border-white/5">

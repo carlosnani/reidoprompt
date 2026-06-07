@@ -1,4 +1,4 @@
-# Rei do Prompt
+# O Rei do Prompt
 
 O Rei do Prompt é uma plataforma avançada para gerenciamento e descoberta de prompts para modelos de IA.
 
@@ -44,4 +44,4 @@ O Rei do Prompt é uma plataforma avançada para gerenciamento e descoberta de p
 
 ---
 
-Desenvolvido com ❤️ por Rei do Prompt.
+Desenvolvido com ❤️ por O Rei do Prompt.

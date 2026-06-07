@@ -1,6 +1,6 @@
 # Basecode - Definições do Projeto
 
-Este arquivo contém as definições fundamentais, arquitetura e diretrizes do projeto **Rei do Prompt**.
+Este arquivo contém as definições fundamentais, arquitetura e diretrizes do projeto **O Rei do Prompt**.
 
 ## 🚀 Tecnologias e Stack
 - **Framework:** [Next.js 15+](https://nextjs.org/) (App Router)
@@ -130,9 +130,9 @@ interface Category {
 ```sql
 CREATE TABLE public.site_settings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    platform_name TEXT NOT NULL DEFAULT 'Rei do Prompt',
+    platform_name TEXT NOT NULL DEFAULT 'O Rei do Prompt',
     support_email TEXT NOT NULL DEFAULT 'suporte@reidoprompt.com',
-    default_meta_title TEXT NOT NULL DEFAULT 'Rei do Prompt - A maior galeria de Prompts',
+    default_meta_title TEXT NOT NULL DEFAULT 'O Rei do Prompt - A maior galeria de Prompts',
     default_meta_description TEXT NOT NULL DEFAULT 'Encontre e copie os melhores prompts testados para Midjourney, DALL-E, ChatGPT e muito mais.',
     monthly_price NUMERIC(10, 2) NOT NULL DEFAULT 39.90,
     yearly_price NUMERIC(10, 2) NOT NULL DEFAULT 399.00,

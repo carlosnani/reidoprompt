@@ -35,7 +35,7 @@ export function Sidebar() {
               <Image src="/logo.svg" alt="Logo" width={24} height={24} className="w-6 h-6 object-contain" />
             </div>
           
-          Rei do Prompt
+          O Rei do Prompt
         </Link>
       </div>
 

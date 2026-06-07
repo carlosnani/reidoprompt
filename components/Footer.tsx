@@ -14,7 +14,7 @@ export function Footer() {
     fetchSiteSettings(supabase).then(setSettings);
   }, []);
 
-  const platformName = settings?.platform_name || "REI DO PROMPT";
+  const platformName = settings?.platform_name || "O REI DO PROMPT";
   const supportEmail = settings?.support_email || "contato@reidoprompt.com";
 
   return (

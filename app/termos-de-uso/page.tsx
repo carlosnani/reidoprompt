@@ -52,7 +52,7 @@ export default function TermosDeUsoPage() {
             <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-white">Termos de Uso</h1>
             <p className="text-gray-400 text-lg">Última atualização: 13 de maio de 2026</p>
             <p className="text-gray-400 leading-relaxed max-w-xl mx-auto">
-              Ao acessar e utilizar a plataforma Rei do Prompt, você concorda com os termos descritos nesta página. Leia com atenção antes de utilizar nossos serviços.
+              Ao acessar e utilizar a plataforma O Rei do Prompt, você concorda com os termos descritos nesta página. Leia com atenção antes de utilizar nossos serviços.
             </p>
           </motion.div>
         </AnimSection>
@@ -87,7 +87,7 @@ export default function TermosDeUsoPage() {
             {[
               {
                 id: "uso", icon: FileText, title: "Uso da Plataforma",
-                content: `A plataforma Rei do Prompt é destinada exclusivamente para uso pessoal e/ou comercial conforme o plano adquirido. É proibido o uso da plataforma para atividades ilegais, fraudulentas ou que violem os direitos de terceiros.
+                content: `A plataforma O Rei do Prompt é destinada exclusivamente para uso pessoal e/ou comercial conforme o plano adquirido. É proibido o uso da plataforma para atividades ilegais, fraudulentas ou que violem os direitos de terceiros.
 
 O acesso à plataforma é concedido mediante cadastro e aceite dos presentes termos. Reservamos o direito de suspender ou encerrar contas que violem estas regras sem aviso prévio.
 
@@ -103,7 +103,7 @@ Novos prompts são adicionados regularmente à biblioteca e disponibilizados con
               },
               {
                 id: "propriedade", icon: AlertTriangle, title: "Propriedade Intelectual",
-                content: `Todo o conteúdo da plataforma Rei do Prompt, incluindo prompts, textos, design, logotipos e código, é protegido por direitos autorais e demais leis de propriedade intelectual aplicáveis.
+                content: `Todo o conteúdo da plataforma O Rei do Prompt, incluindo prompts, textos, design, logotipos e código, é protegido por direitos autorais e demais leis de propriedade intelectual aplicáveis.
 
 Os prompts adquiridos podem ser utilizados para criação de conteúdo pessoal e comercial, conforme licença do plano. No entanto, é expressamente proibido reproduzir, vender, sublicenciar ou redistribuir os prompts para terceiros.
 
@@ -135,7 +135,7 @@ Para solicitar cancelamento por problemas técnicos, entre em contato com nosso 
               },
               {
                 id: "redistribuicao", icon: Ban, title: "Proibição de Redistribuição",
-                content: `É estritamente proibido redistribuir, revender, compartilhar publicamente ou criar produtos derivados com base nos prompts da plataforma Rei do Prompt sem autorização expressa por escrito.
+                content: `É estritamente proibido redistribuir, revender, compartilhar publicamente ou criar produtos derivados com base nos prompts da plataforma O Rei do Prompt sem autorização expressa por escrito.
 
 Isso inclui, mas não se limita a: criação de outros repositórios de prompts, venda em marketplaces de terceiros, distribuição em grupos, canais ou comunidades online.
 
