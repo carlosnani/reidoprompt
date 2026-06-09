@@ -1,5 +1,5 @@
 import { Header } from "@/components/Header";
-import { Hero } from "@/components/Hero";
+import { Hero } from "@/components/herohome";
 import { PromptGallery } from "@/components/PromptGallery";
 import { CategoryGrid } from "@/components/CategoryGrid";
 import { HowItWorks } from "@/components/HowItWorks";

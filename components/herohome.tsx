@@ -26,8 +26,8 @@ function Counter({
     if (isInView && ref.current) {
       const node = ref.current;
       const controls = animate(0, value, {
-        duration: 2,
-        ease: "easeOut" as any,
+        duration: 2,        
+        ease: "easeOut",
         onUpdate(latest) {
           node.textContent = prefix + new Intl.NumberFormat("pt-BR", {
             minimumFractionDigits: decimals,
