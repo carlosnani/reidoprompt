@@ -29,7 +29,7 @@ export function Sidebar() {
   return (
     <aside className="w-64 border-r border-admin-border bg-admin-surface/50 backdrop-blur-xl flex flex-col hidden md:flex sticky top-0 h-screen">
       <div className="h-16 flex items-center px-6 border-b border-admin-border">
-        <Link href="/" className="font-bold text-xl flex items-center gap-2 text-admin-text">
+        <Link href="/" className="font-bold text-xl flex items-center gap-1 text-admin-text">
            
             <div className="p-2 rounded-full bg-black border border-green-neon/20">
               <Image src="/logo.svg" alt="Logo" width={24} height={24} className="w-6 h-6 object-contain" />
