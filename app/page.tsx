@@ -17,8 +17,7 @@ export default function Home() {
       <Header />
       <main className="flex-1 bg-background">
         <HeroHome />
-        <PromptGallery />
-        
+        <PromptGallery />        
         <CategoryGrid />
         {/* <Automations /> */}
         <HowItWorks />
