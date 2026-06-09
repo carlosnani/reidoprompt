@@ -168,7 +168,7 @@ export function HeroHome() {
               <div className="p-2 rounded-lg bg-white/5 group-hover:bg-green-neon/10 transition-colors">
                 <stat.icon className="w-5 h-5 text-green-neon/70 group-hover:text-green-neon transition-colors" />
               </div>
-              <span className="text-2xl font-black text-white">
+              <span className="text-2xl font-black text-white caret-transparent">
                 <Counter 
                   value={stat.value} 
                   prefix={stat.prefix} 
