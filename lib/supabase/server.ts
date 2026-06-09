@@ -41,7 +41,12 @@ export function createServiceRoleClient() {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!url || !key) {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_URL is not set');
+    const missingVars = [];
+    if (!url) missingVars.push('NEXT_PUBLIC_SUPABASE_URL');
+    if (!key) missingVars.push('SUPABASE_SERVICE_ROLE_KEY');
+    
+    console.error('[Supabase Error] Missing environment variables:', missingVars);
+    throw new Error(`Missing environment variables: ${missingVars.join(', ')}. Please ensure these are set in your Vercel environment variables.`);
   }
 
   return createSupabaseClient(url, key);
