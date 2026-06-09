@@ -52,7 +52,7 @@ function Counter({
   );
 }
 
-export function Hero() {
+export function HeroHome() {
   const tags = [
     "Mais Acessados", "Novo", "SEO", "ChatGPT", 
     "Midjourney", "Vídeo", "Marketing", "Automação"

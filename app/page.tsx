@@ -1,5 +1,5 @@
 import { Header } from "@/components/Header";
-import { Hero } from "@/components/herohome";
+import { HeroHome } from "@/components/herohome";
 import { PromptGallery } from "@/components/PromptGallery";
 import { CategoryGrid } from "@/components/CategoryGrid";
 import { HowItWorks } from "@/components/HowItWorks";
@@ -16,7 +16,7 @@ export default function Home() {
     <>
       <Header />
       <main className="flex-1 bg-background">
-        <Hero />
+        <HeroHome />
         <PromptGallery />
         
         <CategoryGrid />
