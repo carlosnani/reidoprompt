@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { hasEnvVars } from "./lib/utils";
 import { isAdmin } from "./lib/supabase/auth";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });

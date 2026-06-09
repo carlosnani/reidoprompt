@@ -6,9 +6,11 @@ import "./globals.css";
 import { fetchSiteSettings } from "@/lib/supabase/site-settings";
 import { createClient } from "@/lib/supabase/server";
 
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
+const defaultUrl = process.env.NEXT_PUBLIC_SITE_URL
+  ? process.env.NEXT_PUBLIC_SITE_URL
+  : process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000";
 
 export async function generateMetadata(): Promise<Metadata> {
   const supabase = await createClient();
