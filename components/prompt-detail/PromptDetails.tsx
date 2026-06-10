@@ -1,6 +1,7 @@
 import type { DetailedPrompt } from "@/lib/supabase/queries";
 import { Eye } from "lucide-react";
 import { FavoriteButton } from "./FavoriteButton";
+import Link from "next/link";
 
 interface PromptDetailsProps {
   prompt: DetailedPrompt;
@@ -13,12 +14,13 @@ export function PromptDetails({ prompt, isFavorited = false }: PromptDetailsProp
       {/* Category Tag */}
       <div className="flex flex-wrap items-center gap-2 mb-3">
         {prompt.categories.map((category, idx) => (
-          <span 
+          <Link 
             key={idx} 
-            className="inline-flex items-center px-4 py-1.5 rounded-full bg-[#181818] border border-white/10 text-[11px] font-semibold text-gray-300 uppercase tracking-wider"
+            href={`/prompts?category=${category.id}`}
+            className="inline-flex items-center px-4 py-1.5 rounded-full bg-[#181818] border border-white/10 text-[11px] font-semibold text-gray-300 uppercase tracking-wider hover:bg-white/5 hover:border-white/20 hover:text-white transition-all cursor-pointer"
           >
             {category.name}
-          </span>
+          </Link>
         ))}
         {prompt.is_premium && (
           <span className="inline-flex items-center px-3 py-1 rounded-full bg-green-neon text-black text-[11px] font-bold uppercase tracking-wider">
