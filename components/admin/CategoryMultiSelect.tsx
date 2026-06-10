@@ -12,6 +12,7 @@ interface CategoryOption {
 interface CategoryMultiSelectProps {
   categories: Category[];
   name?: string;
+  defaultValue?: string[];
 }
 
 const customStyles: StylesConfig<CategoryOption, true> = {
@@ -82,13 +83,19 @@ const customStyles: StylesConfig<CategoryOption, true> = {
   }),
 };
 
-export function CategoryMultiSelect({ categories, name = "categories" }: CategoryMultiSelectProps) {
+export function CategoryMultiSelect({ 
+  categories, 
+  name = "categories",
+  defaultValue = []
+}: CategoryMultiSelectProps) {
   const options = useMemo(
     () => categories.map((category) => ({ value: category.id, label: category.name })),
     [categories]
   );
 
-  const [selectedOptions, setSelectedOptions] = useState<MultiValue<CategoryOption>>([]);
+  const [selectedOptions, setSelectedOptions] = useState<MultiValue<CategoryOption>>(() => {
+    return options.filter(opt => defaultValue.includes(opt.value));
+  });
 
   const handleChange = (value: OnChangeValue<CategoryOption, true>) => {
     setSelectedOptions(value);
