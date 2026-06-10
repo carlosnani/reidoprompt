@@ -8,6 +8,7 @@ import Image from "next/image";
 import { motion, useInView, animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Category } from "@/lib/supabase/queries";
 
 function Counter({ 
   value, 
@@ -53,13 +54,16 @@ function Counter({
   );
 }
 
-export function HeroHome() {
+export function HeroHome({ categories = [] }: { categories?: Category[] }) {
   const router = useRouter();
   const [searchValue, setSearchValue] = useState("");
 
   const tags = [
-    "Mais Acessados", "Novo", "SEO", "ChatGPT", 
-    "Midjourney", "Vídeo", "Marketing", "Automação"
+    { label: "Mais Acessadas", href: "/prompts?sort=populares" },
+    ...categories.slice(0, 7).map(cat => ({
+      label: cat.name,
+      href: `/prompts?category=${cat.id}`
+    }))
   ];
   
   const stats = [
@@ -71,11 +75,10 @@ export function HeroHome() {
     { icon: RefreshCcw, value: 24, prefix: "+", label: "atualizações" },
   ];
 
-  const handleSearch = (e?: React.FormEvent, value?: string) => {
+  const handleSearch = (e?: React.FormEvent) => {
     e?.preventDefault();
-    const query = value || searchValue;
-    if (query.trim()) {
-      router.push(`/prompts?search=${encodeURIComponent(query.trim())}`);
+    if (searchValue.trim()) {
+      router.push(`/prompts?search=${encodeURIComponent(searchValue.trim())}`);
     } else {
       router.push("/prompts");
     }
@@ -169,12 +172,12 @@ export function HeroHome() {
           <span className="text-sm text-gray-500 mr-2">Sugestões:</span>
           {tags.map((tag) => (
             <Badge 
-              key={tag} 
+              key={tag.label} 
               variant="outline" 
-              onClick={() => handleSearch(undefined, tag)}
+              onClick={() => router.push(tag.href)}
               className="px-4 py-1.5 rounded-lg border-white/5 bg-white/5 hover:bg-green-neon hover:text-black hover:border-green-neon transition-all duration-300 cursor-pointer text-sm text-gray-400 font-medium"
             >
-              {tag}
+              {tag.label}
             </Badge>
           ))}
         </motion.div>

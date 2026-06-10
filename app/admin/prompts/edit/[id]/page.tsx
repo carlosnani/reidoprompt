@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { ArrowLeft, Upload, Save, Info, FileText } from "lucide-react";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { SubmitToastButton } from "@/components/admin/SubmitToastButton";
+import { CategoryMultiSelect } from "@/components/admin/CategoryMultiSelect";
 import { getCategories, getAiModels, getPromptById } from "@/lib/supabase/queries";
 import { requireAdmin } from "@/lib/supabase/auth";
 import { editPromptAction } from "../../../actions";
@@ -76,21 +77,7 @@ export default async function EditPromptPage({ params }: { params: Promise<{ id:
                   Categorias
                   <span className="text-[10px] bg-admin-muted px-2 py-0.5 rounded text-admin-text-secondary">Múltiplas</span>
                 </label>
-                <div className="grid grid-cols-2 gap-2 max-h-[160px] overflow-y-auto p-3 rounded-md border border-admin-border-strong bg-admin-bg">
-                  {categories.map((cat) => (
-                    <label key={cat.id} className="flex items-center gap-2 text-xs text-admin-text-secondary hover:text-admin-text cursor-pointer transition-colors">
-                      <input 
-                        type="checkbox" 
-                        name="categories" 
-                        value={cat.id} 
-                        defaultChecked={selectedCategoryIds.includes(cat.id)}
-                        className="w-4 h-4 rounded border-admin-border-strong text-admin-primary focus:ring-admin-primary"
-                      />
-                      {cat.name}
-                    </label>
-                  ))}
-                  {categories.length === 0 && <p className="text-xs text-admin-text-muted col-span-2">Nenhuma categoria cadastrada.</p>}
-                </div>
+                <CategoryMultiSelect categories={categories} defaultValue={selectedCategoryIds} />
               </div>
               
               <div className="space-y-2">
