@@ -220,12 +220,15 @@ CREATE INDEX idx_prompts_title_trgm ON prompts USING gin (title gin_trgm_ops); -
 - **Galeria de Imagens (Multi-image):** Suporte a múltiplas imagens por prompt (armazenadas em `TEXT[]`), com visualizador dinâmico e thumbnails na página de detalhes.
 - **Estados de Carregamento:** Skeletons implementados via `loading.tsx` para transições suaves.
 - **Cores Admin:** Paleta específica para o dashboard admin (ex: `admin-surface`, `admin-border`).
+- **Navegação Categorizada:** Badges dinâmicas na Home e tags funcionais na página de detalhes que filtram a galeria automaticamente por categoria.
+- **Seleção Avançada:** Uso de `React Select` (`CategoryMultiSelect`) para seleção múltipla de categorias no painel administrativo, com suporte a valores pré-carregados na edição.
 
 ## 🛠️ Funcionalidades de Backend e SEO
 1. **Server Actions:** Utilizadas para operações de escrita (admin e auth), incluindo `updateSiteSettingsAction` para configurações globais.
 2. **Otimização de Performance:**
    - **Queries Seletivas:** Busca apenas colunas necessárias para reduzir o payload.
    - **Memoização:** Uso do `cache` do React para evitar múltiplas chamadas ao Supabase no mesmo render.
+   - **Página Inicial Dinâmica:** Categorias em destaque na Home são buscadas em tempo real do banco de dados para garantir sugestões atualizadas.
 3. **Gestão Inteligente de Imagens:**
    - **Compressão no Cliente:** Redução de tamanho antes do upload (máx 1200px, 80% JPEG).
    - **Sincronização de Storage:** Limpeza automática de arquivos órfãos no Storage durante `update` e `delete` de prompts.
