@@ -6,7 +6,8 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import Image from "next/image";
 import { motion, useInView, animate } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 function Counter({ 
   value, 
@@ -53,6 +54,9 @@ function Counter({
 }
 
 export function HeroHome() {
+  const router = useRouter();
+  const [searchValue, setSearchValue] = useState("");
+
   const tags = [
     "Mais Acessados", "Novo", "SEO", "ChatGPT", 
     "Midjourney", "Vídeo", "Marketing", "Automação"
@@ -66,6 +70,16 @@ export function HeroHome() {
     { icon: Star, value: 3.3, prefix: "+", suffix: "k", decimals: 1, label: "avaliações" },
     { icon: RefreshCcw, value: 24, prefix: "+", label: "atualizações" },
   ];
+
+  const handleSearch = (e?: React.FormEvent, value?: string) => {
+    e?.preventDefault();
+    const query = value || searchValue;
+    if (query.trim()) {
+      router.push(`/prompts?search=${encodeURIComponent(query.trim())}`);
+    } else {
+      router.push("/prompts");
+    }
+  };
 
   return (
     <section className="relative pt-40 pb-20 px-6 overflow-hidden flex flex-col items-center justify-center text-center min-h-[90vh] w-full">
@@ -124,17 +138,25 @@ export function HeroHome() {
           className="max-w-3xl mx-auto relative group"
         >
           <div className="absolute -inset-2 bg-gradient-to-r from-green-neon/20 to-green-dark/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-          <div className="relative flex items-center bg-white/5 border border-white/10 rounded-2xl p-2 backdrop-blur-2xl focus-within:border-green-neon/40 focus-within:bg-white/10 transition-all shadow-2xl shadow-black/50">
+          <form 
+            onSubmit={handleSearch}
+            className="relative flex items-center bg-white/5 border border-white/10 rounded-2xl p-2 backdrop-blur-2xl focus-within:border-green-neon/40 focus-within:bg-white/10 transition-all shadow-2xl shadow-black/50"
+          >
             <Search className="w-6 h-6 text-gray-500 ml-4 shrink-0" />
             <Input 
               type="text" 
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
               placeholder="O que você deseja criar hoje? (ex: SEO para blog)" 
               className="border-0 bg-transparent text-lg focus-visible:ring-0 focus-visible:ring-offset-0 px-4 h-14 text-white placeholder:text-gray-500"
             />
-            <Button className="rounded-xl bg-green-neon text-black hover:bg-green-neon/90 px-10 h-14 font-bold text-lg transition-all shadow-[0_0_20px_rgba(72,255,36,0.4)] hover:scale-105 active:scale-95">
+            <Button 
+              type="submit"
+              className="rounded-xl bg-green-neon text-black hover:bg-green-neon/90 px-10 h-14 font-bold text-lg transition-all shadow-[0_0_20px_rgba(72,255,36,0.4)] hover:scale-105 active:scale-95"
+            >
               Explorar
             </Button>
-          </div>
+          </form>
         </motion.div>
 
         {/* Tags */}
@@ -149,6 +171,7 @@ export function HeroHome() {
             <Badge 
               key={tag} 
               variant="outline" 
+              onClick={() => handleSearch(undefined, tag)}
               className="px-4 py-1.5 rounded-lg border-white/5 bg-white/5 hover:bg-green-neon hover:text-black hover:border-green-neon transition-all duration-300 cursor-pointer text-sm text-gray-400 font-medium"
             >
               {tag}
