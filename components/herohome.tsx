@@ -60,7 +60,7 @@ export function HeroHome({ categories = [] }: { categories?: Category[] }) {
 
   const tags = [
     { label: "Mais Acessadas", href: "/prompts?sort=populares" },
-    ...categories.slice(0, 7).map(cat => ({
+    ...categories.slice(0, 4).map(cat => ({
       label: cat.name,
       href: `/prompts?category=${cat.id}`
     }))
