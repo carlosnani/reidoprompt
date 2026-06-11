@@ -1,8 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Bookmark, Eye, Heart, Tag } from "lucide-react";
+import { Bookmark, Eye, Tag } from "lucide-react";
 import type { Prompt } from "@/lib/supabase/queries";
-import { FavoriteButtonCard } from "./FavoriteButtonCard";
+ 
 
 interface PromptCardProps {
   prompt: Prompt;
@@ -10,7 +10,7 @@ interface PromptCardProps {
   showFavoriteButton?: boolean;
 }
 
-export function PromptCard({ prompt, isFavorited = false, showFavoriteButton = true }: PromptCardProps) {
+export function PromptCard({ prompt, isFavorited = false }: PromptCardProps) {
   // O masonry real é feito pelo break-inside-avoid e mb-4 no pai (GalleryGrid)
   return (
     <div className="relative group">
