@@ -39,7 +39,7 @@ export function PromptCard({ prompt, isFavorited = false, showFavoriteButton = t
             <div className="mb-auto mt-2 flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-xs font-medium text-white shadow-lg">
                 <Tag className="w-3 h-3 text-green-neon" />
-                {prompt.tag}
+                {prompt.title}
               </span>
               {prompt.is_premium && (
                 <span className="inline-flex items-center px-3 py-1 rounded-full bg-green-neon text-black text-[10px] font-black uppercase tracking-wider shadow-lg">
