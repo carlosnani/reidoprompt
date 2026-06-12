@@ -25,7 +25,7 @@ export function LoginForm() {
 
     const validated = loginSchema.safeParse({ email, password });
     if (!validated.success) {
-      setError(validated.error.errors[0].message);
+      setError(validated.error.issues[0].message);
       setLoading(false);
       return;
     }

@@ -23,7 +23,7 @@ export async function updateSiteSettingsAction(formData: FormData) {
   const validated = siteSettingsSchema.safeParse(rawData);
 
   if (!validated.success) {
-    return { error: validated.error.errors[0].message };
+    return { error: validated.error.issues[0].message };
   }
 
   const { platformName, supportEmail, seoTitle, seoDesc, monthlyPrice, yearlyPrice } = validated.data;
@@ -72,7 +72,7 @@ export async function addAiModelAction(formData: FormData) {
   const validated = aiModelSchema.safeParse(rawData);
   
   if (!validated.success) {
-    return { error: validated.error.errors[0].message };
+    return { error: validated.error.issues[0].message };
   }
 
   const { name, slug, provider } = validated.data;
@@ -108,7 +108,7 @@ export async function addCategoryAction(formData: FormData) {
   const validated = categorySchema.safeParse(rawData);
 
   if (!validated.success) {
-    return { error: validated.error.errors[0].message };
+    return { error: validated.error.issues[0].message };
   }
 
   const { name, slug } = validated.data;
@@ -160,7 +160,7 @@ export async function addPromptAction(formData: FormData) {
   const validated = promptSchema.safeParse(rawData);
 
   if (!validated.success) {
-    return { error: validated.error.errors[0].message };
+    return { error: validated.error.issues[0].message };
   }
 
   const { title, description, prompt_text, ai_model_id, is_premium, categories: categoryIds, images } = validated.data;
@@ -208,7 +208,7 @@ export async function editPromptAction(id: string, formData: FormData) {
   const validated = promptSchema.safeParse(rawData);
 
   if (!validated.success) {
-    return { error: validated.error.errors[0].message };
+    return { error: validated.error.issues[0].message };
   }
 
   const { title, description, prompt_text, ai_model_id, is_premium, categories: categoryIds, images } = validated.data;
@@ -248,7 +248,7 @@ export async function editAiModelAction(id: string, formData: FormData) {
   const validated = aiModelSchema.safeParse(rawData);
 
   if (!validated.success) {
-    return { error: validated.error.errors[0].message };
+    return { error: validated.error.issues[0].message };
   }
 
   const { name, slug, provider } = validated.data;

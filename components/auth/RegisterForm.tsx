@@ -31,7 +31,7 @@ export function RegisterForm() {
 
     const validated = registerSchema.safeParse({ fullName: name, email, password });
     if (!validated.success) {
-      setError(validated.error.errors[0].message);
+      setError(validated.error.issues[0].message);
       return;
     }
 
