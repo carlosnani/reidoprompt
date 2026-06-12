@@ -2,6 +2,54 @@
 
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { Resend } from 'resend';
+import { contactSchema } from '@/lib/validations';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+export async function sendContactEmailAction(formData: FormData) {
+  const rawData = {
+    name: formData.get('name'),
+    email: formData.get('email'),
+    subject: formData.get('subject'),
+    message: formData.get('message'),
+  };
+
+  const validated = contactSchema.safeParse(rawData);
+
+  if (!validated.success) {
+    return { error: validated.error.issues[0].message };
+  }
+
+  const { name, email, subject, message } = validated.data;
+
+  try {
+    const { error } = await resend.emails.send({
+      from: 'O Rei do Prompt <onboarding@resend.dev>', // Ou um domínio verificado
+      to: 'suporte@reidoprompt.com', // E-mail de destino
+      replyTo: email,
+      subject: `[Contato] ${subject}`,
+      html: `
+        <h2>Nova mensagem de contato</h2>
+        <p><strong>Nome:</strong> ${name}</p>
+        <p><strong>E-mail:</strong> ${email}</p>
+        <p><strong>Assunto:</strong> ${subject}</p>
+        <p><strong>Mensagem:</strong></p>
+        <p>${message.replace(/\n/g, '<br>')}</p>
+      `,
+    });
+
+    if (error) {
+      console.error('Erro Resend:', error);
+      return { error: 'Ocorreu um erro ao enviar sua mensagem. Tente novamente mais tarde.' };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('Erro de e-mail:', err);
+    return { error: 'Ocorreu um erro inesperado. Tente novamente mais tarde.' };
+  }
+}
 
 export async function toggleFavoriteAction(promptId: string) {
   const supabase = await createClient();

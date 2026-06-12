@@ -10,9 +10,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { sendContactEmailAction } from "@/app/actions";
 import {
   Mail, Clock, MessageSquare, BookOpen, HeadphonesIcon,
-  ArrowRight, CheckCircle, ChevronDown, ChevronUp, Sparkles,
+  ArrowRight, CheckCircle, ChevronDown, ChevronUp, Sparkles, Loader2,
 } from "lucide-react";
 
 const fadeUp = {
@@ -46,11 +48,23 @@ const quickFaqs = [
 export default function SuportePage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitted(true);
+    setLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+    const result = await sendContactEmailAction(formData);
+
+    setLoading(false);
+
+    if (result?.error) {
+      toast.error(result.error);
+    } else {
+      setSubmitted(true);
+      toast.success("Mensagem enviada com sucesso!");
+    }
   };
 
   return (
@@ -133,23 +147,57 @@ export default function SuportePage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label className="text-gray-300 text-sm">Nome</Label>
-                        <Input required value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="Seu nome" className="bg-white/5 border-white/10 focus:border-green-neon/40 rounded-xl text-white placeholder:text-gray-500 focus-visible:ring-0" />
+                        <Input 
+                          required 
+                          name="name"
+                          placeholder="Seu nome" 
+                          className="bg-white/5 border-white/10 focus:border-green-neon/40 rounded-xl text-white placeholder:text-gray-500 focus-visible:ring-0" 
+                          disabled={loading}
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label className="text-gray-300 text-sm">E-mail</Label>
-                        <Input required type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} placeholder="seu@email.com" className="bg-white/5 border-white/10 focus:border-green-neon/40 rounded-xl text-white placeholder:text-gray-500 focus-visible:ring-0" />
+                        <Input 
+                          required 
+                          type="email" 
+                          name="email"
+                          placeholder="seu@email.com" 
+                          className="bg-white/5 border-white/10 focus:border-green-neon/40 rounded-xl text-white placeholder:text-gray-500 focus-visible:ring-0" 
+                          disabled={loading}
+                        />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label className="text-gray-300 text-sm">Assunto</Label>
-                      <Input required value={form.subject} onChange={e => setForm(p => ({ ...p, subject: e.target.value }))} placeholder="Do que se trata?" className="bg-white/5 border-white/10 focus:border-green-neon/40 rounded-xl text-white placeholder:text-gray-500 focus-visible:ring-0" />
+                      <Input 
+                        required 
+                        name="subject"
+                        placeholder="Do que se trata?" 
+                        className="bg-white/5 border-white/10 focus:border-green-neon/40 rounded-xl text-white placeholder:text-gray-500 focus-visible:ring-0" 
+                        disabled={loading}
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label className="text-gray-300 text-sm">Mensagem</Label>
-                      <Textarea required value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))} placeholder="Descreva sua dúvida em detalhes..." rows={5} className="bg-white/5 border-white/10 focus:border-green-neon/40 rounded-xl text-white placeholder:text-gray-500 focus-visible:ring-0 resize-none" />
+                      <Textarea 
+                        required 
+                        name="message"
+                        placeholder="Descreva sua dúvida em detalhes..." 
+                        rows={5} 
+                        className="bg-white/5 border-white/10 focus:border-green-neon/40 rounded-xl text-white placeholder:text-gray-500 focus-visible:ring-0 resize-none" 
+                        disabled={loading}
+                      />
                     </div>
-                    <Button type="submit" className="w-full rounded-xl bg-green-neon text-black hover:bg-green-neon/90 hover:shadow-[0_0_20px_rgba(72,255,36,0.4)] font-bold h-12 transition-all">
-                      Enviar Mensagem <ArrowRight className="ml-2 w-4 h-4" />
+                    <Button 
+                      type="submit" 
+                      disabled={loading}
+                      className="w-full rounded-xl bg-green-neon text-black hover:bg-green-neon/90 hover:shadow-[0_0_20px_rgba(72,255,36,0.4)] font-bold h-12 transition-all disabled:opacity-50"
+                    >
+                      {loading ? (
+                        <>Processando... <Loader2 className="ml-2 w-4 h-4 animate-spin" /></>
+                      ) : (
+                        <>Enviar Mensagem <ArrowRight className="ml-2 w-4 h-4" /></>
+                      )}
                     </Button>
                   </form>
                 )}
