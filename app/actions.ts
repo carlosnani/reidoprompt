@@ -18,6 +18,7 @@ export async function sendContactEmailAction(formData: FormData) {
   const validated = contactSchema.safeParse(rawData);
 
   if (!validated.success) {
+    // Seguindo a convenção do basecode.md para tratamento de erros do Zod
     return { error: validated.error.issues[0].message };
   }
 
@@ -25,17 +26,25 @@ export async function sendContactEmailAction(formData: FormData) {
 
   try {
     const { error } = await resend.emails.send({
-      from: 'O Rei do Prompt <onboarding@resend.dev>', // Ou um domínio verificado
-      to: 'suporte@reidoprompt.com', // E-mail de destino
+
+      from: 'O Rei do Prompt <contato@oreidoprompt.online>',
+
+      to: 'carlosnani80@gmail.com',
+
       replyTo: email,
       subject: `[Contato] ${subject}`,
+
       html: `
-        <h2>Nova mensagem de contato</h2>
-        <p><strong>Nome:</strong> ${name}</p>
-        <p><strong>E-mail:</strong> ${email}</p>
-        <p><strong>Assunto:</strong> ${subject}</p>
-        <p><strong>Mensagem:</strong></p>
-        <p>${message.replace(/\n/g, '<br>')}</p>
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9fafb; padding: 20px; border-radius: 8px;">
+          <h2 style="color: #10b981;">Nova mensagem de contato</h2>
+          <p><strong>Nome:</strong> ${name}</p>
+          <p><strong>E-mail:</strong> ${email}</p>
+          <p><strong>Assunto:</strong> ${subject}</p>
+          <p><strong>Mensagem:</strong></p>
+          <div style="background-color: #ffffff; padding: 15px; border-radius: 6px; border-left: 4px solid #10b981;">
+            <p>${message.replace(/\n/g, '<br>')}</p>
+          </div>
+        </div>
       `,
     });
 
@@ -78,14 +87,14 @@ export async function toggleFavoriteAction(promptId: string) {
       .eq('prompt_id', promptId);
 
     if (error) throw error;
-    
+
     // Atualizar contagem de likes no prompt usando adminSupabase
     const { data: prompt } = await adminSupabase
       .from('prompts')
       .select('likes')
       .eq('id', promptId)
       .single();
-    
+
     if (prompt) {
       await adminSupabase
         .from('prompts')
@@ -106,7 +115,7 @@ export async function toggleFavoriteAction(promptId: string) {
       .select('likes')
       .eq('id', promptId)
       .single();
-    
+
     if (prompt) {
       await adminSupabase
         .from('prompts')
@@ -118,6 +127,6 @@ export async function toggleFavoriteAction(promptId: string) {
   revalidatePath(`/prompt/${promptId}`);
   revalidatePath('/favoritos');
   revalidatePath('/prompts');
-  
+
   return { success: true, isFavorite: !existing };
 }
