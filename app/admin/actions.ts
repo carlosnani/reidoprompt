@@ -6,28 +6,39 @@ import { createServiceRoleClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/supabase/auth";
 import { SiteSettings } from "@/lib/supabase/site-settings";
+import { siteSettingsSchema, aiModelSchema, categorySchema, promptSchema } from "@/lib/validations";
 
 export async function updateSiteSettingsAction(formData: FormData) {
   await requireAdmin();
 
-  const platform_name = formData.get("platformName") as string;
-  const support_email = formData.get("supportEmail") as string;
-  const default_meta_title = formData.get("seoTitle") as string;
-  const default_meta_description = formData.get("seoDesc") as string;
-  const monthly_price = parseFloat(formData.get("monthlyPrice") as string);
-  const yearly_price = parseFloat(formData.get("yearlyPrice") as string);
+  const rawData = {
+    platformName: formData.get("platformName"),
+    supportEmail: formData.get("supportEmail"),
+    seoTitle: formData.get("seoTitle"),
+    seoDesc: formData.get("seoDesc"),
+    monthlyPrice: formData.get("monthlyPrice"),
+    yearlyPrice: formData.get("yearlyPrice"),
+  };
+
+  const validated = siteSettingsSchema.safeParse(rawData);
+
+  if (!validated.success) {
+    return { error: validated.error.errors[0].message };
+  }
+
+  const { platformName, supportEmail, seoTitle, seoDesc, monthlyPrice, yearlyPrice } = validated.data;
 
   try {
     const supabase = createServiceRoleClient();
     const { data: current } = await supabase.from('site_settings').select('id').maybeSingle();
     
     const updates: Partial<SiteSettings> = {
-      platform_name,
-      support_email,
-      default_meta_title,
-      default_meta_description,
-      monthly_price,
-      yearly_price,
+      platform_name: platformName,
+      support_email: supportEmail,
+      default_meta_title: seoTitle,
+      default_meta_description: seoDesc,
+      monthly_price: monthlyPrice,
+      yearly_price: yearlyPrice,
     };
 
     if (current) {
@@ -52,24 +63,26 @@ export async function updateSiteSettingsAction(formData: FormData) {
 
 export async function addAiModelAction(formData: FormData) {
   await requireAdmin();
-  const name = formData.get("name") as string;
-  const slug = formData.get("slug") as string;
-  const provider = formData.get("provider") as string;
+  const rawData = {
+    name: formData.get("name"),
+    slug: formData.get("slug"),
+    provider: formData.get("provider"),
+  };
 
-   console.log("📦 Dados recebidos:", { name, slug, provider });
+  const validated = aiModelSchema.safeParse(rawData);
   
-  if (!name || !slug) {
-    return { error: "Nome e Slug são obrigatórios" };
+  if (!validated.success) {
+    return { error: validated.error.errors[0].message };
   }
 
+  const { name, slug, provider } = validated.data;
+
   try {
-    console.log("🔄 Chamando createAiModel...");
     await createAiModel({ name, slug, provider });
     revalidatePath("/admin/models");
     return { success: true };
   } catch (err: any) {
     console.error("Erro no addAiModelAction:", err);
-    console.error("❌ Erro no addAiModelAction:", err);
     return { error: err.message || "Erro ao criar modelo" };
   }
 }
@@ -87,12 +100,18 @@ export async function deleteAiModelAction(id: string) {
 
 export async function addCategoryAction(formData: FormData) {
   await requireAdmin();
-  const name = formData.get("name") as string;
-  const slug = formData.get("slug") as string;
+  const rawData = {
+    name: formData.get("name"),
+    slug: formData.get("slug"),
+  };
 
-  if (!name || !slug) {
-    return { error: "Nome e Slug são obrigatórios" };
+  const validated = categorySchema.safeParse(rawData);
+
+  if (!validated.success) {
+    return { error: validated.error.errors[0].message };
   }
+
+  const { name, slug } = validated.data;
 
   try {
     await createCategory({ name, slug });
@@ -127,33 +146,34 @@ export async function deletePromptAction(id: string) {
 
 export async function addPromptAction(formData: FormData) {
   await requireAdmin();
-  const title = formData.get("title") as string;
-  const description = formData.get("description") as string;
-  const prompt_text = formData.get("prompt_text") as string;
-  const ai_model_id = formData.get("ai_model_id") as string;
-  const is_premium = formData.get("is_premium") === "true";
   
-  // Categorias (pode haver múltiplas)
-  const categoryIds = formData.getAll("categories") as string[];
-  
-  // Imagens enviadas pelo ImageUploader (URLs do Supabase Storage)
-  const images = formData.getAll("images") as string[];
+  const rawData = {
+    title: formData.get("title"),
+    description: formData.get("description"),
+    prompt_text: formData.get("prompt_text"),
+    ai_model_id: formData.get("ai_model_id"),
+    is_premium: formData.get("is_premium") === "true",
+    categories: formData.getAll("categories"),
+    images: formData.getAll("images"),
+  };
 
-  console.log("addPromptAction: received images:", images);
+  const validated = promptSchema.safeParse(rawData);
 
-  if (!title || !prompt_text || !ai_model_id) {
-    return { error: "Título, texto do prompt e modelo são obrigatórios" };
+  if (!validated.success) {
+    return { error: validated.error.errors[0].message };
   }
 
+  const { title, description, prompt_text, ai_model_id, is_premium, categories: categoryIds, images } = validated.data;
+
   // Define a imagem principal como a primeira da lista, ou um placeholder
-  const mainImage = images.length > 0 ? images[0] : "https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?w=400&q=80";
+  const mainImage = images && images.length > 0 ? images[0] : "https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?w=400&q=80";
   const tag = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
   try {
     await createPrompt({
       title,
       tag,
-      description,
+      description: description || "",
       prompt_text,
       ai_model_id,
       is_premium,
@@ -174,32 +194,33 @@ export async function addPromptAction(formData: FormData) {
 
 export async function editPromptAction(id: string, formData: FormData) {
   await requireAdmin();
-  const title = formData.get("title") as string;
-  const description = formData.get("description") as string;
-  const prompt_text = formData.get("prompt_text") as string;
-  const ai_model_id = formData.get("ai_model_id") as string;
-  const is_premium = formData.get("is_premium") === "true";
   
-  // Categorias (pode haver múltiplas)
-  const categoryIds = formData.getAll("categories") as string[];
-  
-  // Imagens
-  const images = formData.getAll("images") as string[];
+  const rawData = {
+    title: formData.get("title"),
+    description: formData.get("description"),
+    prompt_text: formData.get("prompt_text"),
+    ai_model_id: formData.get("ai_model_id"),
+    is_premium: formData.get("is_premium") === "true",
+    categories: formData.getAll("categories"),
+    images: formData.getAll("images"),
+  };
 
-  console.log("editPromptAction: received images:", images);
+  const validated = promptSchema.safeParse(rawData);
 
-  if (!title || !prompt_text || !ai_model_id) {
-    return { error: "Título, texto do prompt e modelo são obrigatórios" };
+  if (!validated.success) {
+    return { error: validated.error.errors[0].message };
   }
 
-  const mainImage = images.length > 0 ? images[0] : "https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?w=400&q=80";
+  const { title, description, prompt_text, ai_model_id, is_premium, categories: categoryIds, images } = validated.data;
+
+  const mainImage = images && images.length > 0 ? images[0] : "https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?w=400&q=80";
   const tag = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
   try {
     await updatePrompt(id, {
       title,
       tag,
-      description,
+      description: description || "",
       prompt_text,
       ai_model_id,
       is_premium,
@@ -218,13 +239,19 @@ export async function editPromptAction(id: string, formData: FormData) {
 
 export async function editAiModelAction(id: string, formData: FormData) {
   await requireAdmin();
-  const name = formData.get("name") as string;
-  const slug = formData.get("slug") as string;
-  const provider = formData.get("provider") as string;
+  const rawData = {
+    name: formData.get("name"),
+    slug: formData.get("slug"),
+    provider: formData.get("provider"),
+  };
 
-  if (!name || !slug) {
-    return { error: "Nome e Slug são obrigatórios" };
+  const validated = aiModelSchema.safeParse(rawData);
+
+  if (!validated.success) {
+    return { error: validated.error.errors[0].message };
   }
+
+  const { name, slug, provider } = validated.data;
 
   try {
     await updateAiModel(id, { name, slug, provider });

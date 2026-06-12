@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import { loginSchema } from "@/lib/validations";
 
 export function LoginForm() {
   const router = useRouter();
@@ -21,6 +22,13 @@ export function LoginForm() {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    const validated = loginSchema.safeParse({ email, password });
+    if (!validated.success) {
+      setError(validated.error.errors[0].message);
+      setLoading(false);
+      return;
+    }
 
     const supabase = createClient();
     const { error: authError } = await supabase.auth.signInWithPassword({

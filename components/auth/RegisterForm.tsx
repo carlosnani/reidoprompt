@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import { registerSchema } from "@/lib/validations";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -25,6 +26,12 @@ export function RegisterForm() {
     e.preventDefault();
     if (password !== confirmPassword) {
       setError("As senhas não coincidem.");
+      return;
+    }
+
+    const validated = registerSchema.safeParse({ fullName: name, email, password });
+    if (!validated.success) {
+      setError(validated.error.errors[0].message);
       return;
     }
 
