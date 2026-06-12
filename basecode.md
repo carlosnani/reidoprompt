@@ -14,6 +14,7 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
 - **Ícones:** [Lucide React](https://lucide.dev/)
 - **Notificações:** [Sonner](https://genau.io/sonner)
 - **Validação:** [Zod](https://zod.dev/)
+- **E-mails:** [Resend](https://resend.com/)
 
 ## 📂 Estrutura de Pastas Detalhada
 
