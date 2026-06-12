@@ -13,6 +13,7 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
 - **Autenticação:** Supabase Auth (Cookie-based / SSR via `@supabase/ssr`)
 - **Ícones:** [Lucide React](https://lucide.dev/)
 - **Notificações:** [Sonner](https://genau.io/sonner)
+- **Validação:** [Zod](https://zod.dev/)
 
 ## 📂 Estrutura de Pastas Detalhada
 
@@ -250,3 +251,7 @@ CREATE INDEX idx_prompts_title_trgm ON prompts USING gin (title gin_trgm_ops); -
 - **fetchSiteSettings:** Sempre utilizar este utilitário para acessar as configurações globais, passando o cliente Supabase adequado (server ou client).
 - **Next.js 15+ Dynamic Routes:** Aguardar sempre `params` e `searchParams` antes do uso.
 - **Revalidação:** Utilizar `revalidatePath` em Server Actions para manter o cache atualizado (especialmente em `/` e `/admin/settings`).
+
+## 🛡️ Validação de Dados
+- **Zod Schemas:** Centralizados em `lib/validations.ts` para garantir consistência entre Client e Server.
+- **Tratamento de Erros:** Ao utilizar `safeParse`, os erros de validação devem ser acessados via `validated.error.issues` (e não `.errors`), seguindo a tipagem oficial do Zod para evitar erros de compilação TypeScript.
