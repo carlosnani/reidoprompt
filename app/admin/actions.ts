@@ -1,7 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache";
-import { createAiModel, deleteAiModel, createCategory, deleteCategory, deletePrompt, createPrompt, updatePrompt, updateAiModel, deleteUser, toggleProAccess, toggleUserBan } from "@/lib/supabase/queries";
+import { createAiModel, deleteAiModel, createCategory, updateCategory, deleteCategory, deletePrompt, createPrompt, updatePrompt, updateAiModel, deleteUser, toggleProAccess, toggleUserBan } from "@/lib/supabase/queries";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/supabase/auth";
@@ -119,6 +119,30 @@ export async function addCategoryAction(formData: FormData) {
     return { success: true };
   } catch (err: any) {
     return { error: err.message || "Erro ao criar categoria" };
+  }
+}
+
+export async function editCategoryAction(id: string, formData: FormData) {
+  await requireAdmin();
+  const rawData = {
+    name: formData.get("name"),
+    slug: formData.get("slug"),
+  };
+
+  const validated = categorySchema.safeParse(rawData);
+
+  if (!validated.success) {
+    return { error: validated.error.issues[0].message };
+  }
+
+  const { name, slug } = validated.data;
+
+  try {
+    await updateCategory(id, { name, slug });
+    revalidatePath("/admin/categories");
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message || "Erro ao editar categoria" };
   }
 }
 

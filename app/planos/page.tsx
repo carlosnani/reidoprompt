@@ -7,8 +7,27 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Check, X, Sparkles, Zap, ShieldCheck, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { fetchSiteSettings } from "@/lib/supabase/site-settings";
 
 export default function PricingPage() {
+  const [monthlyPrice, setMonthlyPrice] = useState<string>("4,99");
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      const supabase = createClient();
+      const settings = await fetchSiteSettings(supabase);
+      if (settings?.monthly_price) {
+        setMonthlyPrice(settings.monthly_price.toLocaleString('pt-BR', { 
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 
+        }));
+      }
+    };
+    loadSettings();
+  }, []);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -146,7 +165,7 @@ export default function PricingPage() {
                   </div>
                   <CardDescription className="text-gray-300 text-base">O arsenal completo para dominar a IA</CardDescription>
                   <div className="mt-6 flex items-baseline gap-1">
-                    <span className="text-5xl font-black text-white">R$ 4,99</span>
+                    <span className="text-5xl font-black text-white">R$ {monthlyPrice}</span>
                     <span className="text-gray-400 font-medium">/mês</span>
                   </div>
                 </CardHeader>

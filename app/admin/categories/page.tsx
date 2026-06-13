@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { TablePagination } from "@/components/admin/TablePagination";
 import { DeleteAction } from "@/components/admin/DeleteAction";
+import { EditCategoryDialog } from "@/components/admin/EditCategoryDialog";
 import { SubmitToastButton } from "@/components/admin/SubmitToastButton";
 
 import { getCategories } from "@/lib/supabase/queries";
@@ -90,10 +91,7 @@ export default async function AdminCategoriesPage({
                       </td>
                       <td className="p-4 align-middle text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <Button variant="ghost" size="icon" className="hover:text-admin-primary hover:bg-admin-primary-soft">
-                            <Edit className="w-4 h-4" />
-                            <span className="sr-only">Editar</span>
-                          </Button>
+                          <EditCategoryDialog category={category} />
                           <DeleteAction id={category.id} entityName="Categoria" action={deleteCategoryAction} />
                         </div>
                       </td>
