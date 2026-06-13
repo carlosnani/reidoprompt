@@ -7,6 +7,15 @@ import { contactSchema } from '@/lib/validations';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export async function sendContactEmailAction(formData: FormData) {
   const rawData = {
     name: formData.get('name'),
@@ -25,6 +34,11 @@ export async function sendContactEmailAction(formData: FormData) {
   const { name, email, subject, message } = validated.data;
 
   try {
+    const escapedName = escapeHtml(name);
+    const escapedEmail = escapeHtml(email);
+    const escapedSubject = escapeHtml(subject);
+    const escapedMessage = escapeHtml(message).replace(/\n/g, '<br>');
+
     const { error } = await resend.emails.send({
 
       from: 'O Rei do Prompt <contato@oreidoprompt.online>',
@@ -37,12 +51,12 @@ export async function sendContactEmailAction(formData: FormData) {
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9fafb; padding: 20px; border-radius: 8px;">
           <h2 style="color: #10b981;">Nova mensagem de contato</h2>
-          <p><strong>Nome:</strong> ${name}</p>
-          <p><strong>E-mail:</strong> ${email}</p>
-          <p><strong>Assunto:</strong> ${subject}</p>
+          <p><strong>Nome:</strong> ${escapedName}</p>
+          <p><strong>E-mail:</strong> ${escapedEmail}</p>
+          <p><strong>Assunto:</strong> ${escapedSubject}</p>
           <p><strong>Mensagem:</strong></p>
           <div style="background-color: #ffffff; padding: 15px; border-radius: 6px; border-left: 4px solid #10b981;">
-            <p>${message.replace(/\n/g, '<br>')}</p>
+            <p>${escapedMessage}</p>
           </div>
         </div>
       `,
