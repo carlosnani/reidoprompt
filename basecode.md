@@ -29,7 +29,7 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
 - `faq/`, `suporte/`, `sobre/`, `termos/`, `privacidade/`: Páginas institucionais e legais.
 
 ### `components/` (Componentes React)
-- `admin/`: Componentes específicos do dashboard (Sidebar, Header, TablePagination - Legacy, ImageUploader, SubmitToastButton, DeleteAction, UserActionButtons, UserSearchInput).
+- `admin/`: Componentes específicos do dashboard (Sidebar, Header, TablePagination - Legacy, ImageUploader, SubmitToastButton, DeleteAction, UserActionButtons, UserSearchInput, EditCategoryDialog).
 - `auth/`: Formulários e containers de autenticação (LoginForm, RegisterForm, SocialLogin, AuthContainer).
 - `AppPagination.tsx`: Componente de paginação universal com suporte a temas 'admin' e 'public'.
 - `prompt-detail/`: Fragmentos da página de detalhes (PromptText, ImageGallery, RelatedPrompts, PromptDetails).
@@ -245,6 +245,8 @@ CREATE INDEX idx_prompts_title_trgm ON prompts USING gin (title gin_trgm_ops); -
    - **Metadata Dinâmico:** Títulos e descrições gerados em tempo real com base no banco e dados do prompt.
    - **OpenGraph:** Social cards dinâmicos que utilizam as imagens reais dos prompts.
    - **Sitemap & Robots:** Gerados dinamicamente para indexação total (`app/sitemap.ts` e `app/robots.ts`).
+7. **Comunicação e Suporte:** Implementação de formulário de contato integrado com **Resend**, utilizando Server Actions para envio de e-mails e validação rigorosa com Zod.
+8. **Gestão de Conteúdo (Admin):** Interface administrativa avançada com diálogos interativos (`AlertDialog`/`EditCategoryDialog`) para edição em tempo real de categorias, garantindo uma experiência de gestão fluida e feedback imediato via `sonner`.
 
 ## 📝 Convenções de Desenvolvimento
 - **Server Components:** Utilizar por padrão para buscar dados e SEO (Metadata dinâmico).
