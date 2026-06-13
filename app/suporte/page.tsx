@@ -144,6 +144,15 @@ export default function SuportePage() {
                   </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-5">
+                    {/* Honeypot field (hidden from screen readers and visual display) */}
+                    <div className="hidden" aria-hidden="true">
+                      <input 
+                        type="text" 
+                        name="website" 
+                        tabIndex={-1} 
+                        autoComplete="off" 
+                      />
+                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label className="text-gray-300 text-sm">Nome</Label>

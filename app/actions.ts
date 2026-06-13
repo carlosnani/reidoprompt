@@ -4,6 +4,7 @@ import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { Resend } from 'resend';
 import { contactSchema } from '@/lib/validations';
+import { headers } from 'next/headers';
 import fs from 'fs';
 import path from 'path';
 
@@ -47,8 +48,53 @@ function escapeHtml(text: string): string {
     .replace(/'/g, '&#039;');
 }
 
+// In-memory rate limiting map: IP -> array of timestamps
+const rateLimitMap = new Map<string, number[]>();
+
+const LIMIT_WINDOW_MS = 5 * 60 * 1000; // 5 minutos
+const MAX_ATTEMPTS = 3; // máximo de 3 tentativas por janela
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const attempts = rateLimitMap.get(ip) || [];
+  
+  // Filtra apenas as tentativas dentro da janela de tempo ativa
+  const activeAttempts = attempts.filter(timestamp => now - timestamp < LIMIT_WINDOW_MS);
+  
+  if (activeAttempts.length >= MAX_ATTEMPTS) {
+    return true;
+  }
+  
+  activeAttempts.push(now);
+  rateLimitMap.set(ip, activeAttempts);
+  return false;
+}
+
 export async function sendContactEmailAction(formData: FormData) {
   console.log('[DEBUG sendContactEmailAction] Iniciando ação...');
+
+  // 1. Verificação de Honeypot (Campo Invisível para evitar bots automatizados simples)
+  const honeypot = formData.get('website');
+  if (honeypot) {
+    console.warn('[SECURITY sendContactEmailAction] Honeypot preenchido. Possível bot. Ignorando envio.');
+    return { success: true }; // Retorna sucesso silencioso para enganar o bot
+  }
+
+  // 2. Limitação de Taxa (Rate Limit) por IP
+  try {
+    const headersList = await headers();
+    const ip = headersList.get('x-forwarded-for')?.split(',')[0] || 
+               headersList.get('x-real-ip') || 
+               '127.0.0.1';
+
+    if (isRateLimited(ip)) {
+      console.warn(`[SECURITY sendContactEmailAction] Rate limit atingido para o IP: ${ip}`);
+      return { error: 'Muitas mensagens enviadas do seu IP. Por favor, aguarde 5 minutos antes de enviar novamente.' };
+    }
+  } catch (error) {
+    console.error('[DEBUG sendContactEmailAction] Erro ao obter headers para rate limit:', error);
+  }
+
   console.log('[DEBUG sendContactEmailAction] RESEND_API_KEY definida?', !!process.env.RESEND_API_KEY);
   if (process.env.RESEND_API_KEY) {
     console.log('[DEBUG sendContactEmailAction] Prefixo da chave:', process.env.RESEND_API_KEY.substring(0, 7) + '...');

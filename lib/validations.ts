@@ -44,8 +44,8 @@ export const promptSchema = z.object({
 });
 
 export const contactSchema = z.object({
-  name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
-  email: z.string().email("E-mail inválido"),
-  subject: z.string().min(5, "O assunto deve ter pelo menos 5 caracteres"),
-  message: z.string().min(10, "A mensagem deve ter pelo menos 10 caracteres"),
+  name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres").max(100, "O nome deve ter no máximo 100 caracteres"),
+  email: z.string().email("E-mail inválido").max(150, "O e-mail deve ter no máximo 150 caracteres"),
+  subject: z.string().min(5, "O assunto deve ter pelo menos 5 caracteres").max(200, "O assunto deve ter no máximo 200 caracteres"),
+  message: z.string().min(10, "A mensagem deve ter pelo menos 10 caracteres").max(5000, "A mensagem deve ter no máximo 5000 caracteres"),
 });
