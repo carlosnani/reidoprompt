@@ -4,12 +4,32 @@ import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { Resend } from 'resend';
 import { contactSchema } from '@/lib/validations';
+import fs from 'fs';
+import path from 'path';
 
 let resendClient: Resend | null = null;
 
 function getResendClient() {
   if (!resendClient) {
-    const apiKey = process.env.RESEND_API_KEY;
+    let apiKey = process.env.RESEND_API_KEY;
+
+    // Fallback: Lê o arquivo .env diretamente se o Next.js não tiver carregado a variável no process.env
+    if (!apiKey) {
+      try {
+        const envPath = path.join(process.cwd(), '.env');
+        if (fs.existsSync(envPath)) {
+          const envContent = fs.readFileSync(envPath, 'utf8');
+          const match = envContent.match(/^RESEND_API_KEY\s*=\s*(.+)$/m);
+          if (match) {
+            apiKey = match[1].trim();
+            console.log('[DEBUG sendContactEmailAction] RESEND_API_KEY carregada com sucesso via fallback do arquivo .env');
+          }
+        }
+      } catch (err) {
+        console.error('[DEBUG sendContactEmailAction] Erro no fallback ao ler arquivo .env:', err);
+      }
+    }
+
     if (!apiKey) {
       throw new Error("RESEND_API_KEY está faltando no process.env. Verifique se o arquivo .env está configurado e se o servidor foi reiniciado.");
     }
