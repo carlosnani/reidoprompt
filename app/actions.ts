@@ -5,7 +5,18 @@ import { revalidatePath } from 'next/cache';
 import { Resend } from 'resend';
 import { contactSchema } from '@/lib/validations';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resendClient: Resend | null = null;
+
+function getResendClient() {
+  if (!resendClient) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error("RESEND_API_KEY está faltando no process.env. Verifique se o arquivo .env está configurado e se o servidor foi reiniciado.");
+    }
+    resendClient = new Resend(apiKey);
+  }
+  return resendClient;
+}
 
 function escapeHtml(text: string): string {
   return text
@@ -48,7 +59,7 @@ export async function sendContactEmailAction(formData: FormData) {
 
     console.log('[DEBUG sendContactEmailAction] Tentando enviar e-mail via Resend...');
 
-    const emailPromise = resend.emails.send({
+    const emailPromise = getResendClient().emails.send({
       from: 'O Rei do Prompt <contato@oreidoprompt.online>',
       to: 'carlosnani80@gmail.com',
       replyTo: email,
