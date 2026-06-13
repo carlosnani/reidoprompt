@@ -17,6 +17,12 @@ function escapeHtml(text: string): string {
 }
 
 export async function sendContactEmailAction(formData: FormData) {
+  console.log('[DEBUG sendContactEmailAction] Iniciando ação...');
+  console.log('[DEBUG sendContactEmailAction] RESEND_API_KEY definida?', !!process.env.RESEND_API_KEY);
+  if (process.env.RESEND_API_KEY) {
+    console.log('[DEBUG sendContactEmailAction] Prefixo da chave:', process.env.RESEND_API_KEY.substring(0, 7) + '...');
+  }
+
   const rawData = {
     name: formData.get('name'),
     email: formData.get('email'),
@@ -27,6 +33,7 @@ export async function sendContactEmailAction(formData: FormData) {
   const validated = contactSchema.safeParse(rawData);
 
   if (!validated.success) {
+    console.log('[DEBUG sendContactEmailAction] Falha na validação do Zod:', validated.error.issues[0].message);
     // Seguindo a convenção do basecode.md para tratamento de erros do Zod
     return { error: validated.error.issues[0].message };
   }
@@ -39,15 +46,13 @@ export async function sendContactEmailAction(formData: FormData) {
     const escapedSubject = escapeHtml(subject);
     const escapedMessage = escapeHtml(message).replace(/\n/g, '<br>');
 
-    const { error } = await resend.emails.send({
+    console.log('[DEBUG sendContactEmailAction] Tentando enviar e-mail via Resend...');
 
+    const emailPromise = resend.emails.send({
       from: 'O Rei do Prompt <contato@oreidoprompt.online>',
-
       to: 'carlosnani80@gmail.com',
-
       replyTo: email,
       subject: `[Contato] ${subject}`,
-
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9fafb; padding: 20px; border-radius: 8px;">
           <h2 style="color: #10b981;">Nova mensagem de contato</h2>
@@ -61,6 +66,15 @@ export async function sendContactEmailAction(formData: FormData) {
         </div>
       `,
     });
+
+    // Timeout de 10 segundos
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Timeout na requisição do Resend (10s)')), 10000)
+    );
+
+    const { error } = await Promise.race([emailPromise, timeoutPromise]) as any;
+
+    console.log('[DEBUG sendContactEmailAction] Retorno do Resend obtido. Erro?', error);
 
     if (error) {
       console.error('Erro Resend:', error);
