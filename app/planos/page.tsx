@@ -2,21 +2,17 @@
 
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, X, Sparkles, Zap, ShieldCheck, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { fetchSiteSettings } from "@/lib/supabase/site-settings";
+import { Button } from "@/components/ui/button";
 
 export default function PricingPage() {
-  const router = useRouter();
   const [monthlyPrice, setMonthlyPrice] = useState<string>("4,99");
-  const [isLoadingCheckout, setIsLoadingCheckout] = useState(false);
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -31,39 +27,6 @@ export default function PricingPage() {
     };
     loadSettings();
   }, []);
-
-  async function handleCheckout() {
-    try {
-      setIsLoadingCheckout(true);
-      const response = await fetch("/api/mercadopago/preference", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const result = await response.json();
-      if (!response.ok) {
-        if (response.status === 401) {
-          router.push("/auth/login");
-          return;
-        }
-
-        throw new Error(result.error || "Erro ao iniciar checkout.");
-      }
-
-      if (!result.checkoutUrl) {
-        throw new Error("Checkout URL não foi gerada.");
-      }
-
-      window.location.href = result.checkoutUrl;
-    } catch (error) {
-      console.error("Erro ao iniciar checkout Mercado Pago:", error);
-      setIsLoadingCheckout(false);
-      toast.error(error instanceof Error ? error.message : "Erro ao iniciar checkout Mercado Pago.");
-    }
-  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -228,15 +191,13 @@ export default function PricingPage() {
                 </CardContent>
 
                 <CardFooter className="relative z-10 pt-8 pb-8">
-                  <button
-                    type="button"
-                    onClick={handleCheckout}
-                    disabled={isLoadingCheckout}
-                    className="w-full h-14 bg-green-neon text-black hover:bg-green-neon/90 disabled:opacity-60 disabled:cursor-not-allowed text-lg font-black rounded-xl transition-all shadow-[0_0_20px_rgba(72,255,36,0.4)] group-hover:scale-[1.02] active:scale-95"
+                  <Link
+                    href="/auth/signup?plan=pro"
+                    className="w-full h-14 inline-flex items-center justify-center bg-green-neon text-black hover:bg-green-neon/90 text-lg font-black rounded-xl transition-all shadow-[0_0_20px_rgba(72,255,36,0.4)] group-hover:scale-[1.02] active:scale-95"
                   >
-                    {isLoadingCheckout ? "Abrindo Mercado Pago..." : "Assinar Agora"}
+                    Assinar Agora
                     <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  </Link>
                 </CardFooter>
               </Card>
             </motion.div>
