@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     const paymentResponse = await fetch(`https://api.mercadopago.com/v1/payments/${id}`, {
       headers: {
-        Authorization: `Bearer ${process.env.MERCADO_PAGO_ACCESS_TOKEN}`,
+        Authorization: `Bearer ${process.env.MERCADO_PAGO_ACCESS_TOKEN || process.env.NEXT_MERCADO_PAGO_ACCESS_TOKEN}`,
       },
     });
 

@@ -16,10 +16,10 @@ export function getBaseUrl() {
 }
 
 export function getMercadoPagoAccessToken() {
-  const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  const token = process.env.MERCADO_PAGO_ACCESS_TOKEN || process.env.NEXT_MERCADO_PAGO_ACCESS_TOKEN;
   if (!token) {
     throw new Error(
-      "MERCADO_PAGO_ACCESS_TOKEN não está definida no ambiente. Defina a variável de ambiente e reinicie o servidor.",
+      "MERCADO_PAGO_ACCESS_TOKEN ou NEXT_MERCADO_PAGO_ACCESS_TOKEN não estão definidas no ambiente. Defina a variável correta e reinicie o servidor.",
     );
   }
   return token;
