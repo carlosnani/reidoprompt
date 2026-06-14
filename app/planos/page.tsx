@@ -9,6 +9,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { fetchSiteSettings } from "@/lib/supabase/site-settings";
 
@@ -36,6 +37,7 @@ export default function PricingPage() {
       setIsLoadingCheckout(true);
       const response = await fetch("/api/mercadopago/preference", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -43,15 +45,23 @@ export default function PricingPage() {
 
       const result = await response.json();
       if (!response.ok) {
+        if (response.status === 401) {
+          router.push("/auth/login");
+          return;
+        }
+
         throw new Error(result.error || "Erro ao iniciar checkout.");
+      }
+
+      if (!result.checkoutUrl) {
+        throw new Error("Checkout URL não foi gerada.");
       }
 
       window.location.href = result.checkoutUrl;
     } catch (error) {
       console.error("Erro ao iniciar checkout Mercado Pago:", error);
       setIsLoadingCheckout(false);
-      // fallback para página de login se necessário
-      router.push("/auth/login");
+      toast.error(error instanceof Error ? error.message : "Erro ao iniciar checkout Mercado Pago.");
     }
   }
 
