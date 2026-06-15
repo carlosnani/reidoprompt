@@ -224,10 +224,10 @@ export default function PricingPage() {
 
               <div className="flex flex-col items-center gap-6">
                 <p className="text-xs uppercase tracking-widest text-gray-600 font-bold">Aceitamos</p>
-                <div className="flex items-center gap-8 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-500">
-                  <img src="/pix.svg" alt="PIX" className="h-6 w-auto" />
-                  <img src="/visa.svg" alt="Visa" className="h-4 w-auto" />
-                  <img src="/mastercard.svg" alt="Mastercard" className="h-6 w-auto" />
+                <div className="flex items-center gap-8 grayscale grayscale-0 hover:opacity-100 transition-all duration-500">
+                  <img src="/pix.svg" alt="PIX" className="h-16 w-auto" />
+                  <img src="/visa.svg" alt="Visa" className="h-16 w-auto" />
+                  <img src="/mastercard.svg" alt="Mastercard" className="h-14 w-auto" />
                 </div>
               </div>
 
