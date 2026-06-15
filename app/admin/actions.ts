@@ -18,6 +18,7 @@ export async function updateSiteSettingsAction(formData: FormData) {
     seoDesc: formData.get("seoDesc"),
     monthlyPrice: formData.get("monthlyPrice"),
     yearlyPrice: formData.get("yearlyPrice"),
+    allowRegistration: formData.get("allowRegistration") === "on",
   };
 
   const validated = siteSettingsSchema.safeParse(rawData);
@@ -26,7 +27,7 @@ export async function updateSiteSettingsAction(formData: FormData) {
     return { error: validated.error.issues[0].message };
   }
 
-  const { platformName, supportEmail, seoTitle, seoDesc, monthlyPrice, yearlyPrice } = validated.data;
+  const { platformName, supportEmail, seoTitle, seoDesc, monthlyPrice, yearlyPrice, allowRegistration } = validated.data;
 
   try {
     const supabase = createServiceRoleClient();
@@ -39,6 +40,7 @@ export async function updateSiteSettingsAction(formData: FormData) {
       default_meta_description: seoDesc,
       monthly_price: monthlyPrice,
       yearly_price: yearlyPrice,
+      allow_registration: allowRegistration,
     };
 
     if (current) {
@@ -55,9 +57,10 @@ export async function updateSiteSettingsAction(formData: FormData) {
     revalidatePath("/");
     revalidatePath("/admin/settings");
     return { success: true };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Erro ao atualizar configurações:", err);
-    return { error: err.message || "Erro ao atualizar configurações" };
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: message || "Erro ao atualizar configurações" };
   }
 }
 
@@ -81,9 +84,10 @@ export async function addAiModelAction(formData: FormData) {
     await createAiModel({ name, slug, provider });
     revalidatePath("/admin/models");
     return { success: true };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Erro no addAiModelAction:", err);
-    return { error: err.message || "Erro ao criar modelo" };
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: message || "Erro ao criar modelo" };
   }
 }
 
@@ -93,8 +97,9 @@ export async function deleteAiModelAction(id: string) {
     await deleteAiModel(id);
     revalidatePath("/admin/models");
     return { success: true };
-  } catch (err: any) {
-    return { error: err.message || "Erro ao deletar modelo" };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: message || "Erro ao deletar modelo" };
   }
 }
 
@@ -117,8 +122,9 @@ export async function addCategoryAction(formData: FormData) {
     await createCategory({ name, slug });
     revalidatePath("/admin/categories");
     return { success: true };
-  } catch (err: any) {
-    return { error: err.message || "Erro ao criar categoria" };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: message || "Erro ao criar categoria" };
   }
 }
 
@@ -141,8 +147,9 @@ export async function editCategoryAction(id: string, formData: FormData) {
     await updateCategory(id, { name, slug });
     revalidatePath("/admin/categories");
     return { success: true };
-  } catch (err: any) {
-    return { error: err.message || "Erro ao editar categoria" };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: message || "Erro ao editar categoria" };
   }
 }
 
@@ -152,8 +159,9 @@ export async function deleteCategoryAction(id: string) {
     await deleteCategory(id);
     revalidatePath("/admin/categories");
     return { success: true };
-  } catch (err: any) {
-    return { error: err.message || "Erro ao deletar categoria" };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: message || "Erro ao deletar categoria" };
   }
 }
 
@@ -163,8 +171,9 @@ export async function deletePromptAction(id: string) {
     await deletePrompt(id);
     revalidatePath("/admin/prompts");
     return { success: true };
-  } catch (err: any) {
-    return { error: err.message || "Erro ao deletar prompt" };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: message || "Erro ao deletar prompt" };
   }
 }
 
@@ -207,9 +216,10 @@ export async function addPromptAction(formData: FormData) {
       likes: 0
     }, categoryIds);
     
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Erro ao criar prompt:", err);
-    return { error: err.message || "Erro ao criar prompt" };
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: message || "Erro ao criar prompt" };
   }
 
   revalidatePath("/admin/prompts");
@@ -252,9 +262,10 @@ export async function editPromptAction(id: string, formData: FormData) {
       images: images
     }, categoryIds);
     
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Erro ao editar prompt:", err);
-    return { error: err.message || "Erro ao editar prompt" };
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: message || "Erro ao editar prompt" };
   }
 
   revalidatePath("/admin/prompts");
@@ -281,8 +292,9 @@ export async function editAiModelAction(id: string, formData: FormData) {
     await updateAiModel(id, { name, slug, provider });
     revalidatePath("/admin/models");
     return { success: true };
-  } catch (err: any) {
-    return { error: err.message || "Erro ao editar modelo" };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: message || "Erro ao editar modelo" };
   }
 }
 
@@ -292,8 +304,9 @@ export async function deleteUserAction(id: string) {
     await deleteUser(id);
     revalidatePath("/admin/users");
     return { success: true };
-  } catch (err: any) {
-    return { error: err.message || "Erro ao deletar usuário" };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: message || "Erro ao deletar usuário" };
   }
 }
 
@@ -303,8 +316,9 @@ export async function toggleProAccessAction(userId: string, isCurrentlyPro: bool
     await toggleProAccess(userId, isCurrentlyPro);
     revalidatePath("/admin/users");
     return { success: true };
-  } catch (err: any) {
-    return { error: err.message || "Erro ao alterar acesso Pro" };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: message || "Erro ao alterar acesso Pro" };
   }
 }
 
@@ -314,7 +328,8 @@ export async function toggleUserBanAction(userId: string, isCurrentlyBanned: boo
     await toggleUserBan(userId, isCurrentlyBanned);
     revalidatePath("/admin/users");
     return { success: true };
-  } catch (err: any) {
-    return { error: err.message || "Erro ao alterar status de banimento" };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: message || "Erro ao alterar status de banimento" };
   }
 }

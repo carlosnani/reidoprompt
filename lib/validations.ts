@@ -20,6 +20,7 @@ export const siteSettingsSchema = z.object({
   seoDesc: z.string().min(1, "Descrição SEO é obrigatória"),
   monthlyPrice: z.coerce.number().min(0, "Preço mensal deve ser positivo"),
   yearlyPrice: z.coerce.number().min(0, "Preço anual deve ser positivo"),
+  allowRegistration: z.boolean().default(true),
 });
 
 export const aiModelSchema = z.object({

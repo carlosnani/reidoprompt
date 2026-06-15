@@ -120,11 +120,13 @@ export function Header() {
               <Link href="/auth/login" className="hidden sm:block text-sm font-medium text-gray-300 hover:text-white transition-colors">
                 Entrar
               </Link>
-              <Link href="/auth/sign-up" className="hidden sm:block">
-                <Button className="rounded-full bg-green-neon text-black hover:bg-green-neon/90 hover:shadow-[0_0_20px_rgba(72,255,36,0.4)] transition-all font-semibold px-6 border border-green-neon">
-                  Criar Conta
-                </Button>
-              </Link>
+              {settings?.allow_registration && (
+                <Link href="/auth/sign-up" className="hidden sm:block">
+                  <Button className="rounded-full bg-green-neon text-black hover:bg-green-neon/90 hover:shadow-[0_0_20px_rgba(72,255,36,0.4)] transition-all font-semibold px-6 border border-green-neon">
+                    Criar Conta
+                  </Button>
+                </Link>
+              )}
             </>
           )}
         </div>

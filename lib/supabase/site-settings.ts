@@ -8,6 +8,7 @@ export interface SiteSettings {
   default_meta_description: string;
   monthly_price: number;
   yearly_price: number;
+  allow_registration: boolean;
   updated_at?: string;
 }
 
@@ -17,7 +18,8 @@ export const SITE_SETTINGS_DEFAULTS: SiteSettings = {
   default_meta_title: 'O Rei do Prompt - A maior galeria de Prompts',
   default_meta_description: 'Encontre e copie os melhores prompts testados para Midjourney, DALL-E, ChatGPT e muito mais.',
   monthly_price: 39.90,
-  yearly_price: 399.00
+  yearly_price: 399.00,
+  allow_registration: true
 };
 
 export async function fetchSiteSettings(supabase: SupabaseClient) {

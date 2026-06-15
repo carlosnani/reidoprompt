@@ -1,10 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Save, Globe, CreditCard, Layout } from "lucide-react";
+import { Save, Globe, CreditCard, Layout, ShieldCheck } from "lucide-react";
 import { SubmitToastButton } from "@/components/admin/SubmitToastButton";
 import { fetchSiteSettings } from "@/lib/supabase/site-settings";
 import { updateSiteSettingsAction } from "@/app/admin/actions";
 import { createClient } from "@/lib/supabase/server";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default async function AdminSettingsPage() {
   const supabase = await createClient();
@@ -53,6 +54,41 @@ export default async function AdminSettingsPage() {
                       defaultValue={settings.support_email} 
                       className="bg-admin-bg border-admin-border-strong text-admin-text focus-visible:ring-admin-primary" 
                     />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Access Control Settings */}
+            <Card className="bg-admin-surface border-admin-border shadow-sm overflow-hidden">
+              <CardHeader className="border-b border-admin-border-light bg-admin-muted/30">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-admin-primary-soft text-admin-primary">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl text-admin-text">Controle de Acesso</CardTitle>
+                    <CardDescription className="text-admin-text-muted">Gerencie quem pode acessar e se cadastrar na plataforma.</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6 pt-6">
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="allowRegistration" 
+                    name="allowRegistration" 
+                    defaultChecked={settings.allow_registration}
+                  />
+                  <div className="grid gap-1.5 leading-none">
+                    <label
+                      htmlFor="allowRegistration"
+                      className="text-sm font-semibold text-admin-text leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Permitir novos cadastros
+                    </label>
+                    <p className="text-xs text-admin-text-muted">
+                      Quando desativado, novos usuários não poderão criar contas na plataforma.
+                    </p>
                   </div>
                 </div>
               </CardContent>
