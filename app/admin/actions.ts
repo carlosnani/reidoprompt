@@ -186,6 +186,7 @@ export async function addPromptAction(formData: FormData) {
     prompt_text: formData.get("prompt_text"),
     ai_model_id: formData.get("ai_model_id"),
     is_premium: formData.get("is_premium") === "true",
+    is_public: formData.get("is_public") === "true",
     categories: formData.getAll("categories"),
     images: formData.getAll("images"),
   };
@@ -196,7 +197,7 @@ export async function addPromptAction(formData: FormData) {
     return { error: validated.error.issues[0].message };
   }
 
-  const { title, description, prompt_text, ai_model_id, is_premium, categories: categoryIds, images } = validated.data;
+  const { title, description, prompt_text, ai_model_id, is_premium, is_public, categories: categoryIds, images } = validated.data;
 
   // Define a imagem principal como a primeira da lista, ou um placeholder
   const mainImage = images && images.length > 0 ? images[0] : "https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?w=400&q=80";
@@ -210,6 +211,7 @@ export async function addPromptAction(formData: FormData) {
       prompt_text,
       ai_model_id,
       is_premium,
+      is_public,
       image: mainImage,
       images: images,
       views: 0,
@@ -235,6 +237,7 @@ export async function editPromptAction(id: string, formData: FormData) {
     prompt_text: formData.get("prompt_text"),
     ai_model_id: formData.get("ai_model_id"),
     is_premium: formData.get("is_premium") === "true",
+    is_public: formData.get("is_public") === "true",
     categories: formData.getAll("categories"),
     images: formData.getAll("images"),
   };
@@ -245,7 +248,7 @@ export async function editPromptAction(id: string, formData: FormData) {
     return { error: validated.error.issues[0].message };
   }
 
-  const { title, description, prompt_text, ai_model_id, is_premium, categories: categoryIds, images } = validated.data;
+  const { title, description, prompt_text, ai_model_id, is_premium, is_public, categories: categoryIds, images } = validated.data;
 
   const mainImage = images && images.length > 0 ? images[0] : "https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?w=400&q=80";
   const tag = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -258,6 +261,7 @@ export async function editPromptAction(id: string, formData: FormData) {
       prompt_text,
       ai_model_id,
       is_premium,
+      is_public,
       image: mainImage,
       images: images
     }, categoryIds);

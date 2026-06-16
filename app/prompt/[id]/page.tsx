@@ -88,11 +88,16 @@ export default async function PromptPage(props: PromptPageProps) {
       favorited = await isFavorite(user.id, params.id);
     }
 
-    const isRestricted = basicPrompt.is_premium && !userIsPro;
+    const isRestricted = basicPrompt.is_public
+      ? false
+      : (basicPrompt.is_premium
+        ? (!user || !userIsPro)
+        : !user);
 
     // Convert to DetailedPrompt using real data from Supabase
     prompt = {
       ...basicPrompt,
+      is_public: !!basicPrompt.is_public,
       title: basicPrompt.title || basicPrompt.tag,
       categories:
         basicPrompt.prompt_categories && basicPrompt.prompt_categories.length > 0
@@ -101,7 +106,7 @@ export default async function PromptPage(props: PromptPageProps) {
           ? [{ id: basicPrompt.category, name: basicPrompt.category, slug: basicPrompt.category.toLowerCase() }]
           : [],
       description: basicPrompt.description || "Um prompt profissional e altamente otimizado para gerar imagens de altíssima qualidade.",
-      // SECURITY: Redact prompt text on server if user is not Pro
+      // SECURITY: Redact prompt text on server if user is not authorized
       prompt_text: isRestricted ? undefined : basicPrompt.prompt_text,
       promptText: isRestricted 
         ? undefined 

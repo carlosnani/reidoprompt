@@ -108,19 +108,35 @@ export default async function NewPromptPage() {
           </CardHeader>
           <CardContent className="space-y-6 pt-6">
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 rounded-xl bg-admin-muted/30 border border-admin-border-light">
-                <div className="space-y-0.5">
-                  <label htmlFor="is_premium" className="text-sm font-semibold text-admin-text">Conteúdo Premium</label>
-                  <p className="text-xs text-admin-text-muted">Torne este prompt exclusivo para assinantes Pro.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center justify-between p-4 rounded-xl bg-admin-muted/30 border border-admin-border-light">
+                  <div className="space-y-0.5">
+                    <label htmlFor="is_premium" className="text-sm font-semibold text-admin-text">Conteúdo Premium</label>
+                    <p className="text-xs text-admin-text-muted">Exclusivo para assinantes Pro.</p>
+                  </div>
+                  <input 
+                    type="checkbox" 
+                    id="is_premium" 
+                    name="is_premium"
+                    value="true"
+                    className="w-5 h-5 rounded border-admin-border-strong text-admin-primary focus:ring-admin-primary transition-all cursor-pointer" 
+                    defaultChecked 
+                  />
                 </div>
-                <input 
-                  type="checkbox" 
-                  id="is_premium" 
-                  name="is_premium"
-                  value="true"
-                  className="w-5 h-5 rounded border-admin-border-strong text-admin-primary focus:ring-admin-primary transition-all cursor-pointer" 
-                  defaultChecked 
-                />
+
+                <div className="flex items-center justify-between p-4 rounded-xl bg-admin-muted/30 border border-admin-border-light">
+                  <div className="space-y-0.5">
+                    <label htmlFor="is_public" className="text-sm font-semibold text-admin-text">Visibilidade Pública</label>
+                    <p className="text-xs text-admin-text-muted">Visível para usuários não logados.</p>
+                  </div>
+                  <input 
+                    type="checkbox" 
+                    id="is_public" 
+                    name="is_public"
+                    value="true"
+                    className="w-5 h-5 rounded border-admin-border-strong text-admin-primary focus:ring-admin-primary transition-all cursor-pointer" 
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">

@@ -10,6 +10,7 @@ export interface Prompt {
   description?: string;
   prompt_text?: string;
   is_premium: boolean;
+  is_public?: boolean;
   views: number;
   likes: number;
   category?: string; // Legacy
@@ -74,6 +75,7 @@ export async function getPrompts(options: {
       tag,
       image,
       is_premium,
+      is_public,
       views,
       likes,
       created_at,

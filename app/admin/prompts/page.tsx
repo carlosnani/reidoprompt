@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Edit } from "lucide-react";
 import { getPrompts } from "@/lib/supabase/queries";
 import { requireAdmin } from "@/lib/supabase/auth";
-import { TablePagination } from "@/components/admin/TablePagination";
 import { DeleteAction } from "@/components/admin/DeleteAction";
 import { deletePromptAction } from "../actions";
 
@@ -68,13 +67,24 @@ export default async function AdminPromptsPage({
                     {prompt.title || prompt.tag}
                   </td>
                   <td className="p-4 align-middle">
-                    {prompt.is_premium ? (
-                      <Badge variant="default" className="bg-admin-success hover:bg-admin-success text-white">
-                        Premium
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary" className="bg-admin-muted text-admin-text-secondary hover:bg-admin-muted border-none">Grátis</Badge>
-                    )}
+                    <div className="flex flex-col gap-1 sm:flex-row sm:gap-2">
+                      {prompt.is_premium ? (
+                        <Badge variant="default" className="bg-admin-success hover:bg-admin-success text-white w-fit">
+                          Premium
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="bg-admin-muted text-admin-text-secondary hover:bg-admin-muted border-none w-fit">Grátis</Badge>
+                      )}
+                      {prompt.is_public ? (
+                        <Badge variant="outline" className="border-admin-primary/30 text-admin-primary w-fit hover:bg-transparent">
+                          Público
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="border-admin-border-strong text-admin-text-muted w-fit hover:bg-transparent">
+                          Privado
+                        </Badge>
+                      )}
+                    </div>
                   </td>
                   <td className="p-4 align-middle text-admin-text-secondary">{prompt.views}</td>
                   <td className="p-4 align-middle text-admin-text-secondary">{prompt.likes}</td>

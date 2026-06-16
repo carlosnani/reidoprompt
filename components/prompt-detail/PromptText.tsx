@@ -7,24 +7,35 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
+import { useUser } from "@/lib/supabase/hooks";
+
 interface PromptTextProps {
   prompt: DetailedPrompt;
 }
 
-const RESTRICTED_TEXT = "ESTE CONTEÚDO É EXCLUSIVO PARA ASSINANTES PRO. AO ASSINAR O PLANO PRO, VOCÊ TERÁ ACESSO COMPLETO A ESTE PROMPT PROFISSIONAL E MILHARES DE OUTROS EXEMPLOS VALIDADOS PARA MAXIMIZAR SEUS RESULTADOS COM INTELIGÊNCIA ARTIFICIAL. ESTE É UM EXEMPLO DE COMO O PROMPT SERÁ EXIBIDO PARA VOCÊ APÓS O DESBLOQUEIO.";
+const RESTRICTED_TEXT = "ESTE CONTEÚDO É RESTRITO. PARA TER ACESSO COMPLETO A ESTE PROMPT PROFISSIONAL E MILHARES DE OUTROS EXEMPLOS VALIDADOS PARA MAXIMIZAR SEUS RESULTADOS COM INTELIGÊNCIA ARTIFICIAL, VOCÊ PRECISA ESTAR LOGADO E, EM CASOS DE CONTEÚDO PREMIUM, POSSUIR UMA ASSINATURA ATIVA. ESTE É UM EXEMPLO DE COMO O PROMPT SERÁ EXIBIDO PARA VOCÊ APÓS O DESBLOQUEIO.";
 
 export function PromptText({ prompt }: PromptTextProps) {
-  // O prompt é restrito no cliente se ele for premium e o servidor não enviou o texto.
-  // Isso é seguro porque o servidor se encarrega de omitir o texto se o usuário não for Pro.
-  const isRestricted = prompt.is_premium && !prompt.promptText;
+  const { user } = useUser();
+  // O prompt é restrito no cliente se o servidor não enviou o texto.
+  // Isso é seguro porque o servidor se encarrega de omitir o texto se o usuário não tiver permissão.
+  const isRestricted = !prompt.promptText;
 
   const handleCopy = async () => {
     if (isRestricted) {
-      toast.error("Este prompt é exclusivo para assinantes Pro.", {
-        description: "Assine o plano Pro para desbloquear este e milhares de outros prompts.",
+      const errorMsg = user 
+        ? "Este prompt é exclusivo para assinantes Pro." 
+        : "Você precisa estar logado para ver este prompt.";
+      
+      const description = user
+        ? "Assine o plano Pro para desbloquear este e milhares de outros prompts."
+        : "Crie uma conta ou faça login para acessar este conteúdo.";
+
+      toast.error(errorMsg, {
+        description: description,
         action: {
-          label: "Ver Planos",
-          onClick: () => window.location.href = "/planos"
+          label: user ? "Ver Planos" : "Fazer Login",
+          onClick: () => window.location.href = user ? "/planos" : "/auth/login"
         },
         className: "bg-white/10 border-white/20 text-white",
         descriptionClassName: "text-gray-300"
@@ -107,11 +118,13 @@ export function PromptText({ prompt }: PromptTextProps) {
                 </div>
                 <h3 className="text-white font-bold text-lg">Conteúdo Bloqueado</h3>
                 <p className="text-gray-400 text-sm">
-                  Assine o plano Pro para visualizar este prompt e elevar o nível das suas criações.
+                  {user 
+                    ? "Assine o plano Pro para visualizar este prompt e elevar o nível das suas criações." 
+                    : "Faça login ou crie uma conta para visualizar este prompt e acessar nossa galeria completa."}
                 </p>
-                <Link href="/planos">
-                  <Button className="bg-[#48FF24] text-black hover:bg-[#48FF24]/90 font-bold mt-2">
-                    Desbloquear Agora
+                <Link href={user ? "/planos" : "/auth/login"}>
+                  <Button className="bg-[#48FF24] text-black hover:bg-[#48FF24]/90 font-bold mt-2 px-8">
+                    {user ? "Desbloquear Agora" : "Fazer Login"}
                   </Button>
                 </Link>
               </div>

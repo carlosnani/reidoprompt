@@ -40,6 +40,7 @@ export const promptSchema = z.object({
   prompt_text: z.string().min(1, "Texto do prompt é obrigatório"),
   ai_model_id: z.string().uuid("Modelo de IA inválido"),
   is_premium: z.boolean().default(false),
+  is_public: z.boolean().default(false),
   categories: z.array(z.string().uuid()).min(1, "Selecione pelo menos uma categoria"),
   images: z.array(z.string().url()).optional(),
 });

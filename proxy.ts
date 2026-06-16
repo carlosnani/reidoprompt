@@ -49,7 +49,8 @@ export async function proxy(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/suporte") ||
     request.nextUrl.pathname.startsWith("/faq") ||
     request.nextUrl.pathname.startsWith("/privacidade") ||
-    request.nextUrl.pathname.startsWith("/prompts");
+    request.nextUrl.pathname.startsWith("/prompts") ||
+    request.nextUrl.pathname.startsWith("/prompt");
 
   const isAdminPath = request.nextUrl.pathname.startsWith("/admin");
 
