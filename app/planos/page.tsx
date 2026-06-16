@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { fetchSiteSettings } from "@/lib/supabase/site-settings";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 export default function PricingPage() {
   const [monthlyPrice, setMonthlyPrice] = useState<string>("4,99");
@@ -225,11 +226,11 @@ export default function PricingPage() {
               <div className="flex flex-col items-center gap-6">
                 <p className="text-xs uppercase tracking-widest text-gray-600 font-bold">Aceitamos</p>
                 <div className="flex items-center gap-8 grayscale grayscale-0 hover:opacity-100 transition-all duration-500">
-                  <img src="/pix.svg" alt="PIX" className="h-16 w-auto" />
-                  <img src="/visa.svg" alt="Visa" className="h-16 w-auto" />
-                  <img src="/mastercard.svg" alt="Mastercard" className="h-14 w-auto" />
+                  <Image src="/pix.svg" alt="PIX" className="h-16 w-auto" />
+                  <Image src="/visa.svg" alt="Visa" className="h-16 w-auto" />
+                  <Image src="/mastercard.svg" alt="Mastercard" className="h-14 w-auto" />
                 </div>
-              </div>
+              </div>  
 
               <div className="flex flex-col items-center md:items-end text-center md:text-right gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-green-neon">
