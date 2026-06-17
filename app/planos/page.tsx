@@ -9,11 +9,15 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { fetchSiteSettings } from "@/lib/supabase/site-settings";
+import { useUser } from "@/lib/supabase/hooks";
+import { StripeCheckoutButton } from "@/components/stripe-checkout-button";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
 export default function PricingPage() {
+  const { user, loading } = useUser();
   const [monthlyPrice, setMonthlyPrice] = useState<string>("4,99");
+  const monthlyPriceId = process.env.STRIPE_PRICE_ID_MONTHLY || process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_MONTHLY || '';
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -137,11 +141,23 @@ export default function PricingPage() {
                 </CardContent>
 
                 <CardFooter className="relative z-10 pt-8 pb-8">
-                  <Link href="/auth/signup?plan=free" className="w-full">
-                    <Button variant="outline" className="w-full h-14 border-white/10 bg-transparent text-white hover:bg-white/10 text-lg font-bold rounded-xl transition-all">
-                      Começar Grátis
+                  {loading ? (
+                    <Button variant="outline" className="w-full h-14 border-white/10 bg-transparent text-white text-lg font-bold rounded-xl" disabled>
+                      Carregando...
                     </Button>
-                  </Link>
+                  ) : user ? (
+                    <Link href="/prompts" className="w-full">
+                      <Button variant="outline" className="w-full h-14 border-white/10 bg-transparent text-white hover:bg-white/10 text-lg font-bold rounded-xl transition-all">
+                        Começar Grátis
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Link href="/auth/sign-up?plan=free" className="w-full">
+                      <Button variant="outline" className="w-full h-14 border-white/10 bg-transparent text-white hover:bg-white/10 text-lg font-bold rounded-xl transition-all">
+                        Começar Grátis
+                      </Button>
+                    </Link>
+                  )}
                 </CardFooter>
               </Card>
             </motion.div>
@@ -192,13 +208,28 @@ export default function PricingPage() {
                 </CardContent>
 
                 <CardFooter className="relative z-10 pt-8 pb-8">
-                  <Link
-                    href="/auth/signup?plan=pro"
-                    className="w-full h-14 inline-flex items-center justify-center bg-green-neon text-black hover:bg-green-neon/90 text-lg font-black rounded-xl transition-all shadow-[0_0_20px_rgba(72,255,36,0.4)] group-hover:scale-[1.02] active:scale-95"
-                  >
-                    Assinar Agora
-                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Link>
+                  {loading ? (
+                    <Button className="w-full h-14 bg-green-neon text-black text-lg font-black rounded-xl" disabled>
+                      Carregando...
+                    </Button>
+                  ) : user ? (
+                    <StripeCheckoutButton
+                      priceId={monthlyPriceId}
+                      userId={user.id}
+                      email={user.email || ''}
+                      className="w-full h-14 bg-green-neon text-black hover:bg-green-neon/90 text-lg font-black rounded-xl transition-all shadow-[0_0_20px_rgba(72,255,36,0.4)] group-hover:scale-[1.02] active:scale-95"
+                    >
+                      Assinar Agora
+                    </StripeCheckoutButton>
+                  ) : (
+                    <Link
+                      href="/auth/login?plan=pro"
+                      className="w-full h-14 inline-flex items-center justify-center bg-green-neon text-black hover:bg-green-neon/90 text-lg font-black rounded-xl transition-all shadow-[0_0_20px_rgba(72,255,36,0.4)] group-hover:scale-[1.02] active:scale-95"
+                    >
+                      Assinar Agora
+                      <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  )}
                 </CardFooter>
               </Card>
             </motion.div>
@@ -225,10 +256,9 @@ export default function PricingPage() {
 
               <div className="flex flex-col items-center gap-6">
                 <p className="text-xs uppercase tracking-widest text-gray-600 font-bold">Aceitamos</p>
-                <div className="flex items-center gap-8 grayscale grayscale-0 hover:opacity-100 transition-all duration-500">
-                  <Image src="/pix.svg" alt="PIX" className="h-16 w-auto" />
-                  <Image src="/visa.svg" alt="Visa" className="h-16 w-auto" />
-                  <Image src="/mastercard.svg" alt="Mastercard" className="h-14 w-auto" />
+                <div className="flex items-center gap-8 grayscale hover:opacity-100 transition-all duration-500">
+                  <Image src="/visa.svg" alt="Visa" className="h-16 w-auto width-auto" width="10" height="10"/>
+                  <Image src="/mastercard.svg" alt="Mastercard" className="h-14 w-auto" width="10" height="10"/>
                 </div>
               </div>  
 

@@ -11,6 +11,7 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
 - **Animações:** [Framer Motion 12+](https://www.framer.com/motion/)
 - **Backend/Banco de Dados:** [Supabase](https://supabase.com/)
 - **Autenticação:** Supabase Auth (Cookie-based / SSR via `@supabase/ssr`)
+- **Pagamentos:** [Stripe](https://stripe.com/) (Assinaturas e Checkout)
 - **Ícones:** [Lucide React](https://lucide.dev/)
 - **Notificações:** [Sonner](https://genau.io/sonner)
 - **Validação:** [Zod](https://zod.dev/)
@@ -20,6 +21,7 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
 
 ### `app/` (Rotas e Páginas)
 - `admin/`: Painel administrativo (Gestão de prompts, categorias, modelos, usuários e settings).
+- `api/`: Endpoints para Webhooks (Stripe) e operações de Checkout.
 - `auth/`: Fluxos de autenticação (Login, Sign-up, etc).
 - `prompts/`: Galeria principal com filtros e busca.
 - `prompt/[id]/`: Detalhes de um prompt.
@@ -37,6 +39,7 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
 - `ui/`: Componentes base do shadcn/ui (Button, Input, Card, Select, Tabs, Textarea, Accordion, Alert-Dialog, etc.).
 - `Header.tsx`, `Footer.tsx`: Layout principal com branding dinâmico.
 - `Hero.tsx`, `PromptGallery.tsx`, `CategoryGrid.tsx`, `Automations.tsx`, `BlogReviews.tsx`, `ToolsGrid.tsx`, `PremiumPrompts.tsx`, `HowItWorks.tsx`, `CTA.tsx`: Seções da Landing Page.
+- `stripe-checkout-button.tsx`, `subscription-manager.tsx`: Gestão de assinaturas e pagamentos via Stripe.
 - `auth-button.tsx`, `logout-button.tsx`, `theme-switcher.tsx`: Utilitários de UI.
 
 ### `lib/` (Lógica e Utilitários)
@@ -44,10 +47,11 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
   - `queries.ts`: CRUD otimizado com **seleção de colunas específica** e **React cache** para memoização.
   - `storage.ts`: Gestão de arquivos (Upload/Delete) com suporte a extração de caminhos via URL.
   - `auth.ts`, `client.ts`, `server.ts`, `site-settings.ts`: Gestão de auth e configurações globais.
+- `stripe.ts`, `stripe-client.ts`: Integração com Stripe para pagamentos e assinaturas.
 - `utils/`:
   - `image.ts`: Utilitário de **compressão de imagem** (Client-side, 1200px, 80% qualidade).
 - `data/`: Mock data.
-- `utils.ts`: Utilitários gerais.
+- `utils.ts`, `validations.ts`: Utilitários gerais e schemas de validação.
 
 ## 📊 Modelos de Dados (Tipagens)
 
@@ -78,6 +82,7 @@ interface Prompt {
   description?: string;
   prompt_text?: string;
   is_premium: boolean;
+  is_public?: boolean;
   views: number;
   likes: number;
   ai_model_id?: string; // Foreign key
@@ -126,6 +131,24 @@ interface Category {
 }
 ```
 
+### StripeSubscription
+Representa o status da assinatura sincronizado com o Stripe.
+```typescript
+interface StripeSubscription {
+  id: string;
+  user_id: string;
+  stripe_customer_id: string;
+  stripe_subscription_id?: string;
+  status: 'active' | 'past_due' | 'canceled' | 'incomplete' | 'incomplete_expired' | 'trialing';
+  price_id?: string;
+  current_period_end?: Date;
+  cancel_at_period_end: boolean;
+  canceled_at?: Date;
+  created_at: Date;
+  updated_at: Date;
+}
+```
+
 ## 🗄️ SQL Database Schema (Supabase)
 
 ### Tabela `site_settings`
@@ -153,6 +176,7 @@ CREATE TABLE public.prompts (
     description TEXT,
     prompt_text TEXT,
     is_premium BOOLEAN DEFAULT false,
+    is_public BOOLEAN DEFAULT true,
     views INTEGER DEFAULT 0,
     likes INTEGER DEFAULT 0,
     ai_model_id UUID REFERENCES public.ai_models(id) ON DELETE SET NULL,
@@ -206,6 +230,24 @@ CREATE TABLE public.favorites (
 );
 ```
 
+### Tabela `stripe_subscriptions`
+```sql
+CREATE TABLE public.stripe_subscriptions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  stripe_customer_id TEXT NOT NULL UNIQUE,
+  stripe_subscription_id TEXT,
+  status TEXT CHECK (status IN ('active', 'past_due', 'canceled', 'incomplete', 'incomplete_expired', 'trialing')),
+  price_id TEXT,
+  current_period_end TIMESTAMP WITH TIME ZONE,
+  cancel_at_period_end BOOLEAN DEFAULT false,
+  canceled_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  UNIQUE(user_id)
+);
+```
+
 ### Índices de Performance Recomendados
 ```sql
 CREATE INDEX idx_prompts_created_at ON prompts (created_at DESC);
@@ -241,19 +283,23 @@ CREATE INDEX idx_prompts_title_trgm ON prompts USING gin (title gin_trgm_ops); -
 5. **Controle de Acesso Seguro (Premium/PRO):**
    - **Bypass de Cache no Servidor:** Para garantir que a visualização do prompt premium seja imediata após o upgrade para PRO, a página `app/prompt/[id]/page.tsx` no servidor utiliza o cliente administrativo do Supabase (`createServiceRoleClient`) para buscar o status atualizado do usuário diretamente no banco de dados, ignorando tokens JWT potencialmente obsoletos contidos no cookie.
    - **Simplificação no Cliente:** O componente cliente `PromptText.tsx` baseia seu estado de bloqueio (`isRestricted`) unicamente no fato de o servidor ter fornecido ou não o `promptText`, já que a lógica de segurança e a omissão do texto real são processadas e aplicadas do lado do servidor.
-6. **SEO & Marketing Dinâmico:**
+6. **Pagamentos e Assinaturas:**
+   - **Foco Exclusivo no Stripe:** Gestão de assinaturas e pagamentos recorrentes ou únicos via Stripe.
+   - **Sincronização de Webhooks:** Atualização automática do status PRO do usuário no banco de dados e metadados de autenticação após confirmação de pagamento.
+   - **Gestão de Assinaturas:** Interface para cancelamento e troca de planos integrada ao Stripe Billing Portal.
+7. **SEO & Marketing Dinâmico:**
    - **Metadata Dinâmico:** Títulos e descrições gerados em tempo real com base no banco e dados do prompt.
    - **OpenGraph:** Social cards dinâmicos que utilizam as imagens reais dos prompts.
    - **Sitemap & Robots:** Gerados dinamicamente para indexação total (`app/sitemap.ts` e `app/robots.ts`).
-7. **Comunicação e Suporte:** Implementação de formulário de contato integrado com **Resend**, utilizando Server Actions para envio de e-mails e validação rigorosa com Zod.
-8. **Gestão de Conteúdo (Admin):** Interface administrativa avançada com diálogos interativos (`AlertDialog`/`EditCategoryDialog`) para edição em tempo real de categorias, garantindo uma experiência de gestão fluida e feedback imediato via `sonner`.
+8. **Comunicação e Suporte:** Implementação de formulário de contato integrado com **Resend**, utilizando Server Actions para envio de e-mails e validação rigorosa com Zod.
+9. **Gestão de Conteúdo (Admin):** Interface administrativa avançada com diálogos interativos (`AlertDialog`/`EditCategoryDialog`) para edição em tempo real de categorias, garantindo uma experiência de gestão fluida e feedback imediato via `sonner`.
 
 ## 📝 Convenções de Desenvolvimento
 - **Server Components:** Utilizar por padrão para buscar dados e SEO (Metadata dinâmico).
 - **Client Components:** Apenas para interatividade (forms, sliders, botões de ação).
 - **fetchSiteSettings:** Sempre utilizar este utilitário para acessar as configurações globais, passando o cliente Supabase adequado (server ou client).
 - **Next.js 15+ Dynamic Routes:** Aguardar sempre `params` e `searchParams` antes do uso.
-- **Revalidação:** Utilizar `revalidatePath` em Server Actions para manter o cache atualizado (especialmente em `/` e `/admin/settings`).
+- **Revalidação:** Utilizar `revalidatePath` em Server Actions para manter o cache atualizado (especialmente em `/`, `/prompts` e `/admin/settings`).
 
 ## 🛡️ Validação de Dados
 - **Zod Schemas:** Centralizados em `lib/validations.ts` para garantir consistência entre Client e Server.

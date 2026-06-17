@@ -235,3 +235,74 @@ export async function toggleFavoriteAction(promptId: string) {
 
   return { success: true, isFavorite: !existing };
 }
+
+export async function getSubscriptionDetailsAction(sessionId: string) {
+  try {
+    if (!sessionId) {
+      throw new Error('Session ID is required');
+    }
+    const stripe = (await import('@/lib/stripe')).default;
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    
+    if (session.subscription) {
+      const sub = await stripe.subscriptions.retrieve(session.subscription as string);
+      const periodEnd = (sub as any).current_period_end || sub.items.data[0]?.current_period_end || 0;
+      
+      const userId = session.metadata?.userId || sub.metadata?.userId;
+      if (userId) {
+        const adminSupabase = createServiceRoleClient();
+        
+        // 1. Sync database row
+        await adminSupabase
+          .from('stripe_subscriptions')
+          .upsert(
+            {
+              user_id: userId,
+              stripe_customer_id: sub.customer as string,
+              stripe_subscription_id: sub.id,
+              status: sub.status,
+              current_period_end: new Date(periodEnd * 1000),
+              cancel_at_period_end: sub.cancel_at_period_end,
+              price_id: sub.items.data[0]?.price.id,
+              updated_at: new Date(),
+            },
+            { onConflict: 'user_id' }
+          );
+
+        // 2. Sync auth metadata
+        try {
+          const { data: userObject, error: getError } = await adminSupabase.auth.admin.getUserById(userId);
+          if (!getError && userObject?.user) {
+            const currentMetadata = userObject.user.user_metadata || {};
+            const isStatusActive = sub.status === 'active' || sub.status === 'trialing';
+            const newMetadata = {
+              ...currentMetadata,
+              subscription: isStatusActive ? 'active' : 'inactive',
+              plan: isStatusActive ? 'pro' : 'free'
+            };
+            await adminSupabase.auth.admin.updateUserById(userId, {
+              user_metadata: newMetadata
+            });
+            console.log(`[Success Page Sync] Updated user ${userId} auth metadata to plan: ${newMetadata.plan}, subscription: ${newMetadata.subscription}`);
+          }
+        } catch (err) {
+          console.error('[Success Page Sync] Error updating user auth metadata:', err);
+        }
+      }
+
+      return {
+        success: true,
+        subscription: {
+          id: sub.id,
+          status: sub.status,
+          current_period_end: periodEnd,
+        }
+      };
+    }
+    return { success: false, error: 'No subscription found for session' };
+  } catch (error: any) {
+    console.error('getSubscriptionDetailsAction error:', error);
+    return { success: false, error: error.message || 'Failed to retrieve subscription details' };
+  }
+}
+
