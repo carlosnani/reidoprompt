@@ -51,7 +51,7 @@ Este arquivo contém as definições fundamentais, arquitetura e diretrizes do p
 - `utils/`:
   - `image.ts`: Utilitário de **compressão de imagem** (Client-side, 1200px, 80% qualidade).
 - `data/`: Mock data.
-- `utils.ts`, `validations.ts`: Utilitários gerais e schemas de validação.
+- `utils.ts`, `validations.ts`: Utilitários gerais e schemas de validação centralizados com Zod.
 
 ## 📊 Modelos de Dados (Tipagens)
 
@@ -66,6 +66,7 @@ interface SiteSettings {
   default_meta_description: string;
   monthly_price: number;
   yearly_price: number;
+  allow_registration: boolean;
   updated_at?: string;
 }
 ```
@@ -92,16 +93,6 @@ interface Prompt {
   // Relacionamentos (via Joins)
   ai_model?: AiModel;
   prompt_categories?: { category: Category }[];
-}
-
-### DetailedPrompt
-Extensão do Prompt com dados processados para a página de detalhes.
-```typescript
-interface DetailedPrompt extends Prompt {
-  categories: Category[];
-  author?: string;
-  date?: string;
-  promptText?: string;
 }
 ```
 
@@ -161,6 +152,7 @@ CREATE TABLE public.site_settings (
     default_meta_description TEXT NOT NULL DEFAULT 'Encontre e copie os melhores prompts testados para Midjourney, DALL-E, ChatGPT e muito mais.',
     monthly_price NUMERIC(10, 2) NOT NULL DEFAULT 39.90,
     yearly_price NUMERIC(10, 2) NOT NULL DEFAULT 399.00,
+    allow_registration BOOLEAN NOT NULL DEFAULT true,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 ```
