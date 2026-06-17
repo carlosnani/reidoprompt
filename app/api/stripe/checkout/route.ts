@@ -1,15 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import stripe from '@/lib/stripe';
-import { createServiceRoleClient } from '@/lib/supabase/server';
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'http://localhost:3000';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}));
-    const { priceId, userId, email } = body as { priceId?: string; userId?: string; email?: string };
+    const { priceId } = body as { priceId?: string };
 
-    console.log('Checkout endpoint received body:', body);
+    const supabaseClient = await createClient();
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+
+    if (authError || !user) {
+      console.warn('Checkout attempted by unauthorized user or session error:', authError);
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const safeUserId = user.id;
+    const safeEmail = user.email!;
+
+    console.log('Checkout endpoint received request for user:', safeUserId);
 
     const requestedPriceId = typeof priceId === 'string' ? priceId : undefined;
     const fallbackPrice = process.env.STRIPE_PRICE_ID_MONTHLY || process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_MONTHLY;
@@ -28,21 +42,13 @@ export async function POST(request: NextRequest) {
       ? fallbackPrice
       : undefined;
 
-    const missingFields = [] as string[];
-    if (!finalPriceId) missingFields.push('priceId');
-    if (!userId) missingFields.push('userId');
-    if (!email) missingFields.push('email');
-
-    if (missingFields.length > 0) {
-      console.warn('Checkout missing fields:', missingFields, 'body:', body);
+    if (!finalPriceId) {
+      console.warn('Checkout missing finalPriceId');
       return NextResponse.json(
-        { error: `Missing required fields: ${missingFields.join(', ')}` },
+        { error: 'Missing required field: priceId' },
         { status: 400 }
       );
     }
-
-    const safeUserId = userId as string;
-    const safeEmail = email as string;
 
     if (!appUrl) {
       return NextResponse.json(
@@ -55,7 +61,7 @@ export async function POST(request: NextRequest) {
     const { data: subscription, error: selectError } = await supabase
       .from('stripe_subscriptions')
       .select('stripe_customer_id')
-      .eq('user_id', userId)
+      .eq('user_id', safeUserId)
       .single();
 
     const ignoredSelectErrors = ['PGRST116', 'PGRST205'];

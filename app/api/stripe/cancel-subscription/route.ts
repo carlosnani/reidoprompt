@@ -1,32 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server';
 import stripe from '@/lib/stripe';
-import { createServiceRoleClient } from '@/lib/supabase/server';
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { subscriptionId } = await request.json();
+    const supabaseClient = await createClient();
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
 
-    if (!subscriptionId) {
+    if (authError || !user) {
       return NextResponse.json(
-        { error: 'Subscription ID required' },
-        { status: 400 }
+        { error: 'Unauthorized' },
+        { status: 401 }
       );
     }
 
-    // Cancelar subscription ao final do período
-    const canceledSubscription = await stripe.subscriptions.update(subscriptionId, {
+    const supabaseAdmin = createServiceRoleClient();
+
+    // Query database for subscription details securely using the authenticated user.id
+    const { data: subscription, error: dbError } = await supabaseAdmin
+      .from('stripe_subscriptions')
+      .select('stripe_subscription_id')
+      .eq('user_id', user.id)
+      .single();
+
+    if (dbError || !subscription?.stripe_subscription_id) {
+      console.warn(`Cancel subscription: subscription not found for user ${user.id}:`, dbError);
+      return NextResponse.json(
+        { error: 'Active subscription not found' },
+        { status: 404 }
+      );
+    }
+
+    const safeSubscriptionId = subscription.stripe_subscription_id;
+
+    // Cancel subscription at the end of period
+    const canceledSubscription = await stripe.subscriptions.update(safeSubscriptionId, {
       cancel_at_period_end: true,
     });
 
-    const supabase = createServiceRoleClient();
-
-    // Atualizar registro no banco
-    await supabase
+    // Update DB record
+    await supabaseAdmin
       .from('stripe_subscriptions')
       .update({
         cancel_at_period_end: true,
       })
-      .eq('stripe_subscription_id', subscriptionId);
+      .eq('stripe_subscription_id', safeSubscriptionId);
 
     return NextResponse.json({
       message: 'Subscription will be canceled at the end of the billing period',

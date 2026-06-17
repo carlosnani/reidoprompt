@@ -281,9 +281,13 @@ export async function getSubscriptionDetailsAction(sessionId: string) {
               plan: isStatusActive ? 'pro' : 'free'
             };
             await adminSupabase.auth.admin.updateUserById(userId, {
-              user_metadata: newMetadata
+              user_metadata: newMetadata,
+              app_metadata: {
+                plan: isStatusActive ? 'pro' : 'free',
+                subscription: isStatusActive ? 'active' : 'inactive'
+              }
             });
-            console.log(`[Success Page Sync] Updated user ${userId} auth metadata to plan: ${newMetadata.plan}, subscription: ${newMetadata.subscription}`);
+            console.log(`[Success Page Sync] Updated user ${userId} auth metadata (user_metadata + app_metadata) to plan: ${newMetadata.plan}, subscription: ${newMetadata.subscription}`);
           }
         } catch (err) {
           console.error('[Success Page Sync] Error updating user auth metadata:', err);

@@ -18,7 +18,6 @@ export function isAdmin(user: any) {
     process.env.NEXT_PUBLIC_ADMIN_EMAIL || process.env.ADMIN_EMAIL;
 
   return (
-    user?.user_metadata?.role === "admin" ||
     user?.app_metadata?.role === "admin" ||
     (adminEmail && user?.email?.toLowerCase() === adminEmail?.toLowerCase())
   );
@@ -28,8 +27,8 @@ export function isAdmin(user: any) {
 export function isPro(user: any) {
   if (isAdmin(user)) return true;
   
-  const plan = (user?.user_metadata?.plan || user?.app_metadata?.plan || "").toLowerCase();
-  const subscription = (user?.user_metadata?.subscription || user?.app_metadata?.subscription || "").toLowerCase();
+  const plan = (user?.app_metadata?.plan || "").toLowerCase();
+  const subscription = (user?.app_metadata?.subscription || "").toLowerCase();
   
   return plan === "pro" || subscription === "active";
 }

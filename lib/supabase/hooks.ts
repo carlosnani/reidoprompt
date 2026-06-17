@@ -8,13 +8,10 @@ export function useUser() {
 
   const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || process.env.ADMIN_EMAIL;
   
-  const isAdmin = user?.user_metadata?.role === "admin" || 
-                  user?.app_metadata?.role === "admin" || 
+  const isAdmin = user?.app_metadata?.role === "admin" || 
                   (!!adminEmail && user?.email?.toLowerCase() === adminEmail.toLowerCase());
   
   const isPro = isAdmin || 
-                user?.user_metadata?.plan === "pro" || 
-                user?.user_metadata?.subscription === "active" ||
                 user?.app_metadata?.plan === "pro" || 
                 user?.app_metadata?.subscription === "active";
 

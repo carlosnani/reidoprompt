@@ -534,7 +534,11 @@ export async function toggleProAccess(userId: string, isCurrentlyPro: boolean) {
   };
 
   const { error: updateError } = await supabase.auth.admin.updateUserById(userId, {
-    user_metadata: newMetadata
+    user_metadata: newMetadata,
+    app_metadata: {
+      plan: isCurrentlyPro ? 'free' : 'pro',
+      subscription: isCurrentlyPro ? 'inactive' : 'active'
+    }
   });
 
   if (updateError) throw updateError;

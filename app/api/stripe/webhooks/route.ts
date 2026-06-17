@@ -62,9 +62,13 @@ async function handleSubscriptionEvent(
             plan: isStatusActive ? 'pro' : 'free'
           };
           await supabase.auth.admin.updateUserById(userId, {
-            user_metadata: newMetadata
+            user_metadata: newMetadata,
+            app_metadata: {
+              plan: isStatusActive ? 'pro' : 'free',
+              subscription: isStatusActive ? 'active' : 'inactive'
+            }
           });
-          console.log(`Updated user ${userId} auth metadata to plan: ${newMetadata.plan}, subscription: ${newMetadata.subscription}`);
+          console.log(`Updated user ${userId} auth metadata (user_metadata + app_metadata) to plan: ${newMetadata.plan}, subscription: ${newMetadata.subscription}`);
         } else {
           console.error(`Error fetching user ${userId} to update auth metadata:`, getError);
         }
@@ -99,9 +103,13 @@ async function handleSubscriptionEvent(
             plan: 'free'
           };
           await supabase.auth.admin.updateUserById(userId, {
-            user_metadata: newMetadata
+            user_metadata: newMetadata,
+            app_metadata: {
+              plan: 'free',
+              subscription: 'inactive'
+            }
           });
-          console.log(`Removed user ${userId} PRO access on subscription delete`);
+          console.log(`Removed user ${userId} PRO access on subscription delete (user_metadata + app_metadata)`);
         }
       } catch (err) {
         console.error('Error removing user auth metadata in webhook:', err);

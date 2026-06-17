@@ -45,7 +45,7 @@ export function Header() {
   };
 
   // Verificar se o usuário é admin pelo metadata ou role
-  const isAdmin = user?.user_metadata?.role === "admin" || user?.app_metadata?.role === "admin";
+  const isAdmin = user?.app_metadata?.role === "admin";
   const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Usuário";
   const platformName = settings?.platform_name || "O REI DO PROMPT";
 

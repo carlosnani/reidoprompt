@@ -12,7 +12,7 @@ export async function AuthButton() {
   const adminEmail =
     process.env.NEXT_PUBLIC_ADMIN_EMAIL || process.env.ADMIN_EMAIL;
   const isAdmin =
-    user?.user_metadata?.role === "admin" ||
+    user?.app_metadata?.role === "admin" ||
     (!!adminEmail && user?.email?.toLowerCase() === adminEmail.toLowerCase());
 
   return user ? (
