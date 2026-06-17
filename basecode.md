@@ -140,7 +140,12 @@ interface StripeSubscription {
 }
 ```
 
-## 🗄️ SQL Database Schema (Supabase)
+## 🗄️ SQL Database Schema & Security (Supabase)
+
+### Row Level Security (RLS)
+Todas as tabelas possuem RLS habilitado por padrão para garantir a integridade e segurança dos dados.
+- **Tabelas Públicas (`prompts`, `categories`, `ai_models`, `site_settings`):** Leitura pública permitida; escrita restrita ao `service_role` ou usuários com role `admin` em `app_metadata`.
+- **Tabelas de Usuário (`favorites`, `stripe_subscriptions`):** Acesso de leitura/escrita restrito ao próprio usuário (`auth.uid() = user_id`) ou `service_role`.
 
 ### Tabela `site_settings`
 ```sql
@@ -178,50 +183,6 @@ CREATE TABLE public.prompts (
 );
 ```
 
-### Tabela `ai_models`
-```sql
-CREATE TABLE public.ai_models (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name TEXT NOT NULL,
-    slug TEXT NOT NULL UNIQUE,
-    provider TEXT,
-    description TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-```
-
-### Tabela `categories`
-```sql
-CREATE TABLE public.categories (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name TEXT NOT NULL,
-    slug TEXT NOT NULL UNIQUE,
-    description TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-```
-
-### Tabela `prompt_categories` (N:N)
-```sql
-CREATE TABLE public.prompt_categories (
-    prompt_id UUID REFERENCES public.prompts(id) ON DELETE CASCADE,
-    category_id UUID REFERENCES public.categories(id) ON DELETE CASCADE,
-    PRIMARY KEY (prompt_id, category_id)
-);
-```
-
-### Tabela `favorites`
-```sql
-CREATE TABLE public.favorites (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-    prompt_id UUID REFERENCES public.prompts(id) ON DELETE CASCADE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    UNIQUE(user_id, prompt_id)
-);
-```
-
 ### Tabela `stripe_subscriptions`
 ```sql
 CREATE TABLE public.stripe_subscriptions (
@@ -240,14 +201,6 @@ CREATE TABLE public.stripe_subscriptions (
 );
 ```
 
-### Índices de Performance Recomendados
-```sql
-CREATE INDEX idx_prompts_created_at ON prompts (created_at DESC);
-CREATE INDEX idx_prompts_views ON prompts (views DESC);
-CREATE INDEX idx_prompts_likes ON prompts (likes DESC);
-CREATE INDEX idx_prompts_title_trgm ON prompts USING gin (title gin_trgm_ops); -- Requer pg_trgm
-```
-
 ## 🎨 Design System e UI/UX
 - **Tema:** Dark Mode (Next Themes).
 - **Estética:** Premium, glassmorphism, gradientes neon (foco em `green-neon`).
@@ -256,43 +209,28 @@ CREATE INDEX idx_prompts_title_trgm ON prompts USING gin (title gin_trgm_ops); -
 - **Galeria de Imagens (Multi-image):** Suporte a múltiplas imagens por prompt (armazenadas em `TEXT[]`), com visualizador dinâmico e thumbnails na página de detalhes.
 - **Estados de Carregamento:** Skeletons implementados via `loading.tsx` para transições suaves.
 - **Cores Admin:** Paleta específica para o dashboard admin (ex: `admin-surface`, `admin-border`).
-- **Navegação Categorizada:** Badges dinâmicas na Home e tags funcionais na página de detalhes que filtram a galeria automaticamente por categoria.
-- **Seleção Avançada:** Uso de `React Select` (`CategoryMultiSelect`) para seleção múltipla de categorias no painel administrativo, com suporte a valores pré-carregados na edição.
 
-## 🛠️ Funcionalidades de Backend e SEO
-1. **Server Actions:** Utilizadas para operações de escrita (admin e auth), incluindo `updateSiteSettingsAction` para configurações globais.
-2. **Otimização de Performance:**
-   - **Queries Seletivas:** Busca apenas colunas necessárias para reduzir o payload.
-   - **Memoização:** Uso do `cache` do React para evitar múltiplas chamadas ao Supabase no mesmo render.
-   - **Página Inicial Dinâmica:** Categorias em destaque na Home são buscadas em tempo real do banco de dados para garantir sugestões atualizadas.
-3. **Gestão Inteligente de Imagens:**
+## 🛠️ Funcionalidades de Backend e Segurança
+1. **Server Actions Protegidas:** Todas as operações de escrita (admin) utilizam `requireAdmin()`, que valida o papel do usuário no `app_metadata` (protegido contra edição via cliente).
+2. **Row Level Security (RLS):** Implementação rigorosa de políticas RLS para garantir que usuários não possam acessar ou modificar dados de terceiros.
+3. **Ofuscação de Conteúdo Premium:** O `prompt_text` de prompts premium é omitido no servidor para usuários sem assinatura ativa, garantindo proteção total contra vazamento de conteúdo via devtools ou interceptação de rede.
+4. **Sincronização de Auth & DB:** O status de assinatura (PRO) é sincronizado entre os metadados do Supabase Auth e a tabela `stripe_subscriptions` para garantir consistência e performance.
+5. **Busca Administrativa Segura:** Busca de usuários realizada no servidor via API Admin do Supabase, evitando exposição de dados sensíveis no cliente.
+6. **Gestão Inteligente de Imagens:**
    - **Compressão no Cliente:** Redução de tamanho antes do upload (máx 1200px, 80% JPEG).
    - **Sincronização de Storage:** Limpeza automática de arquivos órfãos no Storage durante `update` e `delete` de prompts.
-4. **Gestão de Usuários (Admin):**
-   - **Ações Administrativas:** Deleção física de usuários do Supabase Auth (`deleteUserAction`), controle de banimento por tempo determinado (`toggleUserBanAction`) e controle de acesso PRO (`toggleProAccessAction`).
-   - **UserActionButtons:** Painel interativo com diálogo de confirmação (Alert Dialog) para operações críticas de banimento.
-   - **Busca Administrativa:** Busca em tempo real de usuários por nome ou e-mail (`UserSearchInput`), realizada no servidor com suporte a paginação integrada e preservação dos parâmetros de busca na URL.
-5. **Controle de Acesso Seguro (Premium/PRO):**
-   - **Bypass de Cache no Servidor:** Para garantir que a visualização do prompt premium seja imediata após o upgrade para PRO, a página `app/prompt/[id]/page.tsx` no servidor utiliza o cliente administrativo do Supabase (`createServiceRoleClient`) para buscar o status atualizado do usuário diretamente no banco de dados, ignorando tokens JWT potencialmente obsoletos contidos no cookie.
-   - **Simplificação no Cliente:** O componente cliente `PromptText.tsx` baseia seu estado de bloqueio (`isRestricted`) unicamente no fato de o servidor ter fornecido ou não o `promptText`, já que a lógica de segurança e a omissão do texto real são processadas e aplicadas do lado do servidor.
-6. **Pagamentos e Assinaturas:**
-   - **Foco Exclusivo no Stripe:** Gestão de assinaturas e pagamentos recorrentes ou únicos via Stripe.
-   - **Sincronização de Webhooks:** Atualização automática do status PRO do usuário no banco de dados e metadados de autenticação após confirmação de pagamento.
+7. **Pagamentos e Assinaturas:**
+   - **Foco Exclusivo no Stripe:** Gestão de assinaturas e pagamentos recorrentes via Stripe.
    - **Gestão de Assinaturas:** Interface para cancelamento e troca de planos integrada ao Stripe Billing Portal.
-7. **SEO & Marketing Dinâmico:**
-   - **Metadata Dinâmico:** Títulos e descrições gerados em tempo real com base no banco e dados do prompt.
-   - **OpenGraph:** Social cards dinâmicos que utilizam as imagens reais dos prompts.
-   - **Sitemap & Robots:** Gerados dinamicamente para indexação total (`app/sitemap.ts` e `app/robots.ts`).
-8. **Comunicação e Suporte:** Implementação de formulário de contato integrado com **Resend**, utilizando Server Actions para envio de e-mails e validação rigorosa com Zod.
-9. **Gestão de Conteúdo (Admin):** Interface administrativa avançada com diálogos interativos (`AlertDialog`/`EditCategoryDialog`) para edição em tempo real de categorias, garantindo uma experiência de gestão fluida e feedback imediato via `sonner`.
+8. **Comunicação e Suporte:** Implementação de formulário de contato integrado com **Resend**, utilizando Server Actions para envio de e-mails com rate limiting por IP e validação rigorosa com Zod.
 
 ## 📝 Convenções de Desenvolvimento
+- **Segurança Primeiro:** Nunca confiar em metadados vindos do cliente para permissões críticas. Sempre validar no servidor usando `requireAdmin()` ou `requireUser()`.
 - **Server Components:** Utilizar por padrão para buscar dados e SEO (Metadata dinâmico).
 - **Client Components:** Apenas para interatividade (forms, sliders, botões de ação).
-- **fetchSiteSettings:** Sempre utilizar este utilitário para acessar as configurações globais, passando o cliente Supabase adequado (server ou client).
-- **Next.js 15+ Dynamic Routes:** Aguardar sempre `params` e `searchParams` antes do uso.
+- **fetchSiteSettings:** Sempre utilizar este utilitário para acessar as configurações globais.
 - **Revalidação:** Utilizar `revalidatePath` em Server Actions para manter o cache atualizado (especialmente em `/`, `/prompts` e `/admin/settings`).
 
 ## 🛡️ Validação de Dados
 - **Zod Schemas:** Centralizados em `lib/validations.ts` para garantir consistência entre Client e Server.
-- **Tratamento de Erros:** Ao utilizar `safeParse`, os erros de validação devem ser acessados via `validated.error.issues` (e não `.errors`), seguindo a tipagem oficial do Zod para evitar erros de compilação TypeScript.
+- **Tratamento de Erros:** Ao utilizar `safeParse`, os erros de validação devem ser acessados via `validated.error.issues`, seguindo a tipagem oficial do Zod.
