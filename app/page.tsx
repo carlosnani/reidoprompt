@@ -8,19 +8,38 @@ import { PremiumPrompts } from "@/components/PremiumPrompts";
 //import { Automations } from "@/components/Automations";
 import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
-import { getCategories } from "@/lib/supabase/queries";
-
-// This is the main page of the application, which serves as the landing page for users. It includes various sections such as the header, hero, prompt gallery, category grid, how it works, tools grid, premium prompts, and a call to action. The footer is also included at the bottom of the page.
+import { getCategories, getPrompts } from "@/lib/supabase/queries";
 
 export default async function Home() {
   const { data: categories } = await getCategories(10); // Fetch up to 10 categories for the hero
+  
+  let dbPrompts: any[] = [];
+  try {
+    const { data } = await getPrompts({ limit: 18, orderBy: 'recentes' });
+    dbPrompts = data || [];
+  } catch (err) {
+    console.error("Erro ao buscar prompts reais para o carrossel:", err);
+  }
+
+  const mappedPrompts = dbPrompts.map((p: any) => {
+    const mainCategory = p.prompt_categories && p.prompt_categories.length > 0
+      ? p.prompt_categories[0].category?.name
+      : undefined;
+
+    return {
+      id: p.id,
+      title: p.title || p.tag,
+      image: p.image,
+      category: mainCategory
+    };
+  });
 
   return (
     <>
       <Header />
       <main className="flex-1 bg-background">
         <HeroHome categories={categories} />
-        <PromptGallery />        
+        <PromptGallery initialPrompts={mappedPrompts} />        
         <CategoryGrid />
         {/* <Automations /> */}
         <HowItWorks />

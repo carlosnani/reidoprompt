@@ -25,9 +25,41 @@ const themes = [
   { name: "Fotografia", img: "/home/fotografia.jpg" },  
 ];
 
-export function PromptGallery() {
-  const row1 = themes.slice(0, 9);
-  const row2 = themes.slice(9);
+interface PromptGalleryProps {
+  initialPrompts?: {
+    id: string;
+    title: string;
+    image: string;
+    category?: string;
+  }[];
+}
+
+export function PromptGallery({ initialPrompts = [] }: PromptGalleryProps) {
+  // Mapear prompts reais obtidos do banco com tipos explícitos para aceitar IDs opcionais
+  const realThemes: { name: string; img: string; id?: string }[] = initialPrompts.map(p => ({
+    name: p.category || "Prompt",
+    img: p.image,
+    id: p.id
+  }));
+
+  // Completar a lista com dados mockados até termos 18 itens
+  const totalItemsNeeded = 18;
+  let finalThemes: { name: string; img: string; id?: string }[] = [...realThemes];
+  
+  if (finalThemes.length < totalItemsNeeded) {
+    const remainingCount = totalItemsNeeded - finalThemes.length;
+    const fallbackSlice = themes.slice(0, remainingCount).map(t => ({
+      name: t.name,
+      img: t.img,
+      id: undefined as string | undefined
+    }));
+    finalThemes = [...finalThemes, ...fallbackSlice];
+  } else {
+    finalThemes = finalThemes.slice(0, totalItemsNeeded);
+  }
+
+  const row1 = finalThemes.slice(0, 9);
+  const row2 = finalThemes.slice(9);
 
   return (
     <section className="py-24 bg-[#050505] overflow-hidden relative">
@@ -100,10 +132,12 @@ export function PromptGallery() {
   );
 }
 
-function GalleryCard({ theme }: { theme: typeof themes[0] }) {
+function GalleryCard({ theme }: { theme: { name: string; img: string; id?: string } }) {
+  const href = theme.id ? `/prompt/${theme.id}` : "/prompts";
+  
   return (
     <Link 
-      href="/prompts"
+      href={href}
       className="group relative block w-72 h-96 rounded-2xl overflow-hidden cursor-pointer shrink-0 border border-white/5 hover:border-green-neon/30 transition-all duration-700 bg-white/5"
     >
       <Image 
