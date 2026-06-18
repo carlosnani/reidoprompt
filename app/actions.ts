@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
+import stripe from '@/lib/stripe';
 import { revalidatePath } from 'next/cache';
 import { Resend } from 'resend';
 import { contactSchema } from '@/lib/validations';
@@ -307,6 +308,48 @@ export async function getSubscriptionDetailsAction(sessionId: string) {
   } catch (error: any) {
     console.error('getSubscriptionDetailsAction error:', error);
     return { success: false, error: error.message || 'Failed to retrieve subscription details' };
+  }
+}
+
+export async function getStripePricesAction() {
+  try {
+    const monthlyPriceId = process.env.STRIPE_PRICE_ID_MONTHLY || process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_MONTHLY;
+    const yearlyPriceId = process.env.STRIPE_PRICE_ID_YEARLY || process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_YEARLY;
+
+    let monthlyFormatted = "39,90";
+    let yearlyFormatted = "399,00";
+
+    if (monthlyPriceId) {
+      const price = await stripe.prices.retrieve(monthlyPriceId);
+      if (price.unit_amount) {
+        monthlyFormatted = (price.unit_amount / 100).toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      }
+    }
+
+    if (yearlyPriceId) {
+      const price = await stripe.prices.retrieve(yearlyPriceId);
+      if (price.unit_amount) {
+        yearlyFormatted = (price.unit_amount / 100).toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      }
+    }
+
+    return {
+      success: true,
+      monthly: monthlyFormatted,
+      yearly: yearlyFormatted,
+    };
+  } catch (err: any) {
+    console.error("Error retrieving Stripe prices:", err);
+    return {
+      success: false,
+      error: err.message || "Failed to retrieve prices",
+    };
   }
 }
 

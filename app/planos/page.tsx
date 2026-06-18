@@ -16,11 +16,28 @@ import Image from "next/image";
 
 export default function PricingPage() {
   const { user, loading } = useUser();
-  const [monthlyPrice, setMonthlyPrice] = useState<string>("4,99");
+  const [monthlyPrice, setMonthlyPrice] = useState<string>("39,90");
+  const [yearlyPrice, setYearlyPrice] = useState<string>("399,00");
+  
   const monthlyPriceId = process.env.STRIPE_PRICE_ID_MONTHLY || process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_MONTHLY || '';
+  const yearlyPriceId = process.env.STRIPE_PRICE_ID_YEARLY || process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_YEARLY || '';
 
   useEffect(() => {
     const loadSettings = async () => {
+      // Tenta buscar os preços reais do Stripe via Server Action
+      try {
+        const { getStripePricesAction } = await import("@/app/actions");
+        const res = await getStripePricesAction();
+        if (res.success && res.monthly && res.yearly) {
+          setMonthlyPrice(res.monthly);
+          setYearlyPrice(res.yearly);
+          return;
+        }
+      } catch (err) {
+        console.error("Erro ao carregar preços reais do Stripe via Action:", err);
+      }
+
+      // Fallback para Supabase settings
       const supabase = createClient();
       const settings = await fetchSiteSettings(supabase);
       if (settings?.monthly_price) {
@@ -29,9 +46,30 @@ export default function PricingPage() {
           maximumFractionDigits: 2,
         }));
       }
+      if (settings?.yearly_price) {
+        setYearlyPrice(settings.yearly_price.toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }));
+      }
     };
     loadSettings();
   }, []);
+
+  const getYearlyMonthlyEquivalent = () => {
+    try {
+      const numericVal = parseFloat(yearlyPrice.replace(/\./g, '').replace(',', '.'));
+      if (!isNaN(numericVal)) {
+        return (numericVal / 12).toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return "33,25";
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -94,7 +132,7 @@ export default function PricingPage() {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto items-stretch"
+            className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch"
           >
             {/* Free Plan */}
             <motion.div variants={itemVariants} className="h-full">
@@ -162,25 +200,19 @@ export default function PricingPage() {
               </Card>
             </motion.div>
 
-            {/* Premium Plan */}
+            {/* Pro Plan (Mensal) */}
             <motion.div variants={itemVariants} className="h-full">
-              <Card className="h-full flex flex-col border-green-neon/30 bg-[#0d0d0d] relative overflow-hidden shadow-[0_0_50px_-12px_rgba(72,255,36,0.3)] group">
-                {/* 🌟 Efeito de Brilho */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-green-neon/10 blur-[80px] rounded-full -mr-20 -mt-20 pointer-events-none" />
+              <Card className="h-full flex flex-col border-white/10 bg-white/5 backdrop-blur-xl relative overflow-hidden group hover:border-white/20 transition-all duration-300">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[80px] rounded-full pointer-events-none" />
                 
-                {/* 🏷️ Badge de Destaque */}
-                <div className="absolute top-0 left-0 w-full bg-green-neon text-black text-center text-[10px] font-black py-1.5 uppercase tracking-widest z-20">
-                  Melhor Custo-Benefício
-                </div>
-                
-                <CardHeader className="relative z-10 pt-10">
+                <CardHeader className="relative z-10">
                   <div className="flex justify-between items-start mb-2">
-                    <CardTitle className="text-2xl font-bold text-green-neon">Pro</CardTitle>
-                    <div className="p-2 rounded-lg bg-green-neon/10">
-                      <Sparkles className="w-5 h-5 text-green-neon" />
+                    <CardTitle className="text-2xl font-bold text-white">Pro</CardTitle>
+                    <div className="p-2 rounded-lg bg-white/5">
+                      <Sparkles className="w-5 h-5 text-blue-400" />
                     </div>
                   </div>
-                  <CardDescription className="text-gray-300 text-base">O arsenal completo para dominar a IA</CardDescription>
+                  <CardDescription className="text-gray-400 text-base">O arsenal completo para dominar a IA mensalmente</CardDescription>
                   <div className="mt-6 flex items-baseline gap-1">
                     <span className="text-5xl font-black text-white">R$ {monthlyPrice}</span>
                     <span className="text-gray-400 font-medium">/mês</span>
@@ -196,6 +228,81 @@ export default function PricingPage() {
                       "Busca Avançada e Filtros Premium",
                       "Novos Prompts Adicionados Semanalmente",
                       "Suporte Prioritário VIP"
+                    ].map((text, i) => (
+                      <li key={i} className="flex items-center gap-3 text-sm text-gray-300 font-medium">
+                        <div className="flex-shrink-0 w-5 h-5 rounded-full bg-white/10 flex items-center justify-center">
+                          <Check className="w-3 h-3 text-blue-400" />
+                        </div>
+                        {text}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+
+                <CardFooter className="relative z-10 pt-8 pb-8">
+                  {loading ? (
+                    <Button className="w-full h-14 bg-white/10 text-white text-lg font-bold rounded-xl" disabled>
+                      Carregando...
+                    </Button>
+                  ) : user ? (
+                    <StripeCheckoutButton
+                      priceId={monthlyPriceId}
+                      userId={user.id}
+                      email={user.email || ''}
+                      className="w-full h-14 bg-white/10 text-white hover:bg-white/20 text-lg font-bold rounded-xl transition-all group-hover:scale-[1.02] active:scale-95 border border-white/10"
+                    >
+                      Assinar Mensal
+                    </StripeCheckoutButton>
+                  ) : (
+                    <Link
+                      href="/auth/login?plan=pro"
+                      className="w-full h-14 inline-flex items-center justify-center bg-white/10 text-white hover:bg-white/20 text-lg font-bold rounded-xl transition-all group-hover:scale-[1.02] active:scale-95 border border-white/10"
+                    >
+                      Assinar Mensal
+                      <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  )}
+                </CardFooter>
+              </Card>
+            </motion.div>
+
+            {/* Ultra Plan (Anual) */}
+            <motion.div variants={itemVariants} className="h-full">
+              <Card className="h-full flex flex-col border-green-neon/30 bg-[#0d0d0d] relative overflow-hidden shadow-[0_0_50px_-12px_rgba(72,255,36,0.3)] group hover:border-green-neon/50 transition-all duration-300">
+                {/* 🌟 Efeito de Brilho */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-green-neon/10 blur-[80px] rounded-full -mr-20 -mt-20 pointer-events-none" />
+                
+                {/* 🏷️ Badge de Destaque */}
+                <div className="absolute top-0 left-0 w-full bg-green-neon text-black text-center text-[10px] font-black py-1.5 uppercase tracking-widest z-20">
+                  Melhor Economia (Economize +15%)
+                </div>
+                
+                <CardHeader className="relative z-10 pt-10">
+                  <div className="flex justify-between items-start mb-2">
+                    <CardTitle className="text-2xl font-bold text-green-neon">Ultra</CardTitle>
+                    <div className="p-2 rounded-lg bg-green-neon/10">
+                      <Sparkles className="w-5 h-5 text-green-neon" />
+                    </div>
+                  </div>
+                  <CardDescription className="text-gray-300 text-base">O plano definitivo para acesso anual sem interrupções</CardDescription>
+                  <div className="mt-6 flex flex-col gap-1">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-5xl font-black text-white">R$ {yearlyPrice}</span>
+                      <span className="text-gray-400 font-medium">/ano</span>
+                    </div>
+                    <span className="text-xs text-green-neon/80 font-semibold">Equivalente a R$ {getYearlyMonthlyEquivalent()}/mês</span>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="flex-1 relative z-10 pt-4">
+                  <ul className="space-y-4">
+                    {[
+                      "Tudo do Plano PRO Mensal",
+                      "Equivalente a 2 meses grátis",
+                      "Acesso prioritário a novos prompts e ferramentas",
+                      "Suporte VIP dedicado por WhatsApp",
+                      "Download ilimitado de favoritos",
+                      "Garantia de preço fixo anual"
                     ].map((text, i) => (
                       <li key={i} className="flex items-center gap-3 text-sm text-white font-medium">
                         <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-neon/20 flex items-center justify-center">
@@ -214,19 +321,19 @@ export default function PricingPage() {
                     </Button>
                   ) : user ? (
                     <StripeCheckoutButton
-                      priceId={monthlyPriceId}
+                      priceId={yearlyPriceId}
                       userId={user.id}
                       email={user.email || ''}
                       className="w-full h-14 bg-green-neon text-black hover:bg-green-neon/90 text-lg font-black rounded-xl transition-all shadow-[0_0_20px_rgba(72,255,36,0.4)] group-hover:scale-[1.02] active:scale-95"
                     >
-                      Assinar Agora
+                      Assinar Anual (Ultra)
                     </StripeCheckoutButton>
                   ) : (
                     <Link
-                      href="/auth/login?plan=pro"
+                      href={`/auth/login?plan=pro&priceId=${yearlyPriceId}`}
                       className="w-full h-14 inline-flex items-center justify-center bg-green-neon text-black hover:bg-green-neon/90 text-lg font-black rounded-xl transition-all shadow-[0_0_20px_rgba(72,255,36,0.4)] group-hover:scale-[1.02] active:scale-95"
                     >
-                      Assinar Agora
+                      Assinar Anual (Ultra)
                       <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   )}
