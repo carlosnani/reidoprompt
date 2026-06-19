@@ -34,41 +34,59 @@ async function handleSubscriptionEvent(
         break;
       }
 
-      await supabase
+      // Fetch full subscription from Stripe to ensure price/recurring info is available
+      let fullSub: Stripe.Subscription | null = null;
+      try {
+        fullSub = await stripe.subscriptions.retrieve(subscription.id as string, { expand: ['items.data.price'] });
+      } catch (err) {
+        console.warn('Could not retrieve full subscription from Stripe, falling back to event data:', err);
+        fullSub = subscription;
+      }
+
+      const priceId = fullSub?.items?.data?.[0]?.price?.id || (fullSub as any).items?.data?.[0]?.price || null;
+      const priceRecurringInterval = (fullSub?.items?.data?.[0]?.price as any)?.recurring?.interval || null;
+      const isYearly = priceRecurringInterval === 'year' || priceId === process.env.STRIPE_PRICE_ID_YEARLY || priceId === process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_YEARLY;
+
+      const { error: upsertError } = await supabase
         .from('stripe_subscriptions')
         .upsert(
           {
             user_id: userId,
-            stripe_customer_id: subscription.customer as string,
-            stripe_subscription_id: subscription.id,
-            status: subscription.status,
-            current_period_end: new Date(((subscription as any).current_period_end || subscription.items.data[0]?.current_period_end || 0) * 1000),
-            cancel_at_period_end: subscription.cancel_at_period_end,
-            price_id: subscription.items.data[0]?.price.id,
+            stripe_customer_id: fullSub?.customer as string,
+            stripe_subscription_id: fullSub?.id,
+            status: fullSub?.status,
+            current_period_end: new Date(((fullSub as any)?.current_period_end || (fullSub as any)?.items?.data[0]?.current_period_end || 0) * 1000),
+            cancel_at_period_end: (fullSub as any)?.cancel_at_period_end,
+            price_id: priceId,
             updated_at: new Date(),
           },
           { onConflict: 'user_id' }
         );
+
+      if (upsertError) {
+        console.error('[Webhook Sync] Error upserting stripe_subscriptions:', upsertError);
+      }
 
       // Atualizar metadados do usuário no Supabase Auth
       try {
         const { data: userObject, error: getError } = await supabase.auth.admin.getUserById(userId);
         if (!getError && userObject?.user) {
           const currentMetadata = userObject.user.user_metadata || {};
-          const isStatusActive = subscription.status === 'active' || subscription.status === 'trialing';
+          const isStatusActive = (fullSub?.status === 'active' || fullSub?.status === 'trialing');
+          const planToSet = isYearly ? 'ultra' : (isStatusActive ? 'pro' : 'free');
           const newMetadata = {
             ...currentMetadata,
             subscription: isStatusActive ? 'active' : 'inactive',
-            plan: isStatusActive ? 'pro' : 'free'
+            plan: planToSet
           };
           await supabase.auth.admin.updateUserById(userId, {
             user_metadata: newMetadata,
             app_metadata: {
-              plan: isStatusActive ? 'pro' : 'free',
+              plan: planToSet,
               subscription: isStatusActive ? 'active' : 'inactive'
             }
           });
-          console.log(`Updated user ${userId} auth metadata (user_metadata + app_metadata) to plan: ${newMetadata.plan}, subscription: ${newMetadata.subscription}`);
+          console.log(`Updated user ${userId} auth metadata (user_metadata + app_metadata) to plan: ${planToSet}, subscription: ${newMetadata.subscription}`);
         } else {
           console.error(`Error fetching user ${userId} to update auth metadata:`, getError);
         }

@@ -1,7 +1,7 @@
 -- Create stripe_subscriptions table
 create table public.stripe_subscriptions (
   id uuid default gen_random_uuid() primary key,
-  user_id uuid not null references auth.users(id) on delete cascade,
+  user_id uuid not null unique references auth.users(id) on delete cascade,
   stripe_customer_id text not null unique,
   stripe_subscription_id text,
   status text check (status in ('active', 'past_due', 'canceled', 'incomplete', 'incomplete_expired', 'trialing')),
@@ -14,7 +14,7 @@ create table public.stripe_subscriptions (
 );
 
 -- Create indices
-create index idx_stripe_subscriptions_user_id on public.stripe_subscriptions(user_id);
+create unique index idx_stripe_subscriptions_user_id on public.stripe_subscriptions(user_id);
 create index idx_stripe_subscriptions_stripe_customer_id on public.stripe_subscriptions(stripe_customer_id);
 create index idx_stripe_subscriptions_stripe_subscription_id on public.stripe_subscriptions(stripe_subscription_id);
 

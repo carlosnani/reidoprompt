@@ -254,7 +254,7 @@ export async function getSubscriptionDetailsAction(sessionId: string) {
         const adminSupabase = createServiceRoleClient();
         
         // 1. Sync database row
-        await adminSupabase
+        const { error: dbError } = await adminSupabase
           .from('stripe_subscriptions')
           .upsert(
             {
@@ -269,6 +269,10 @@ export async function getSubscriptionDetailsAction(sessionId: string) {
             },
             { onConflict: 'user_id' }
           );
+
+        if (dbError) {
+          console.error('[Success Page Sync] Error upserting stripe_subscriptions:', dbError);
+        }
 
         // 2. Sync auth metadata
         try {
