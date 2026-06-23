@@ -81,7 +81,7 @@ export function PromptText({ prompt }: PromptTextProps) {
   };
 
   return (
-    <div className="flex flex-col mt-8">
+    <div className="flex flex-col">
 
       <div className="flex items-center justify-between mb-8">
         {/* Copy Button */}
