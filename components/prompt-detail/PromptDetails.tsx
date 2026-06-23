@@ -47,7 +47,7 @@ export function PromptDetails({ prompt, isFavorited = false }: PromptDetailsProp
               Visualizações
             </span>
           </div>
-        </div>
+        </div>f
 
         {/* Right Side: Favorite Action */}
         <div className="flex items-center">

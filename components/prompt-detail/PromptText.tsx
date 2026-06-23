@@ -2,7 +2,7 @@
 
 import type { DetailedPrompt } from "@/lib/supabase/queries";
 import { Button } from "@/components/ui/button";
-import { Copy, Terminal, Lock } from "lucide-react";
+import { Copy, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -23,10 +23,10 @@ export function PromptText({ prompt }: PromptTextProps) {
 
   const handleCopy = async () => {
     if (isRestricted) {
-      const errorMsg = user 
-        ? "Este prompt é exclusivo para assinantes Pro." 
+      const errorMsg = user
+        ? "Este prompt é exclusivo para assinantes Pro."
         : "Você precisa estar logado para ver este prompt.";
-      
+
       const description = user
         ? "Assine o plano Pro para desbloquear este e milhares de outros prompts."
         : "Crie uma conta ou faça login para acessar este conteúdo.";
@@ -58,7 +58,7 @@ export function PromptText({ prompt }: PromptTextProps) {
         document.execCommand('copy');
         textArea.remove();
       }
-      
+
       // Toast de sucesso com ícone renderizado corretamente
       toast.success("Prompt copiado com sucesso!", {
         description: "Cole onde quiser e aproveite!",
@@ -82,6 +82,23 @@ export function PromptText({ prompt }: PromptTextProps) {
 
   return (
     <div className="flex flex-col mt-8">
+
+      <div className="flex items-center justify-between mb-8">
+        {/* Copy Button */}
+        <Button
+          onClick={handleCopy}
+          disabled={isRestricted}
+          className={cn(
+            "w-full sm:w-auto self-start mt-4 bg-white text-black hover:bg-white/90 font-bold h-12 px-8 rounded-xl transition-all shadow-md flex items-center justify-center gap-2",
+            isRestricted && "opacity-50 grayscale cursor-not-allowed"
+          )}
+        >
+
+          <Copy className="w-4 h-4" />
+          {isRestricted ? "Prompt Bloqueado" : "Copiar Prompt"}
+        </Button>
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2 text-lg font-bold">
@@ -118,8 +135,8 @@ export function PromptText({ prompt }: PromptTextProps) {
                 </div>
                 <h3 className="text-white font-bold text-lg">Conteúdo Bloqueado</h3>
                 <p className="text-gray-400 text-sm">
-                  {user 
-                    ? "Assine o plano Pro para visualizar este prompt e elevar o nível das suas criações." 
+                  {user
+                    ? "Assine o plano Pro para visualizar este prompt e elevar o nível das suas criações."
                     : "Faça login ou crie uma conta para visualizar este prompt e acessar nossa galeria completa."}
                 </p>
                 <Link href={user ? "/planos" : "/auth/login"}>
@@ -132,19 +149,6 @@ export function PromptText({ prompt }: PromptTextProps) {
           )}
         </div>
       </div>
-
-      {/* Copy Button */}
-      <Button
-        onClick={handleCopy}
-        disabled={isRestricted}
-        className={cn(
-          "w-full sm:w-auto self-start mt-4 bg-white text-black hover:bg-white/90 font-bold h-12 px-8 rounded-xl transition-all shadow-md flex items-center justify-center gap-2",
-          isRestricted && "opacity-50 grayscale cursor-not-allowed"
-        )}
-      >
-        <Copy className="w-4 h-4" />
-        {isRestricted ? "Prompt Bloqueado" : "Copiar Prompt"}
-      </Button>
     </div>
   );
 }
