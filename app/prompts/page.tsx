@@ -3,7 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { GalleryHeader } from "@/components/prompts/GalleryHeader";
 import { GalleryGrid } from "@/components/prompts/GalleryGrid";
-import { GalleryPagination } from "@/components/prompts/GalleryPagination";
+// import { GalleryPagination } from "@/components/prompts/GalleryPagination";
 import { getPrompts, getCategories, getUserFavorites } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
 import { isAdmin } from "@/lib/supabase/auth";
@@ -31,7 +31,7 @@ export default async function PromptsGalleryPage({
     page?: string; 
     search?: string; 
     category?: string; 
-    sort?: string;
+    sort?: "recentes" | "populares" | "favoritos";
   }> 
 }) {
   const params = await searchParams;
@@ -39,9 +39,9 @@ export default async function PromptsGalleryPage({
   const currentPage = Number(params.page) || 1;
   const search = params.search || "";
   const categoryId = params.category || undefined;
-  const sort = (params.sort as any) || "recentes";
+  const sort = params.sort === "populares" || params.sort === "favoritos" ? params.sort : "recentes";
   
-  const limit = 12;
+  const limit = 48;
   const offset = (currentPage - 1) * limit;
 
   const { data: prompts, count } = await getPrompts({
