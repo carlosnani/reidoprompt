@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useState, useEffect, useTransition } from "react";
+import { useState, useTransition } from "react";
 import type { Category } from "@/lib/supabase/queries";
 import { cn } from "@/lib/utils";
 
@@ -53,10 +53,10 @@ export function GalleryHeader({ categories }: GalleryHeaderProps) {
     updateFilters({ search: searchValue });
   };
 
-  const clearFilters = () => {
-    setSearchValue("");
-    router.push(pathname);
-  };
+  // const clearFilters = () => {
+  //   setSearchValue("");
+  //   router.push(pathname);
+  // };
 
   return (
     <div className="flex flex-col gap-8 mb-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
@@ -66,7 +66,7 @@ export function GalleryHeader({ categories }: GalleryHeaderProps) {
         <h1 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
           Prompts de IA – <br className="hidden md:block" />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-neon to-green-500">
-            Coleção Cinematográfica & Identidade
+            Os Melhores Prompts da Web
           </span>
         </h1>
 
