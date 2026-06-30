@@ -120,9 +120,9 @@ export function HeroHome({ categories = [] }: { categories?: Category[] }) {
 
           {/* Title */}
           <h1 className="text-5xl md:text-8xl font-black tracking-tighter leading-[0.9] text-white">
-            Domine a <br /> 
+            Domine a Geração<br /> 
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-neon via-green-400 to-green-dark drop-shadow-[0_0_30px_rgba(72,255,36,0.3)]">
-              Inteligência Artificial
+             de Imagens com IA
             </span>
           </h1>
 
@@ -150,7 +150,7 @@ export function HeroHome({ categories = [] }: { categories?: Category[] }) {
               type="text" 
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              placeholder="O que você deseja criar hoje? (ex: SEO para blog)" 
+              placeholder="O que você deseja criar hoje? (ex: 3D, Cyberpunk, Paisagem, etc.)" 
               className="border-0 bg-transparent text-lg focus-visible:ring-0 focus-visible:ring-offset-0 px-4 h-14 text-white placeholder:text-gray-500"
             />
             <Button 

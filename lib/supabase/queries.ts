@@ -328,6 +328,66 @@ export const getCategories = cache(async (limit = 100, offset = 0) => {
   return { data: data as Category[], count: count || 0 };
 });
 
+export interface CategoryWithCount extends Category {
+  prompt_count: number;
+  last_image?: string | null;
+}
+
+/**
+ * Busca categorias com contagem de prompts associados
+ * Ideal para exibir em grids na página inicial
+ */
+export const getCategoriesWithCount = cache(async (limit = 8) => {
+  const supabase = await createClient();
+
+  // Busca primeiro as categorias
+  const { data: categories, error: catError } = await supabase
+    .from('categories')
+    .select('id, name, slug, description')
+    .order('name')
+    .limit(limit);
+
+  if (catError || !categories) {
+    console.error('Error fetching categories:', catError);
+    return [];
+  }
+
+  // Para cada categoria, conta os prompts associados e busca a última imagem cadastrada
+  const categoriesWithCount = await Promise.all(
+    categories.map(async (cat) => {
+      const { count, error: countError } = await supabase
+        .from('prompt_categories')
+        .select('*', { count: 'exact', head: true })
+        .eq('category_id', cat.id);
+
+      // Busca a imagem do último prompt cadastrado nesta categoria
+      const { data: latestPrompt, error: promptError } = await supabase
+        .from('prompts')
+        .select('image, prompt_categories!inner(category_id)')
+        .eq('prompt_categories.category_id', cat.id)
+        .not('image', 'is', null)
+        .neq('image', '')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (promptError) {
+        console.error(`Error fetching latest prompt image for category ${cat.name}:`, promptError);
+      }
+
+      const last_image = latestPrompt ? (latestPrompt as any).image : null;
+
+      return {
+        ...cat,
+        prompt_count: !countError && count ? count : 0,
+        last_image
+      } as CategoryWithCount;
+    })
+  );
+
+  return categoriesWithCount;
+});
+
 export async function createCategory(category: Omit<Category, 'id'>) {
   let supabase;
   try {
