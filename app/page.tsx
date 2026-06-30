@@ -12,7 +12,7 @@ import { getCategories, getPrompts } from "@/lib/supabase/queries";
 
 export default async function Home() {
   const { data: categories } = await getCategories(10); // Fetch up to 10 categories for the hero
-  
+
   let dbPrompts: any[] = [];
   try {
     const { data } = await getPrompts({ limit: 18, orderBy: 'recentes' });
@@ -39,11 +39,11 @@ export default async function Home() {
       <Header />
       <main className="flex-1 bg-background">
         <HeroHome categories={categories} />
-        <PromptGallery initialPrompts={mappedPrompts} />        
+        <PromptGallery initialPrompts={mappedPrompts} />
         <CategoryGrid />
         {/* <Automations /> */}
         <HowItWorks />
-        <ToolsGrid />
+        {/* <ToolsGrid /> */}
         <PremiumPrompts />
         <CTA />
       </main>

@@ -352,38 +352,59 @@ export const getCategoriesWithCount = cache(async (limit = 8) => {
     return [];
   }
 
-  // Para cada categoria, conta os prompts associados e busca a última imagem cadastrada
-  const categoriesWithCount = await Promise.all(
+  // Para cada categoria, conta os prompts associados e busca as últimas imagens cadastradas (limite 10)
+  const categoriesWithRawData = await Promise.all(
     categories.map(async (cat) => {
       const { count, error: countError } = await supabase
         .from('prompt_categories')
         .select('*', { count: 'exact', head: true })
         .eq('category_id', cat.id);
 
-      // Busca a imagem do último prompt cadastrado nesta categoria
-      const { data: latestPrompt, error: promptError } = await supabase
+      // Busca as imagens dos últimos prompts cadastrados nesta categoria para deduping
+      const { data: promptsData, error: promptError } = await supabase
         .from('prompts')
         .select('image, prompt_categories!inner(category_id)')
         .eq('prompt_categories.category_id', cat.id)
         .not('image', 'is', null)
         .neq('image', '')
         .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .limit(10);
 
       if (promptError) {
-        console.error(`Error fetching latest prompt image for category ${cat.name}:`, promptError);
+        console.error(`Error fetching latest prompt images for category ${cat.name}:`, promptError);
       }
 
-      const last_image = latestPrompt ? (latestPrompt as any).image : null;
+      const images = promptsData
+        ? (promptsData as unknown as { image: string }[]).map((p) => p.image)
+        : [];
 
       return {
-        ...cat,
+        cat,
         prompt_count: !countError && count ? count : 0,
-        last_image
-      } as CategoryWithCount;
+        images
+      };
     })
   );
+
+  // Garante que cada imagem seja usada em no máximo uma categoria no grid
+  const usedImages = new Set<string>();
+  const categoriesWithCount = categoriesWithRawData.map(({ cat, prompt_count, images }) => {
+    let last_image: string | null = null;
+    
+    for (const img of images) {
+      if (!usedImages.has(img)) {
+        last_image = img;
+        usedImages.add(img);
+        break;
+      }
+    }
+
+    return {
+      ...cat,
+      prompt_count,
+      last_image
+    } as CategoryWithCount;
+  });
 
   return categoriesWithCount;
 });
