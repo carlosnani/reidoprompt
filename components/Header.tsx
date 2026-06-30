@@ -105,6 +105,12 @@ export function Header() {
               Admin Dashboard
             </Link>
           )}
+          <Link
+            href="/sobre"
+            className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white rounded-full hover:bg-white/5 transition-colors"
+          >
+            Sobre Nós
+          </Link>
         </nav>
 
         {/* Mobile menu button */}
@@ -194,6 +200,13 @@ export function Header() {
                 Admin Dashboard
               </Link>
             )}
+            <Link
+              href="/sobre"
+              onClick={closeMobileMenu}
+              className="block rounded-xl px-4 py-3 text-base font-medium text-gray-200 hover:bg-white/5 transition-colors"
+            >
+              Sobre Nós
+            </Link>
 
             <div className="border-t border-white/10 pt-4">
               {isPending ? (
