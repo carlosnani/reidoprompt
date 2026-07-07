@@ -10,11 +10,15 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Eye, EyeOff, ArrowLeft, Loader2, AlertCircle, LogIn } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
-  visible: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 0.4, delay: i * 0.08, ease: "easeOut" as any } }),
+  visible: (i = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, delay: i * 0.08, ease: "easeOut" },
+  }),
 };
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
