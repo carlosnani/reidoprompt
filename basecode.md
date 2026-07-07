@@ -104,6 +104,22 @@ interface StripeSubscription {
 }
 ```
 
+### Category & CategoryWithCount
+```typescript
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+}
+
+interface CategoryWithCount extends Category {
+  prompt_count: number;
+  last_image?: string | null;
+}
+```
+
+
 ## 🗄️ SQL Database Schema & Security (Supabase)
 
 ### Row Level Security (RLS)
@@ -129,6 +145,8 @@ Todas as tabelas possuem RLS habilitado. As políticas são configuradas para:
 
 ## 🎨 Design System e UI/UX
 - **Aesthetic:** Dark Premium com glassmorphism e acentos neon (`green-neon`).
+- **Zoom de Imagem de Categoria:** Imagens de fundo das categorias possuem escala padrão de 20% (`scale-[1.2]`) para esconder imperfeições de bordas nas gerações de IA, com zoom adicional no hover (`group-hover:scale-[1.25]`).
+- **Navegação nas Categorias:** Os cards de categoria na Home funcionam como links diretos para a galeria filtrada (`/prompts?category={id}`).
 - **Feedback:** Notificações instantâneas via `sonner` integradas às Server Actions.
 - **Loading:** Experiência fluida com Skeletons e `loading.tsx` para todas as rotas dinâmicas.
 - **Responsividade:** Interface adaptada para Mobile, Tablet e Desktop com foco em usabilidade.
@@ -136,6 +154,7 @@ Todas as tabelas possuem RLS habilitado. As políticas são configuradas para:
 ## 📝 Convenções de Desenvolvimento
 - **Segurança em Primeiro Lugar:** Use sempre `requireAdmin()` ou `requireUser()` em Server Actions.
 - **Queries Eficientes:** Busque apenas as colunas necessárias e utilize `memoization` (React cache) para queries repetitivas.
+- **Desduplicação de Imagens de Categorias:** Para evitar repetição visual na Home, o método `getCategoriesWithCount` busca as 10 últimas imagens de cada categoria e escolhe a primeira não utilizada pelas categorias anteriores.
 - **Componentização:** Mantenha componentes UI puros em `components/ui` e componentes de negócio organizados por domínio.
 - **Revalidação:** Acione `revalidatePath` após qualquer operação de mutação para manter o cache do Next.js sincronizado.
 
