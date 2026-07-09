@@ -3,25 +3,24 @@ import { HeroHome } from "@/components/herohome";
 import { PromptGallery } from "@/components/PromptGallery";
 import { CategoryGrid } from "@/components/CategoryGrid";
 import { HowItWorks } from "@/components/HowItWorks";
-import { ToolsGrid } from "@/components/ToolsGrid";
 import { PremiumPrompts } from "@/components/PremiumPrompts";
 //import { Automations } from "@/components/Automations";
 import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
-import { getCategories, getPrompts } from "@/lib/supabase/queries";
+import { getCategories, getPrompts, type Prompt } from "@/lib/supabase/queries";
 
 export default async function Home() {
   const { data: categories } = await getCategories(10); // Fetch up to 10 categories for the hero
 
-  let dbPrompts: any[] = [];
+  let dbPrompts: Prompt[] = [];
   try {
-    const { data } = await getPrompts({ limit: 18, orderBy: 'recentes' });
+    const { data } = await getPrompts({ limit: 18, orderBy: "recentes" });
     dbPrompts = data || [];
   } catch (err) {
     console.error("Erro ao buscar prompts reais para o carrossel:", err);
   }
 
-  const mappedPrompts = dbPrompts.map((p: any) => {
+  const mappedPrompts = dbPrompts.map((p) => {
     const mainCategory = p.prompt_categories && p.prompt_categories.length > 0
       ? p.prompt_categories[0].category?.name
       : undefined;
@@ -30,7 +29,7 @@ export default async function Home() {
       id: p.id,
       title: p.title || p.tag,
       image: p.image,
-      category: mainCategory
+      category: mainCategory,
     };
   });
 
