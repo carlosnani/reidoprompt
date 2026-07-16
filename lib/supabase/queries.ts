@@ -131,12 +131,7 @@ export async function createPrompt(
   prompt: Omit<Prompt, 'id' | 'created_at' | 'updated_at' | 'ai_model' | 'prompt_categories'>,
   categoryIds?: string[]
 ) {
-  let supabase;
-  try {
-    supabase = createServiceRoleClient();
-  } catch {
-    supabase = await createClient();
-  }
+  const supabase = createServiceRoleClient();
 
   console.log('createPrompt: inserting prompt payload:', {
     ...prompt,
@@ -179,12 +174,7 @@ export async function updatePrompt(
   updates: Partial<Omit<Prompt, 'ai_model' | 'prompt_categories'>>,
   categoryIds?: string[]
 ) {
-  let supabase;
-  try {
-    supabase = createServiceRoleClient();
-  } catch {
-    supabase = await createClient();
-  }
+  const supabase = createServiceRoleClient();
 
   // 1. Otimização: Se houver atualização de imagens, limpar as antigas do Storage
   if (updates.image !== undefined || updates.images !== undefined) {
@@ -261,12 +251,7 @@ export async function updatePrompt(
 }
 
 export async function deletePrompt(id: string) {
-  let supabase;
-  try {
-    supabase = createServiceRoleClient();
-  } catch {
-    supabase = await createClient();
-  }
+  const supabase = createServiceRoleClient();
 
   // 1. Buscar o prompt para pegar as URLs das imagens
   const { data: prompt } = await supabase
@@ -410,12 +395,7 @@ export const getCategoriesWithCount = cache(async (limit = 8) => {
 });
 
 export async function createCategory(category: Omit<Category, 'id'>) {
-  let supabase;
-  try {
-    supabase = createServiceRoleClient();
-  } catch {
-    supabase = await createClient();
-  }
+  const supabase = createServiceRoleClient();
 
   const { data, error } = await supabase
     .from('categories')
@@ -428,12 +408,7 @@ export async function createCategory(category: Omit<Category, 'id'>) {
 }
 
 export async function updateCategory(id: string, updates: Partial<Category>) {
-  let supabase;
-  try {
-    supabase = createServiceRoleClient();
-  } catch {
-    supabase = await createClient();
-  }
+  const supabase = createServiceRoleClient();
 
   const { data, error } = await supabase
     .from('categories')
@@ -447,12 +422,7 @@ export async function updateCategory(id: string, updates: Partial<Category>) {
 }
 
 export async function deleteCategory(id: string) {
-  let supabase;
-  try {
-    supabase = createServiceRoleClient();
-  } catch {
-    supabase = await createClient();
-  }
+  const supabase = createServiceRoleClient();
 
   // Delete prompt_categories associations first
   await supabase.from('prompt_categories').delete().eq('category_id', id);
@@ -481,12 +451,7 @@ export const getAiModels = cache(async (limit = 100, offset = 0) => {
 });
 
 export async function createAiModel(model: Omit<AiModel, 'id' | 'created_at' | 'updated_at'>) {
-  let supabase;
-  try {
-    supabase = createServiceRoleClient();
-  } catch {
-    supabase = await createClient();
-  }
+  const supabase = createServiceRoleClient();
 
   const { data, error } = await supabase
     .from('ai_models')
@@ -499,12 +464,7 @@ export async function createAiModel(model: Omit<AiModel, 'id' | 'created_at' | '
 }
 
 export async function updateAiModel(id: string, updates: Partial<AiModel>) {
-  let supabase;
-  try {
-    supabase = createServiceRoleClient();
-  } catch {
-    supabase = await createClient();
-  }
+  const supabase = createServiceRoleClient();
 
   const { data, error } = await supabase
     .from('ai_models')
@@ -518,12 +478,7 @@ export async function updateAiModel(id: string, updates: Partial<AiModel>) {
 }
 
 export async function deleteAiModel(id: string) {
-  let supabase;
-  try {
-    supabase = createServiceRoleClient();
-  } catch {
-    supabase = await createClient();
-  }
+  const supabase = createServiceRoleClient();
 
   const { error } = await supabase
     .from('ai_models')
@@ -643,12 +598,7 @@ export async function toggleUserBan(userId: string, isCurrentlyBanned: boolean) 
 // ==================== FAVORITES ====================
 
 export async function getUserFavorites(userId: string) {
-  let supabase;
-  try {
-    supabase = createServiceRoleClient();
-  } catch {
-    supabase = await createClient();
-  }
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from('favorites')
@@ -663,12 +613,7 @@ export async function getUserFavorites(userId: string) {
 }
 
 export async function addFavorite(userId: string, promptId: string) {
-  let supabase;
-  try {
-    supabase = createServiceRoleClient();
-  } catch {
-    supabase = await createClient();
-  }
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from('favorites')
@@ -679,12 +624,7 @@ export async function addFavorite(userId: string, promptId: string) {
 }
 
 export async function removeFavorite(userId: string, promptId: string) {
-  let supabase;
-  try {
-    supabase = createServiceRoleClient();
-  } catch {
-    supabase = await createClient();
-  }
+  const supabase = await createClient();
 
   const { error } = await supabase
     .from('favorites')
@@ -696,12 +636,7 @@ export async function removeFavorite(userId: string, promptId: string) {
 }
 
 export async function isFavorite(userId: string, promptId: string) {
-  let supabase;
-  try {
-    supabase = createServiceRoleClient();
-  } catch {
-    supabase = await createClient();
-  }
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from('favorites')
@@ -715,12 +650,7 @@ export async function isFavorite(userId: string, promptId: string) {
 }
 
 export async function incrementPromptViews(id: string) {
-  let supabase;
-  try {
-    supabase = createServiceRoleClient();
-  } catch {
-    supabase = await createClient();
-  }
+  const supabase = await createClient();
 
   // Tenta usar a função RPC do Supabase para incremento atômico
   const { error: rpcError } = await supabase.rpc('increment_prompt_views', { prompt_id: id });

@@ -35,7 +35,7 @@ export default function ContaPage() {
 
 async function ContaContent() {
   const user = await requireUser();
-  const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || process.env.ADMIN_EMAIL;
+  const adminEmail = process.env.ADMIN_EMAIL;
   const isAdmin = user.user_metadata?.role === "admin" || (!!adminEmail && user.email?.toLowerCase() === adminEmail.toLowerCase());
 
   const supabase = await createClient();
@@ -261,24 +261,6 @@ async function ContaContent() {
         </div>
       </div>
 
-      {/* Global Custom Scrollbar Styles */}
-      <style dangerouslySetInnerHTML={{
-        __html: `
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.02);
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(72, 255, 36, 0.5);
-        }
-      `}} />
     </div>
   );
 }

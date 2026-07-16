@@ -50,7 +50,8 @@ export function RegisterForm() {
     });
 
     if (authError) {
-      setError(authError.message || "Erro ao criar conta.");
+      // Mensagem genérica para não revelar detalhes internos
+      setError("Não foi possível criar a conta. Verifique os dados e tente novamente.");
       setLoading(false);
       return;
     }

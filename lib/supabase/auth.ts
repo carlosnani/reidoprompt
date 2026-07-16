@@ -14,13 +14,18 @@ export async function requireUser() {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isAdmin(user: any) {
-  const adminEmail =
-    process.env.NEXT_PUBLIC_ADMIN_EMAIL || process.env.ADMIN_EMAIL;
+  // Check app_metadata first (set via auth admin API)
+  if (user?.app_metadata?.role === "admin") return true;
 
-  return (
-    user?.app_metadata?.role === "admin" ||
-    (adminEmail && user?.email?.toLowerCase() === adminEmail?.toLowerCase())
-  );
+  // Fallback: check email against server-side ADMIN_EMAIL
+  // Note: only checks process.env.ADMIN_EMAIL (NOT NEXT_PUBLIC_ADMIN_EMAIL)
+  // to avoid exposing admin email to the client bundle
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (adminEmail && user?.email?.toLowerCase() === adminEmail?.toLowerCase()) {
+    return true;
+  }
+
+  return false;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

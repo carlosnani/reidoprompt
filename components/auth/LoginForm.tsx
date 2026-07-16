@@ -37,7 +37,8 @@ export function LoginForm() {
     });
 
     if (authError) {
-      setError(authError.message || "Email ou senha incorretos.");
+      // Mensagem genérica para não revelar se o email existe ou não
+      setError("Email ou senha incorretos.");
       setLoading(false);
       return;
     }
